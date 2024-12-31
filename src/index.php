@@ -14,43 +14,32 @@ if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
+add_action('init', 'register_geo_target_assets');
 
-// WIP: Cannot get the block to show up in Gutenberg
+function register_geo_target_assets()
+{
+    wp_register_script(
+        'geo-target-frontend',
+        plugins_url('js/geo-content.js', __FILE__),
+        ['wp-api-fetch'],
+        '1.0.0',
+        true
+    );
 
-// function create_location_block()
-// {
-//     register_block_type(__DIR__ . '../build/blocks/location');
-// }
-// add_action('init', 'create_location_block');
+    wp_localize_script('geo-target-frontend', 'geoUtilsData', [
+        'endpoint' => rest_url('geoutils/v1/location'),
+        'nonce' => wp_create_nonce('wp_rest')
+    ]);
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_geo_target_scripts');
+
+function enqueue_geo_target_scripts()
+{
+    wp_enqueue_script('geo-target-frontend');
+}
 
 
-// add_action('wp_enqueue_scripts', function () {
-//     wp_enqueue_script('geoutils-location-block', plugin_dir_url(__FILE__) . 'blocks/location.js', array('jquery'), '1.0', true);
-//     wp_localize_script('geoutils-location-block', 'geoUtilsData', array(
-//         'nonce' => wp_create_nonce('wp_rest'),
-//         'apiUrl' => rest_url('geoutils/v1/location')
-//     ));
-// });
-
-
-// add_action('enqueue_block_editor_assets', function () {
-//     // Enqueue block script
-//     wp_enqueue_script(
-//         'geoutils-block-editor', // Script handle
-//         plugin_dir_url(__FILE__) . '/blocks/location.js', // Path to your block.js file
-//         array('wp-blocks', 'wp-element', 'wp-editor'), // WordPress dependencies
-//         '1.0', // Version
-//         true // Load in footer
-//     );
-
-//     // Enqueue editor styles for the block (optional)
-//     wp_enqueue_style(
-//         'geoutils-block-editor-style',
-//         plugin_dir_url(__FILE__) . 'blocks/location.css', // Path to your block's CSS file
-//         array(),
-//         '1.0'
-//     );
-// });
 
 require_once("blocks/setup.php");
 require_once("api/location.php");

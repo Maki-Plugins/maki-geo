@@ -1,55 +1,109 @@
 import { registerBlockType } from "@wordpress/blocks";
-import { useState } from "@wordpress/element";
+import {
+  InnerBlocks,
+  InspectorControls,
+  useBlockProps,
+} from "@wordpress/block-editor";
+import {
+  PanelBody,
+  TextControl,
+  SelectControl,
+  Button,
+} from "@wordpress/components";
 import metadata from "./block.json";
 
 registerBlockType(metadata.name, {
-  edit: () => {
-    const [location, setLocation] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  edit: ({ attributes, setAttributes }) => {
+    const { geoRules = [] } = attributes;
+    const blockProps = useBlockProps({
+      style: {
+        border: "2px dashed #ccc",
+        padding: "20px",
+        backgroundColor: "#f9f9f9",
+        minHeight: "100px",
+        position: "relative",
+      },
+    });
 
-    const geoUtilsData = window.geoUtilsData || {};
+    const addGeoRule = () => {
+      setAttributes({
+        geoRules: [...geoRules, { country: "", action: "show" }],
+      });
+    };
 
-    const fetchLocation = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(geoUtilsData.endpoint, {
-          method: "GET",
-          headers: {
-            "X-WP-Nonce": geoUtilsData.nonce,
-          },
-        });
+    const updateGeoRule = (index, field, value) => {
+      const newRules = [...geoRules];
+      newRules[index] = { ...newRules[index], [field]: value };
+      setAttributes({ geoRules: newRules });
+    };
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch location data");
-        }
-
-        const data = await response.json();
-        setLocation(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    const removeGeoRule = (index) => {
+      setAttributes({
+        geoRules: geoRules.filter((_, i) => i !== index),
+      });
     };
 
     return (
-      <div>
-        <h3>User Location Block</h3>
-        <button onClick={fetchLocation} disabled={loading}>
-          {loading ? "Loading..." : "Get Location"}
-        </button>
-        {error && <p style={{ color: "red" }}>Error: {error}</p>}
-        {location && (
-          <div>
-            <p>City: {location.city}</p>
-            <p>Country: {location.country}</p>
+      <>
+        <InspectorControls>
+          <PanelBody title="Geo Targeting Rules">
+            {geoRules.map((rule, index) => (
+              <div key={index} style={{ marginBottom: "20px" }}>
+                <TextControl
+                  label="Country"
+                  value={rule.country}
+                  onChange={(value) => updateGeoRule(index, "country", value)}
+                />
+                <SelectControl
+                  label="Action"
+                  value={rule.action}
+                  options={[
+                    { label: "Show", value: "show" },
+                    { label: "Hide", value: "hide" },
+                  ]}
+                  onChange={(value) => updateGeoRule(index, "action", value)}
+                />
+                <Button isDestructive onClick={() => removeGeoRule(index)}>
+                  Remove Rule
+                </Button>
+              </div>
+            ))}
+            <Button isPrimary onClick={addGeoRule}>
+              Add Geo Rule
+            </Button>
+          </PanelBody>
+        </InspectorControls>
+
+        <div {...blockProps}>
+          <div
+            className="geo-target-block__label"
+            style={{
+              position: "absolute",
+              top: "-25px",
+              left: "0",
+              background: "#f0f0f0",
+              padding: "2px 8px",
+              borderRadius: "3px",
+              fontSize: "12px",
+              color: "#666",
+            }}
+          >
+            Geo Target Block{" "}
+            {geoRules.length ? `(${geoRules.length} rules)` : ""}
           </div>
-        )}
-      </div>
+          <InnerBlocks
+            renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
+          />
+        </div>
+      </>
     );
   },
   save: () => {
-    return <p>This block displays the user’s location dynamically.</p>;
+    const blockProps = useBlockProps.save();
+    return (
+      <div {...blockProps}>
+        <InnerBlocks.Content />
+      </div>
+    );
   },
 });
