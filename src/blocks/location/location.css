@@ -1,0 +1,9 @@
+.geoutils-block {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+.geoutils-block button {
+    margin-top: 10px;
+    padding: 5px 10px;
+}

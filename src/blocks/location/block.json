@@ -1,0 +1,16 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "geo-utils/location-block",
+    "version": "0.0.1",
+    "title": "Target user location block",
+    "category": "geoutils-category",
+    "description": "TESTING.",
+    "example": {},
+    "attributes": {
+    },
+    "supports": {
+    },
+    "editorScript": "file:./location.js",
+    "editorStyle": "file:./location.css"
+  }
