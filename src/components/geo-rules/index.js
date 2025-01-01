@@ -87,7 +87,7 @@ export function GeoRules({ rules, onChange }) {
     onChange(newRules);
   };
 
-  const renderConditionInput = (condition) => {
+  const renderConditionInput = (condition, ruleIndex, conditionIndex) => {
     switch (condition.type) {
       case "continent":
         return (
@@ -200,7 +200,7 @@ export function GeoRules({ rules, onChange }) {
                                 })
                               }
                             />
-                            {renderConditionInput(condition)}
+                            {renderConditionInput(condition, ruleIndex, conditionIndex)}
                             <Button
                               isDestructive
                               isSmall
