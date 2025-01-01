@@ -173,7 +173,57 @@ export function GeoRules({ rules, onChange }) {
                           updateRule(index, { type, value: "" })
                         }
                       />
-                      {renderRuleInput(rule, index)}
+                      <SelectControl
+                        label="Action"
+                        value={rule.action}
+                        options={[
+                          { label: "Show Content", value: "show" },
+                          { label: "Hide Content", value: "hide" },
+                        ]}
+                        onChange={(action) => updateRule(index, { action })}
+                      />
+                      <SelectControl
+                        label="Operator"
+                        value={rule.operator}
+                        options={[
+                          { label: "Match ALL conditions (AND)", value: "AND" },
+                          { label: "Match ANY condition (OR)", value: "OR" },
+                        ]}
+                        onChange={(operator) => updateRule(index, { operator })}
+                      />
+                      <div className="geo-rule-conditions">
+                        {rule.conditions.map((condition, conditionIndex) => (
+                          <div key={conditionIndex} className="geo-condition">
+                            <SelectControl
+                              label="Location Type"
+                              value={condition.type}
+                              options={Object.entries(locationTypes).map(
+                                ([value, label]) => ({
+                                  value,
+                                  label,
+                                })
+                              )}
+                              onChange={(type) => updateCondition(index, conditionIndex, { type, value: "" })}
+                            />
+                            {renderConditionInput(rule, index, condition, conditionIndex)}
+                            <Button 
+                              isDestructive 
+                              isSmall
+                              onClick={() => removeCondition(index, conditionIndex)}
+                              disabled={rule.conditions.length === 1}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                        <Button 
+                          variant="secondary"
+                          isSmall
+                          onClick={() => addCondition(index)}
+                        >
+                          Add Condition
+                        </Button>
+                      </div>
                     </CardBody>
                   </Card>
                 )}
