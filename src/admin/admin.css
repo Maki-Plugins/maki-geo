@@ -9,12 +9,30 @@
 }
 
 .geo-rule-card {
-    margin-bottom: 24px;
+    margin-bottom: 8px;
     border: 1px solid #dcdcde;
     border-radius: 6px;
     background: white;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.2s ease;
+}
+
+.rule-actions {
+    padding: 0 20px 20px;
+    text-align: right;
+}
+
+.remove-rule-button.components-button.is-destructive {
+    background: #d63638;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    height: auto;
+}
+
+.remove-rule-button.components-button.is-destructive:hover {
+    background: #b32d2e;
+    color: white;
 }
 
 .geo-rule-card:hover {

@@ -37,13 +37,16 @@ export function GeoRulesManager({ rules, onChange }) {
             onChange={(updatedRule) => updateRule(index, updatedRule)}
             showName={true}
           />
-          <Button
-            isDestructive
-            onClick={() => removeRule(index)}
-            className="remove-rule-button"
-          >
-            Remove Rule
-          </Button>
+          <div className="rule-actions">
+            <Button
+              variant="secondary"
+              isDestructive
+              onClick={() => removeRule(index)}
+              className="remove-rule-button"
+            >
+              Remove Rule
+            </Button>
+          </div>
         </div>
       ))}
 
