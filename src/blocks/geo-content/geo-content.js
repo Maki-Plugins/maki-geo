@@ -172,7 +172,10 @@ registerBlockType(metadata.name, {
               >
                 Add Geo Rule
               </Button>
-            </div>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </PanelBody>
         </InspectorControls>
 
