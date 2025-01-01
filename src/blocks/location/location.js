@@ -16,13 +16,7 @@ registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
     const { geoRules = [] } = attributes;
     const blockProps = useBlockProps({
-      style: {
-        border: "2px dashed #ccc",
-        padding: "20px",
-        backgroundColor: "#f9f9f9",
-        minHeight: "100px",
-        position: "relative",
-      },
+      className: "geo-target-block"
     });
 
     const addGeoRule = () => {
@@ -75,19 +69,7 @@ registerBlockType(metadata.name, {
         </InspectorControls>
 
         <div {...blockProps}>
-          <div
-            className="geo-target-block__label"
-            style={{
-              position: "absolute",
-              top: "-25px",
-              left: "0",
-              background: "#f0f0f0",
-              padding: "2px 8px",
-              borderRadius: "3px",
-              fontSize: "12px",
-              color: "#666",
-            }}
-          >
+          <div className="geo-target-block__label">
             Geo Target Block{" "}
             {geoRules.length ? `(${geoRules.length} rules)` : ""}
           </div>

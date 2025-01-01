@@ -7,3 +7,22 @@
     margin-top: 10px;
     padding: 5px 10px;
 }
+
+.geo-target-block {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: 100px;
+    position: relative;
+}
+
+.geo-target-block__label {
+    position: absolute;
+    top: -25px;
+    left: 0;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #666;
+}
