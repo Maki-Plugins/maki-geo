@@ -44,5 +44,6 @@
   "textdomain": "geo-utils",
   "editorScript": "file:./geo-popup.js",
   "editorStyle": "file:./geo-popup.css",
-  "style": "file:./style.css"
+  "style": "file:./style.css",
+  "script": "file:./popup-handler.js"
 }
