@@ -10,6 +10,11 @@ add_action('rest_api_init', function () {
             'permission_callback' => 'is_user_logged_in',
         ),
         array(
+            'methods' => 'DELETE',
+            'callback' => 'delete_all_geo_rules',
+            'permission_callback' => 'is_user_logged_in',
+        ),
+        array(
             'methods' => 'POST',
             'callback' => 'create_geo_rule',
             'permission_callback' => 'is_user_logged_in',
@@ -83,6 +88,12 @@ function delete_geo_rule($request) {
     array_splice($rules, $index, 1);
     update_option('geoutils_rules', $rules);
     
+    return array('success' => true);
+}
+
+function delete_all_geo_rules() {
+    verify_nonce();
+    update_option('geoutils_rules', array());
     return array('success' => true);
 }
 

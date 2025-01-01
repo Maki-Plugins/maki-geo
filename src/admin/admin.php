@@ -54,6 +54,35 @@ function gu_render_settings_page()
                         do_settings_sections('geoutils_settings');
                         submit_button();
                         ?>
+                        <hr />
+                        <h3>Danger Zone</h3>
+                        <p>
+                            <button type="button" id="delete-all-rules" class="button button-link-delete">
+                                Delete All Geo Rules
+                            </button>
+                        </p>
+                        <script>
+                            document.getElementById('delete-all-rules').addEventListener('click', async function() {
+                                if (!confirm('Are you sure you want to delete all geo rules? This action cannot be undone.')) {
+                                    return;
+                                }
+                                
+                                try {
+                                    const response = await wp.apiFetch({
+                                        path: 'geoutils/v1/rules/all',
+                                        method: 'DELETE',
+                                    });
+                                    
+                                    if (response.success) {
+                                        alert('All rules have been deleted successfully.');
+                                        window.location.reload();
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to delete rules:', error);
+                                    alert('Failed to delete rules. Please try again.');
+                                }
+                            });
+                        </script>
                     </form>
                 </div>
             </div>
