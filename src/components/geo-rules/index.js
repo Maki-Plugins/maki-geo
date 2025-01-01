@@ -1,4 +1,4 @@
-import { 
+import {
   SelectControl,
   TextControl,
   Button,
@@ -16,7 +16,7 @@ export const locationTypes = {
   country: "Country",
   region: "State/Province",
   city: "City",
-  ip: "IP Range"
+  ip: "IP Range",
 };
 
 export const continents = [
@@ -26,16 +26,19 @@ export const continents = [
   { label: "Europe", value: "EU" },
   { label: "North America", value: "NA" },
   { label: "Oceania", value: "OC" },
-  { label: "South America", value: "SA" }
+  { label: "South America", value: "SA" },
 ];
 
 export function GeoRules({ rules, onChange }) {
   const addRule = () => {
-    onChange([...rules, {
-      type: "country",
-      value: "",
-      action: "show"
-    }]);
+    onChange([
+      ...rules,
+      {
+        type: "country",
+        value: "",
+        action: "show",
+      },
+    ]);
   };
 
   const updateRule = (index, updates) => {
@@ -50,7 +53,7 @@ export function GeoRules({ rules, onChange }) {
 
   const renderRuleInput = (rule, index) => {
     switch (rule.type) {
-      case 'continent':
+      case "continent":
         return (
           <SelectControl
             value={rule.value}
@@ -58,7 +61,7 @@ export function GeoRules({ rules, onChange }) {
             onChange={(value) => updateRule(index, { value })}
           />
         );
-      case 'ip':
+      case "ip":
         return (
           <TextControl
             placeholder="e.g. 192.168.1.0/24"
@@ -78,30 +81,32 @@ export function GeoRules({ rules, onChange }) {
   };
 
   return (
-    <DragDropContext onDragEnd={(result) => {
-      if (!result.destination) return;
-      
-      const newRules = Array.from(rules);
-      const [reorderedRule] = newRules.splice(result.source.index, 1);
-      newRules.splice(result.destination.index, 0, reorderedRule);
-      
-      onChange(newRules);
-    }}>
+    <DragDropContext
+      onDragEnd={(result) => {
+        if (!result.destination) return;
+
+        const newRules = Array.from(rules);
+        const [reorderedRule] = newRules.splice(result.source.index, 1);
+        newRules.splice(result.destination.index, 0, reorderedRule);
+
+        onChange(newRules);
+      }}
+    >
       <Droppable droppableId="geo-rules">
         {(provided) => (
-          <div 
+          <div
             className="geo-rules-container"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
             {rules.map((rule, index) => (
-              <Draggable 
-                key={index} 
-                draggableId={`rule-${index}`} 
+              <Draggable
+                key={index}
+                draggableId={`rule-${index}`}
                 index={index}
               >
                 {(provided) => (
-                  <Card 
+                  <Card
                     className="geo-rule-card"
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -131,11 +136,15 @@ export function GeoRules({ rules, onChange }) {
                       <SelectControl
                         label="Location Type"
                         value={rule.type}
-                        options={Object.entries(locationTypes).map(([value, label]) => ({
-                          value,
-                          label
-                        }))}
-                        onChange={(type) => updateRule(index, { type, value: "" })}
+                        options={Object.entries(locationTypes).map(
+                          ([value, label]) => ({
+                            value,
+                            label,
+                          })
+                        )}
+                        onChange={(type) =>
+                          updateRule(index, { type, value: "" })
+                        }
                       />
                       {renderRuleInput(rule, index)}
                     </CardBody>

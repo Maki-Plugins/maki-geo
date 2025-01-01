@@ -4,11 +4,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function gu_render_settings_page() {
-    ?>
+function gu_render_settings_page()
+{
+?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-        
+
         <nav class="nav-tab-wrapper">
             <a href="#dashboard" class="nav-tab nav-tab-active">Dashboard</a>
             <a href="#geo-rules" class="nav-tab">Geo Rules</a>
@@ -63,6 +64,7 @@ function gu_render_settings_page() {
         .gu-admin-container {
             margin-top: 20px;
         }
+
         .gu-admin-card {
             background: white;
             border: 1px solid #ccd0d4;
@@ -70,33 +72,40 @@ function gu_render_settings_page() {
             margin-bottom: 20px;
             border-radius: 4px;
         }
+
         .gu-admin-card h2 {
             margin-top: 0;
         }
+
         .gu-admin-tab {
             display: none;
         }
+
         .gu-admin-tab.active {
             display: block;
         }
+
         .gu-stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
+
         .gu-stat-box {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 4px;
             text-align: center;
         }
+
         .gu-stat-number {
             font-size: 24px;
             font-weight: bold;
             margin: 10px 0;
             color: #2271b1;
         }
+
         .gu-stat-text {
             font-size: 18px;
             margin: 10px 0;
@@ -111,14 +120,14 @@ function gu_render_settings_page() {
 
             function switchTab(e) {
                 e.preventDefault();
-                
+
                 // Remove active class from all tabs
                 tabs.forEach(tab => tab.classList.remove('nav-tab-active'));
                 tabContents.forEach(content => content.classList.remove('active'));
 
                 // Add active class to clicked tab
                 e.target.classList.add('nav-tab-active');
-                
+
                 // Show corresponding content
                 const targetId = e.target.getAttribute('href').substring(1);
                 document.getElementById(targetId).classList.add('active');
@@ -127,13 +136,14 @@ function gu_render_settings_page() {
             tabs.forEach(tab => tab.addEventListener('click', switchTab));
         });
     </script>
-    <?php
+<?php
 }
 
-function gu_register_settings() {
+function gu_register_settings()
+{
     // General Settings
     register_setting('geoutils_settings', 'geoutils_options');
-    
+
     add_settings_section(
         'geoutils_general_section',
         'General Settings',
@@ -151,7 +161,7 @@ function gu_register_settings() {
 
     // Geo Rules Settings
     register_setting('geoutils_rules', 'geoutils_rules_options');
-    
+
     add_settings_section(
         'geoutils_rules_section',
         'Default Geo Rules',
@@ -168,31 +178,34 @@ function gu_register_settings() {
     );
 }
 
-function gu_render_debug_mode_field() {
+function gu_render_debug_mode_field()
+{
     $options = get_option('geoutils_options');
     $debug_mode = isset($options['debug_mode']) ? $options['debug_mode'] : 0;
-    ?>
+?>
     <label>
         <input type="checkbox" name="geoutils_options[debug_mode]" value="1" <?php checked(1, $debug_mode); ?> />
         Enable debug logging
     </label>
     <p class="description">When enabled, additional debugging information will be logged.</p>
-    <?php
+<?php
 }
 
-function gu_render_default_action_field() {
+function gu_render_default_action_field()
+{
     $options = get_option('geoutils_rules_options');
     $default_action = isset($options['default_action']) ? $options['default_action'] : 'show';
-    ?>
+?>
     <select name="geoutils_rules_options[default_action]">
         <option value="show" <?php selected('show', $default_action); ?>>Show Content</option>
         <option value="hide" <?php selected('hide', $default_action); ?>>Hide Content</option>
     </select>
     <p class="description">Default action when no geo rules match.</p>
-    <?php
+<?php
 }
 
-function gu_add_admin_menu() {
+function gu_add_admin_menu()
+{
     add_menu_page(
         'GeoUtils Settings',
         'GeoUtils',
@@ -204,14 +217,15 @@ function gu_add_admin_menu() {
     );
 }
 
-function gu_enqueue_admin_scripts($hook) {
+function gu_enqueue_admin_scripts($hook)
+{
     if ($hook !== 'toplevel_page_geoutils-settings') {
         return;
     }
 
     wp_enqueue_script(
         'geoutils-admin',
-        plugin_dir_url(__FILE__) . '../build/admin.js',
+        plugin_dir_url(__FILE__) . '../../build/admin.js',
         ['wp-element', 'wp-components', 'jquery'],
         '1.0.0',
         true
@@ -228,9 +242,9 @@ add_action('admin_init', 'gu_register_settings');
 add_action('admin_enqueue_scripts', 'gu_enqueue_admin_scripts');
 
 // Add AJAX handler for saving rules
-add_action('wp_ajax_save_geo_rules', function() {
+add_action('wp_ajax_save_geo_rules', function () {
     check_ajax_referer('geoutils_save_rules', 'nonce');
-    
+
     if (!current_user_can('manage_options')) {
         wp_send_json_error('Unauthorized');
     }
