@@ -34,16 +34,43 @@ export function GeoRules({ rules, onChange }) {
     onChange([
       ...rules,
       {
-        type: "country",
-        value: "",
-        action: "show",
+        conditions: [{
+          type: "country",
+          value: ""
+        }],
+        operator: "AND",
+        action: "show"
       },
     ]);
   };
 
-  const updateRule = (index, updates) => {
+  const updateRule = (ruleIndex, updates) => {
     const newRules = [...rules];
-    newRules[index] = { ...newRules[index], ...updates };
+    newRules[ruleIndex] = { ...newRules[ruleIndex], ...updates };
+    onChange(newRules);
+  };
+
+  const addCondition = (ruleIndex) => {
+    const newRules = [...rules];
+    newRules[ruleIndex].conditions.push({
+      type: "country",
+      value: ""
+    });
+    onChange(newRules);
+  };
+
+  const updateCondition = (ruleIndex, conditionIndex, updates) => {
+    const newRules = [...rules];
+    newRules[ruleIndex].conditions[conditionIndex] = {
+      ...newRules[ruleIndex].conditions[conditionIndex],
+      ...updates
+    };
+    onChange(newRules);
+  };
+
+  const removeCondition = (ruleIndex, conditionIndex) => {
+    const newRules = [...rules];
+    newRules[ruleIndex].conditions.splice(conditionIndex, 1);
     onChange(newRules);
   };
 
@@ -51,14 +78,14 @@ export function GeoRules({ rules, onChange }) {
     onChange(rules.filter((_, i) => i !== index));
   };
 
-  const renderRuleInput = (rule, index) => {
-    switch (rule.type) {
+  const renderConditionInput = (rule, ruleIndex, condition, conditionIndex) => {
+    switch (condition.type) {
       case "continent":
         return (
           <SelectControl
-            value={rule.value}
+            value={condition.value}
             options={continents}
-            onChange={(value) => updateRule(index, { value })}
+            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
           />
         );
       case "ip":
