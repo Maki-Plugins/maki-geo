@@ -8,13 +8,17 @@
   "description": "TESTING.",
   "example": {},
   "attributes": {
-    "localRules": {
-      "type": "array",
-      "default": []
+    "ruleType": {
+      "type": "string",
+      "default": "none"
     },
-    "globalRuleIds": {
-      "type": "array",
-      "default": []
+    "localRule": {
+      "type": "object",
+      "default": null
+    },
+    "globalRuleId": {
+      "type": "string",
+      "default": null
     }
   },
   "supports": {},

@@ -7,16 +7,20 @@ async function initGeoTargeting() {
     console.log(`API response: ${JSON.stringify(response)}`);
 
     const blocks = document.querySelectorAll(".gu-geo-target-block");
+    const globalRules = window.geoUtilsSettings?.globalRules || [];
+    
     blocks.forEach((block) => {
-      const localRules = JSON.parse(block.dataset.localRules || '[]');
-      const globalRuleIds = JSON.parse(block.dataset.globalRuleIds || '[]');
-      const globalRules = window.geoUtilsSettings?.globalRules || [];
-      
-      const rules = [
-        ...localRules,
-        ...globalRules.filter(rule => globalRuleIds.includes(rule.id))
-      ];
-      const shouldShow = evaluateGeoRules(rules, response);
+      const ruleType = block.dataset.ruleType;
+      let rule = null;
+
+      if (ruleType === 'local') {
+        rule = JSON.parse(block.dataset.localRule || 'null');
+      } else if (ruleType === 'global') {
+        const globalRuleId = block.dataset.globalRuleId;
+        rule = globalRules.find(r => r.id === globalRuleId);
+      }
+
+      const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
       block.style.display = shouldShow ? "block" : "none";
     });
   } catch (error) {

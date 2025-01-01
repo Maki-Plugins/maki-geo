@@ -1,5 +1,5 @@
 import { render } from "@wordpress/element";
-import { GeoRules } from "../components/geo-rules";
+import { GeoRulesManager } from "../components/geo-rules-manager";
 import { useState, useEffect } from "react";
 
 function AdminGeoRules() {
@@ -29,7 +29,7 @@ function AdminGeoRules() {
 
   return (
     <div className="geo-rules-admin-wrapper">
-      <GeoRules rules={rules} onChange={handleRulesChange} isGlobal={true} />
+      <GeoRulesManager rules={rules} onChange={handleRulesChange} />
     </div>
   );
 }
