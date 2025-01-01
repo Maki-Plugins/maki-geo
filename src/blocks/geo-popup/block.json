@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "geo-utils/geo-popup",
+  "version": "0.0.1",
+  "title": "Geo Popup",
+  "category": "widgets",
+  "icon": "admin-site",
+  "description": "Create location-based popup content",
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "geoRules": {
+      "type": "array",
+      "default": []
+    },
+    "popupContent": {
+      "type": "string",
+      "default": ""
+    },
+    "popupTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "popupStyle": {
+      "type": "object",
+      "default": {
+        "width": "400px",
+        "height": "auto",
+        "backgroundColor": "#ffffff",
+        "borderRadius": "8px"
+      }
+    },
+    "triggerType": {
+      "type": "string",
+      "default": "immediate"
+    },
+    "triggerDelay": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "textdomain": "geo-utils",
+  "editorScript": "file:./geo-popup.js",
+  "editorStyle": "file:./geo-popup.css",
+  "style": "file:./style.css"
+}

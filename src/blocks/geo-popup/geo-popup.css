@@ -1,0 +1,39 @@
+.wp-block-geo-utils-geo-popup {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  background-color: #f9f9f9;
+  margin: 20px 0;
+}
+
+.geo-popup-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.geo-popup-editor__section {
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.geo-popup-editor__section-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #1e1e1e;
+}
+
+.geo-popup-style-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.geo-popup-preview {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
