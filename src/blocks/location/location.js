@@ -11,7 +11,7 @@ import {
   Button,
 } from "@wordpress/components";
 import metadata from "./block.json";
-import "./location.css";
+import "./geo-content.css";
 
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {

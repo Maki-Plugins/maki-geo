@@ -14,7 +14,7 @@
     }
   },
   "supports": {},
-  "editorScript": "file:./location.js",
-  "editorStyle": "file:./location.css",
+  "editorScript": "file:./geo-content.js",
+  "editorStyle": "file:./geo-content.css",
   "render": "file:./render.php"
 }
