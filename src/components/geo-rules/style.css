@@ -10,6 +10,24 @@
     cursor: grab;
 }
 
+.geo-rule-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.geo-condition {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
 .geo-rule-card:active {
     cursor: grabbing;
 }
