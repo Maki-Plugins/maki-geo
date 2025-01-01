@@ -10,7 +10,7 @@
   "attributes": {
     "ruleType": {
       "type": "string",
-      "default": "none"
+      "default": "global"
     },
     "localRule": {
       "type": "object",

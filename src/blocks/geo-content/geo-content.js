@@ -13,7 +13,7 @@ import "./geo-content.css";
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
     const {
-      ruleType = "none",
+      ruleType = "global",
       localRule = null,
       globalRuleId = null,
     } = attributes;
@@ -53,7 +53,6 @@ registerBlockType(metadata.name, {
               label="Rule Type"
               selected={selectedType}
               options={[
-                { label: "No Geo Targeting", value: "none" },
                 { label: "Use Global Rule", value: "global" },
                 { label: "Create Local Rule", value: "local" },
               ]}
@@ -90,7 +89,7 @@ registerBlockType(metadata.name, {
         <div {...blockProps}>
           <div className="geo-target-block__label">
             Geo Targeted Content
-            {selectedType !== "none" && (
+            {(
               <span className="geo-target-type">
                 ({selectedType === "global" ? "Global Rule" : "Local Rule"})
               </span>
