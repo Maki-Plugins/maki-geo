@@ -11,12 +11,13 @@ import {
   Button,
 } from "@wordpress/components";
 import metadata from "./block.json";
+import "./location.css";
 
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
     const { geoRules = [] } = attributes;
     const blockProps = useBlockProps({
-      className: "geo-target-block"
+      className: "geo-target-block",
     });
 
     const addGeoRule = () => {
@@ -70,7 +71,7 @@ registerBlockType(metadata.name, {
 
         <div {...blockProps}>
           <div className="geo-target-block__label">
-            Geo Target Block{" "}
+            Geo Targeted Content{" "}
             {geoRules.length ? `(${geoRules.length} rules)` : ""}
           </div>
           <InnerBlocks

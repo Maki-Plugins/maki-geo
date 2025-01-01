@@ -9,7 +9,7 @@
 }
 
 .geo-target-block {
-    border: 2px dashed #ccc;
+    border: 1px dashed #ccc;
     padding: 20px;
     background-color: #f9f9f9;
     min-height: 100px;
@@ -18,8 +18,8 @@
 
 .geo-target-block__label {
     position: absolute;
-    top: -25px;
-    left: 0;
+    bottom: 1px;
+    left: 1px;
     background: #f0f0f0;
     padding: 2px 8px;
     border-radius: 3px;
