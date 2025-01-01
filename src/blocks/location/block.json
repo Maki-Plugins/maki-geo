@@ -1,9 +1,9 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "geo-utils/location-block",
+  "name": "geo-utils/geo-content-block",
   "version": "0.0.1",
-  "title": "Target user location block",
+  "title": "Geo Content Block",
   "category": "geoutils-category",
   "description": "TESTING.",
   "example": {},
