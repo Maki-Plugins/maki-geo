@@ -40,13 +40,7 @@ function gu_render_settings_page() {
                 <div class="gu-admin-card">
                     <h2>Geo Rules Management</h2>
                     <p>Configure default geo-targeting rules that apply site-wide.</p>
-                    <form method="post" action="options.php">
-                        <?php
-                        settings_fields('geoutils_rules');
-                        do_settings_sections('geoutils_rules');
-                        submit_button();
-                        ?>
-                    </form>
+                    <div id="geo-rules-admin"></div>
                 </div>
             </div>
 
@@ -210,5 +204,38 @@ function gu_add_admin_menu() {
     );
 }
 
+function gu_enqueue_admin_scripts($hook) {
+    if ($hook !== 'toplevel_page_geoutils-settings') {
+        return;
+    }
+
+    wp_enqueue_script(
+        'geoutils-admin',
+        plugin_dir_url(__FILE__) . '../build/admin.js',
+        ['wp-element', 'wp-components', 'jquery'],
+        '1.0.0',
+        true
+    );
+
+    wp_localize_script('geoutils-admin', 'geoUtilsSettings', [
+        'nonce' => wp_create_nonce('geoutils_save_rules'),
+        'rules' => get_option('geoutils_rules', [])
+    ]);
+}
+
 add_action('admin_menu', 'gu_add_admin_menu');
 add_action('admin_init', 'gu_register_settings');
+add_action('admin_enqueue_scripts', 'gu_enqueue_admin_scripts');
+
+// Add AJAX handler for saving rules
+add_action('wp_ajax_save_geo_rules', function() {
+    check_ajax_referer('geoutils_save_rules', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized');
+    }
+
+    $rules = json_decode(stripslashes($_POST['rules']), true);
+    update_option('geoutils_rules', $rules);
+    wp_send_json_success();
+});

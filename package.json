@@ -17,5 +17,8 @@
 	"devDependencies": {
 		"@wordpress/env": "^10.14.0",
 		"@wordpress/scripts": "^30.7.0"
+	},
+	"dependencies": {
+		"react-beautiful-dnd": "^13.1.1"
 	}
 }
