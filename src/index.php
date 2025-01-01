@@ -45,6 +45,15 @@ function enqueue_geo_target_scripts()
         [],
         '1.0.0'
     );
+
+    // Enqueue the popup handler script
+    wp_enqueue_script(
+        'geo-utils-popup-handler',
+        plugins_url('blocks/geo-popup/popup-handler.js', __FILE__),
+        [],
+        '1.0.0',
+        true // Load in footer
+    );
 }
 
 

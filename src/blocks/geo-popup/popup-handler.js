@@ -1,7 +1,8 @@
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing popup handler...');
     const popups = document.querySelectorAll('.geo-popup-overlay');
     console.log('Found popups:', popups.length);
+    console.log('DOM content:', document.body.innerHTML);
 
     popups.forEach((popup, index) => {
         const container = popup.querySelector('.geo-popup-container');
@@ -39,7 +40,7 @@
                 break;
         }
     });
-})();
+});
 
 function showPopup(popup) {
     console.log('Showing popup...');
