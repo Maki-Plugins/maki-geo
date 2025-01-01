@@ -53,8 +53,8 @@ registerBlockType(metadata.name, {
               label="Rule Type"
               selected={selectedType}
               options={[
-                { label: "Use Global Rule", value: "global" },
                 { label: "Create Local Rule", value: "local" },
+                { label: "Use Global Rule", value: "global" }
               ]}
               onChange={handleRuleTypeChange}
             />
