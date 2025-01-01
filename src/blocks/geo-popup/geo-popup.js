@@ -51,11 +51,12 @@ registerBlockType(metadata.name, {
                             onChange={(value) => setAttributes({ triggerType: value })}
                         />
                         {triggerType === 'delayed' && (
-                            <RangeControl
+                            <TextControl
+                                type="number"
                                 label="Delay (seconds)"
                                 value={triggerDelay}
-                                onChange={(value) => setAttributes({ triggerDelay: value })}
-                                min={0}
+                                onChange={(value) => setAttributes({ triggerDelay: parseInt(value) || 0 })}
+                                min="0"
                             />
                         )}
                         <SelectControl
