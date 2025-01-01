@@ -12,30 +12,37 @@ import "./geo-content.css";
 
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
-    const { ruleType = 'none', localRule = null, globalRuleId = null } = attributes;
+    const {
+      ruleType = "none",
+      localRule = null,
+      globalRuleId = null,
+    } = attributes;
     const [selectedType, setSelectedType] = useState(ruleType);
     const blockProps = useBlockProps({
       className: "geo-target-block",
     });
 
-    const globalRules = window.geoUtilsSettings?.rules || [];
+    const globalRules = window.geoUtilsSettings?.globalRules || [];
 
     const handleRuleTypeChange = (newType) => {
       setSelectedType(newType);
-      setAttributes({ 
+      setAttributes({
         ruleType: newType,
-        localRule: newType === 'local' ? localRule || createDefaultRule() : null,
-        globalRuleId: newType === 'global' ? globalRuleId : null
+        localRule:
+          newType === "local" ? localRule || createDefaultRule() : null,
+        globalRuleId: newType === "global" ? globalRuleId : null,
       });
     };
 
     const createDefaultRule = () => ({
-      conditions: [{
-        type: "country",
-        value: ""
-      }],
+      conditions: [
+        {
+          type: "country",
+          value: "",
+        },
+      ],
       operator: "AND",
-      action: "show"
+      action: "show",
     });
 
     return (
@@ -46,21 +53,23 @@ registerBlockType(metadata.name, {
               label="Rule Type"
               selected={selectedType}
               options={[
-                { label: 'No Geo Targeting', value: 'none' },
-                { label: 'Use Global Rule', value: 'global' },
-                { label: 'Create Local Rule', value: 'local' },
+                { label: "No Geo Targeting", value: "none" },
+                { label: "Use Global Rule", value: "global" },
+                { label: "Create Local Rule", value: "local" },
               ]}
               onChange={handleRuleTypeChange}
             />
 
-            {selectedType === 'global' && (
+            {selectedType === "global" && (
               <select
-                value={globalRuleId || ''}
-                onChange={(e) => setAttributes({ globalRuleId: e.target.value })}
-                style={{ width: '100%', marginTop: '10px' }}
+                value={globalRuleId || ""}
+                onChange={(e) =>
+                  setAttributes({ globalRuleId: e.target.value })
+                }
+                style={{ width: "100%", marginTop: "10px" }}
               >
                 <option value="">Select a global rule</option>
-                {globalRules.map(rule => (
+                {globalRules.map((rule) => (
                   <option key={rule.id} value={rule.id}>
                     {rule.name}
                   </option>
@@ -68,7 +77,7 @@ registerBlockType(metadata.name, {
               </select>
             )}
 
-            {selectedType === 'local' && (
+            {selectedType === "local" && (
               <GeoRuleEditor
                 rule={localRule || createDefaultRule()}
                 onChange={(newRule) => setAttributes({ localRule: newRule })}
@@ -81,9 +90,9 @@ registerBlockType(metadata.name, {
         <div {...blockProps}>
           <div className="geo-target-block__label">
             Geo Targeted Content
-            {selectedType !== 'none' && (
+            {selectedType !== "none" && (
               <span className="geo-target-type">
-                ({selectedType === 'global' ? 'Global Rule' : 'Local Rule'})
+                ({selectedType === "global" ? "Global Rule" : "Local Rule"})
               </span>
             )}
           </div>

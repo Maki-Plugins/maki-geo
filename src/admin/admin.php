@@ -66,13 +66,13 @@ function gu_render_settings_page()
                                 if (!confirm('Are you sure you want to delete all geo rules? This action cannot be undone.')) {
                                     return;
                                 }
-                                
+
                                 try {
                                     const response = await wp.apiFetch({
                                         path: 'geoutils/v1/rules',
                                         method: 'DELETE',
                                     });
-                                    
+
                                     if (response.success) {
                                         alert('All rules have been deleted successfully.');
                                         window.location.reload();
@@ -267,7 +267,7 @@ function gu_enqueue_admin_scripts($hook)
     ]);
 
     // Block editor script data
-    wp_localize_script('wp-blocks', 'geoUtilsSettings', [
+    wp_localize_script('geo-utils-geo-popup-block-editor-script', 'geoUtilsSettings', [
         'globalRules' => get_option('geoutils_rules', [])
     ]);
 }
@@ -275,4 +275,3 @@ function gu_enqueue_admin_scripts($hook)
 add_action('admin_menu', 'gu_add_admin_menu');
 add_action('admin_init', 'gu_register_settings');
 add_action('admin_enqueue_scripts', 'gu_enqueue_admin_scripts');
-
