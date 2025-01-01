@@ -69,7 +69,7 @@ function gu_render_settings_page()
                                 
                                 try {
                                     const response = await wp.apiFetch({
-                                        path: 'geoutils/v1/rules/all',
+                                        path: 'geoutils/v1/rules',
                                         method: 'DELETE',
                                     });
                                     
