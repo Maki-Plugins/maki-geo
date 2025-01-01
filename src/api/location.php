@@ -19,7 +19,7 @@ function get_debug_data()
 
 function get_debug_ip()
 {
-    return "";
+    return "86.94.131.20";
 }
 
 
