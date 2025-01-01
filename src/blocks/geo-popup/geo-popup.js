@@ -59,9 +59,15 @@ registerBlockType(metadata.name, {
                                 max={60}
                             />
                         )}
-                        <TextControl
+                        <SelectControl
                             label="Width"
                             value={popupStyle.width}
+                            options={[
+                                { label: 'Small (400px)', value: '400px' },
+                                { label: 'Medium (600px)', value: '600px' },
+                                { label: 'Large (800px)', value: '800px' },
+                                { label: 'Full Width (90%)', value: '90%' },
+                            ]}
                             onChange={(value) => updateStyle('width', value)}
                         />
                         <div>
