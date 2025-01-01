@@ -7,7 +7,6 @@
 .geo-rule-card {
     margin-bottom: 16px;
     border: 1px solid #e2e4e7;
-    cursor: grab;
 }
 
 .geo-rule-conditions {
@@ -22,13 +21,14 @@
 .geo-condition {
     display: flex;
     gap: 10px;
-    align-items: flex-start;
+    align-items: center;
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
+    cursor: grab;
 }
 
-.geo-rule-card:active {
+.geo-condition:active {
     cursor: grabbing;
 }
 
@@ -46,7 +46,18 @@
     margin-top: 8px !important;
 }
 
+.add-condition-button {
+    margin-top: 12px;
+}
+
 .components-select-control,
 .components-text-control {
     margin-bottom: 12px;
+    flex: 1;
+}
+
+.geo-condition > div:first-child {
+    cursor: grab;
+    color: #757575;
+    padding: 0 8px;
 }

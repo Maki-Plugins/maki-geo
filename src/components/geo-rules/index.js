@@ -32,6 +32,7 @@ export const continents = [
 export function GeoRules({ rules, onChange }) {
   const addRule = () => {
     const newRule = {
+      name: `Rule ${rules.length + 1}`,
       conditions: [{
         type: "country",
         value: ""
@@ -44,13 +45,9 @@ export function GeoRules({ rules, onChange }) {
 
   const updateRule = (ruleIndex, updates) => {
     const newRules = [...rules];
-    newRules[ruleIndex] = { 
-      ...newRules[ruleIndex], 
+    newRules[ruleIndex] = {
+      ...newRules[ruleIndex],
       ...updates,
-      conditions: newRules[ruleIndex].conditions || [{
-        type: "country",
-        value: ""
-      }]
     };
     onChange(newRules);
   };
@@ -83,7 +80,14 @@ export function GeoRules({ rules, onChange }) {
     onChange(rules.filter((_, i) => i !== index));
   };
 
-  const renderConditionInput = (rule, ruleIndex, condition, conditionIndex) => {
+  const reorderConditions = (ruleIndex, startIndex, endIndex) => {
+    const newRules = [...rules];
+    const [removed] = newRules[ruleIndex].conditions.splice(startIndex, 1);
+    newRules[ruleIndex].conditions.splice(endIndex, 0, removed);
+    onChange(newRules);
+  };
+
+  const renderConditionInput = (condition) => {
     switch (condition.type) {
       case "continent":
         return (
@@ -97,110 +101,91 @@ export function GeoRules({ rules, onChange }) {
         return (
           <TextControl
             placeholder="e.g. 192.168.1.0/24"
-            value={rule.value}
-            onChange={(value) => updateRule(index, { value })}
+            value={condition.value}
+            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
           />
         );
       default:
         return (
           <TextControl
-            placeholder={`Enter ${locationTypes[rule.type]}`}
-            value={rule.value}
-            onChange={(value) => updateRule(index, { value })}
+            placeholder={`Enter ${locationTypes[condition.type]}`}
+            value={condition.value}
+            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
           />
         );
     }
   };
 
   return (
-    <DragDropContext
-      onDragEnd={(result) => {
-        if (!result.destination) return;
-
-        const newRules = Array.from(rules);
-        const [reorderedRule] = newRules.splice(result.source.index, 1);
-        newRules.splice(result.destination.index, 0, reorderedRule);
-
-        onChange(newRules);
-      }}
-    >
-      <Droppable droppableId="geo-rules">
-        {(provided) => (
-          <div
-            className="geo-rules-container"
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {rules.map((rule, index) => (
-              <Draggable
-                key={index}
-                draggableId={`rule-${index}`}
-                index={index}
+    <div className="geo-rules-container">
+      {rules.map((rule, ruleIndex) => (
+        <Card key={ruleIndex} className="geo-rule-card">
+          <CardHeader>
+            <Flex align="center" justify="space-between">
+              <TextControl
+                value={rule.name}
+                onChange={(name) => updateRule(ruleIndex, { name })}
+              />
+              <Button
+                isDestructive
+                isSmall
+                onClick={() => removeRule(ruleIndex)}
               >
+                Remove Rule
+              </Button>
+            </Flex>
+          </CardHeader>
+          <CardBody>
+            <SelectControl
+              label="Action"
+              value={rule.action}
+              options={[
+                { label: "Show Content", value: "show" },
+                { label: "Hide Content", value: "hide" },
+              ]}
+              onChange={(action) => updateRule(ruleIndex, { action })}
+            />
+            <SelectControl
+              label="Operator"
+              value={rule.operator}
+              options={[
+                { label: "Match ALL conditions (AND)", value: "AND" },
+                { label: "Match ANY condition (OR)", value: "OR" },
+              ]}
+              onChange={(operator) => updateRule(ruleIndex, { operator })}
+            />
+            
+            <DragDropContext
+              onDragEnd={(result) => {
+                if (!result.destination) return;
+                reorderConditions(
+                  ruleIndex,
+                  result.source.index,
+                  result.destination.index
+                );
+              }}
+            >
+              <Droppable droppableId={`conditions-${ruleIndex}`}>
                 {(provided) => (
-                  <Card
-                    className="geo-rule-card"
+                  <div
+                    className="geo-rule-conditions"
                     ref={provided.innerRef}
-                    {...provided.draggableProps}
+                    {...provided.droppableProps}
                   >
-                    <CardHeader {...provided.dragHandleProps}>
-                      <Flex align="center">
-                        <FlexItem>⋮⋮ Rule {index + 1}</FlexItem>
-                        <Button
-                          isDestructive
-                          isSmall
-                          onClick={() => removeRule(index)}
-                        >
-                          Remove
-                        </Button>
-                      </Flex>
-                    </CardHeader>
-                    <CardBody>
-                      <SelectControl
-                        label="Action"
-                        value={rule.action}
-                        options={[
-                          { label: "Show Content", value: "show" },
-                          { label: "Hide Content", value: "hide" },
-                        ]}
-                        onChange={(action) => updateRule(index, { action })}
-                      />
-                      <SelectControl
-                        label="Location Type"
-                        value={rule.type}
-                        options={Object.entries(locationTypes).map(
-                          ([value, label]) => ({
-                            value,
-                            label,
-                          })
-                        )}
-                        onChange={(type) =>
-                          updateRule(index, { type, value: "" })
-                        }
-                      />
-                      <SelectControl
-                        label="Action"
-                        value={rule.action}
-                        options={[
-                          { label: "Show Content", value: "show" },
-                          { label: "Hide Content", value: "hide" },
-                        ]}
-                        onChange={(action) => updateRule(index, { action })}
-                      />
-                      <SelectControl
-                        label="Operator"
-                        value={rule.operator}
-                        options={[
-                          { label: "Match ALL conditions (AND)", value: "AND" },
-                          { label: "Match ANY condition (OR)", value: "OR" },
-                        ]}
-                        onChange={(operator) => updateRule(index, { operator })}
-                      />
-                      <div className="geo-rule-conditions">
-                        {rule.conditions.map((condition, conditionIndex) => (
-                          <div key={conditionIndex} className="geo-condition">
+                    {rule.conditions.map((condition, conditionIndex) => (
+                      <Draggable
+                        key={conditionIndex}
+                        draggableId={`condition-${ruleIndex}-${conditionIndex}`}
+                        index={conditionIndex}
+                      >
+                        {(provided) => (
+                          <div
+                            className="geo-condition"
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                          >
+                            <div {...provided.dragHandleProps}>⋮⋮</div>
                             <SelectControl
-                              label="Location Type"
                               value={condition.type}
                               options={Object.entries(locationTypes).map(
                                 ([value, label]) => ({
@@ -208,43 +193,51 @@ export function GeoRules({ rules, onChange }) {
                                   label,
                                 })
                               )}
-                              onChange={(type) => updateCondition(index, conditionIndex, { type, value: "" })}
+                              onChange={(type) =>
+                                updateCondition(ruleIndex, conditionIndex, {
+                                  type,
+                                  value: "",
+                                })
+                              }
                             />
-                            {renderConditionInput(rule, index, condition, conditionIndex)}
-                            <Button 
-                              isDestructive 
+                            {renderConditionInput(condition)}
+                            <Button
+                              isDestructive
                               isSmall
-                              onClick={() => removeCondition(index, conditionIndex)}
+                              onClick={() => removeCondition(ruleIndex, conditionIndex)}
                               disabled={rule.conditions.length === 1}
                             >
                               Remove
                             </Button>
                           </div>
-                        ))}
-                        <Button 
-                          variant="secondary"
-                          isSmall
-                          onClick={() => addCondition(index)}
-                        >
-                          Add Condition
-                        </Button>
-                      </div>
-                    </CardBody>
-                  </Card>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
                 )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
+              </Droppable>
+            </DragDropContext>
+            
             <Button
-              variant="primary"
-              className="geo-rule-add-button"
-              onClick={addRule}
+              variant="secondary"
+              isSmall
+              onClick={() => addCondition(ruleIndex)}
+              className="add-condition-button"
             >
-              Add Geo Rule
+              Add Condition
             </Button>
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+          </CardBody>
+        </Card>
+      ))}
+      
+      <Button
+        variant="primary"
+        className="geo-rule-add-button"
+        onClick={addRule}
+      >
+        Add Geo Rule
+      </Button>
+    </div>
   );
 }
