@@ -31,22 +31,27 @@ export const continents = [
 
 export function GeoRules({ rules, onChange }) {
   const addRule = () => {
-    onChange([
-      ...rules,
-      {
-        conditions: [{
-          type: "country",
-          value: ""
-        }],
-        operator: "AND",
-        action: "show"
-      },
-    ]);
+    const newRule = {
+      conditions: [{
+        type: "country",
+        value: ""
+      }],
+      operator: "AND",
+      action: "show"
+    };
+    onChange([...rules, newRule]);
   };
 
   const updateRule = (ruleIndex, updates) => {
     const newRules = [...rules];
-    newRules[ruleIndex] = { ...newRules[ruleIndex], ...updates };
+    newRules[ruleIndex] = { 
+      ...newRules[ruleIndex], 
+      ...updates,
+      conditions: newRules[ruleIndex].conditions || [{
+        type: "country",
+        value: ""
+      }]
+    };
     onChange(newRules);
   };
 
