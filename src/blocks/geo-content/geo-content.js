@@ -6,12 +6,35 @@ import {
 } from "@wordpress/block-editor";
 import {
   PanelBody,
-  TextControl,
   SelectControl,
+  TextControl,
   Button,
+  Card,
+  CardHeader,
+  CardBody,
+  Flex,
+  FlexItem,
 } from "@wordpress/components";
 import metadata from "./block.json";
 import "./geo-content.css";
+
+const locationTypes = {
+  continent: "Continent",
+  country: "Country",
+  region: "State/Province",
+  city: "City",
+  ip: "IP Range"
+};
+
+const continents = [
+  { label: "Africa", value: "AF" },
+  { label: "Antarctica", value: "AN" },
+  { label: "Asia", value: "AS" },
+  { label: "Europe", value: "EU" },
+  { label: "North America", value: "NA" },
+  { label: "Oceania", value: "OC" },
+  { label: "South America", value: "SA" }
+];
 
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
@@ -22,13 +45,17 @@ registerBlockType(metadata.name, {
 
     const addGeoRule = () => {
       setAttributes({
-        geoRules: [...geoRules, { country: "", action: "show" }],
+        geoRules: [...geoRules, {
+          type: "country",
+          value: "",
+          action: "show"
+        }],
       });
     };
 
-    const updateGeoRule = (index, field, value) => {
+    const updateGeoRule = (index, updates) => {
       const newRules = [...geoRules];
-      newRules[index] = { ...newRules[index], [field]: value };
+      newRules[index] = { ...newRules[index], ...updates };
       setAttributes({ geoRules: newRules });
     };
 
@@ -38,34 +65,85 @@ registerBlockType(metadata.name, {
       });
     };
 
+    const renderRuleInput = (rule, index) => {
+      switch (rule.type) {
+        case 'continent':
+          return (
+            <SelectControl
+              value={rule.value}
+              options={continents}
+              onChange={(value) => updateGeoRule(index, { value })}
+            />
+          );
+        case 'ip':
+          return (
+            <TextControl
+              placeholder="e.g. 192.168.1.0/24"
+              value={rule.value}
+              onChange={(value) => updateGeoRule(index, { value })}
+            />
+          );
+        default:
+          return (
+            <TextControl
+              placeholder={`Enter ${locationTypes[rule.type]}`}
+              value={rule.value}
+              onChange={(value) => updateGeoRule(index, { value })}
+            />
+          );
+      }
+    };
+
     return (
       <>
         <InspectorControls>
-          <PanelBody title="Geo Targeting Rules">
-            {geoRules.map((rule, index) => (
-              <div key={index} style={{ marginBottom: "20px" }}>
-                <TextControl
-                  label="Country"
-                  value={rule.country}
-                  onChange={(value) => updateGeoRule(index, "country", value)}
-                />
-                <SelectControl
-                  label="Action"
-                  value={rule.action}
-                  options={[
-                    { label: "Show", value: "show" },
-                    { label: "Hide", value: "hide" },
-                  ]}
-                  onChange={(value) => updateGeoRule(index, "action", value)}
-                />
-                <Button isDestructive onClick={() => removeGeoRule(index)}>
-                  Remove Rule
-                </Button>
-              </div>
-            ))}
-            <Button isPrimary onClick={addGeoRule}>
-              Add Geo Rule
-            </Button>
+          <PanelBody title="Geo Targeting Rules" initialOpen={true}>
+            <div className="geo-rules-container">
+              {geoRules.map((rule, index) => (
+                <Card key={index} className="geo-rule-card">
+                  <CardHeader>
+                    <Flex align="center">
+                      <FlexItem>Rule {index + 1}</FlexItem>
+                      <Button
+                        isDestructive
+                        isSmall
+                        onClick={() => removeGeoRule(index)}
+                      >
+                        Remove
+                      </Button>
+                    </Flex>
+                  </CardHeader>
+                  <CardBody>
+                    <SelectControl
+                      label="Action"
+                      value={rule.action}
+                      options={[
+                        { label: "Show Content", value: "show" },
+                        { label: "Hide Content", value: "hide" },
+                      ]}
+                      onChange={(action) => updateGeoRule(index, { action })}
+                    />
+                    <SelectControl
+                      label="Location Type"
+                      value={rule.type}
+                      options={Object.entries(locationTypes).map(([value, label]) => ({
+                        value,
+                        label
+                      }))}
+                      onChange={(type) => updateGeoRule(index, { type, value: "" })}
+                    />
+                    {renderRuleInput(rule, index)}
+                  </CardBody>
+                </Card>
+              ))}
+              <Button
+                variant="primary"
+                className="geo-rule-add-button"
+                onClick={addGeoRule}
+              >
+                Add Geo Rule
+              </Button>
+            </div>
           </PanelBody>
         </InspectorControls>
 
