@@ -22,7 +22,7 @@ registerBlockType(metadata.name, {
       className: "geo-target-block",
     });
 
-    const globalRules = window.geoUtilsSettings?.globalRules || [];
+    const globalRules = window.geoUtilsData?.globalRules || [];
 
     const handleRuleTypeChange = (newType) => {
       setSelectedType(newType);

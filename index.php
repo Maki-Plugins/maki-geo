@@ -24,7 +24,8 @@ function gu_create_geo_content_block()
             'window.geoUtilsData = %s;',
             wp_json_encode([
                 'nonce' => wp_create_nonce('wp_rest'),
-                'endpoint' => rest_url('geoutils/v1/location')
+                'endpoint' => rest_url('geoutils/v1/location'),
+                'globalRules' => get_option('geoutils_rules', [])
             ])
         );
 

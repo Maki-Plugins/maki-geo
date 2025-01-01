@@ -266,10 +266,6 @@ function gu_enqueue_admin_scripts($hook)
         'rules' => get_option('geoutils_rules', [])
     ]);
 
-    // Block editor script data
-    wp_localize_script('geo-utils-geo-popup-block-editor-script', 'geoUtilsSettings', [
-        'globalRules' => get_option('geoutils_rules', [])
-    ]);
 }
 
 add_action('admin_menu', 'gu_add_admin_menu');
