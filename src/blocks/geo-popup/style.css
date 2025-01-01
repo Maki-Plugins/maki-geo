@@ -25,7 +25,7 @@
   overflow-y: auto;
   opacity: 0;
   transform: scale(0.7);
-  transition: all 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .geo-popup-overlay.is-active .geo-popup-container {

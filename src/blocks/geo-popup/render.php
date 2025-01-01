@@ -1,8 +1,7 @@
 <?php
 function render_geo_popup_block($attributes, $content) {
     $wrapper_attributes = get_block_wrapper_attributes([
-        'class' => 'geo-popup-overlay',
-        'style' => 'display: none;'
+        'class' => 'geo-popup-overlay'
     ]);
 
     // Ensure content is wrapped in container

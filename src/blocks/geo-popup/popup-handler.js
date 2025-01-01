@@ -33,11 +33,20 @@
 })();
 
 function showPopup(popup) {
+    popup.style.display = 'flex';
+    // Force a reflow before adding the active class
+    void popup.offsetWidth;
     popup.classList.add('is-active');
 }
 
 function closePopup(popup) {
     popup.classList.remove('is-active');
+    // Wait for transition to complete before hiding
+    setTimeout(() => {
+        if (!popup.classList.contains('is-active')) {
+            popup.style.display = 'none';
+        }
+    }, 300);
 }
 
 function handleExitIntent(popup) {
