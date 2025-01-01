@@ -29,7 +29,7 @@ function AdminGeoRules() {
 
   return (
     <div className="geo-rules-admin-wrapper">
-      <GeoRules rules={rules} onChange={handleRulesChange} />
+      <GeoRules rules={rules} onChange={handleRulesChange} isGlobal={true} />
     </div>
   );
 }

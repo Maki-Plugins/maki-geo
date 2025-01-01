@@ -8,7 +8,14 @@ async function initGeoTargeting() {
 
     const blocks = document.querySelectorAll(".gu-geo-target-block");
     blocks.forEach((block) => {
-      const rules = JSON.parse(block.dataset.rules);
+      const localRules = JSON.parse(block.dataset.localRules || '[]');
+      const globalRuleIds = JSON.parse(block.dataset.globalRuleIds || '[]');
+      const globalRules = window.geoUtilsSettings?.globalRules || [];
+      
+      const rules = [
+        ...localRules,
+        ...globalRules.filter(rule => globalRuleIds.includes(rule.id))
+      ];
       const shouldShow = evaluateGeoRules(rules, response);
       block.style.display = shouldShow ? "block" : "none";
     });

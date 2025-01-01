@@ -6,13 +6,14 @@ import {
 } from "@wordpress/block-editor";
 import { PanelBody } from "@wordpress/components";
 import { GeoRules } from "../../components/geo-rules";
+import { GlobalRuleSelector } from "../../components/global-rule-selector";
 import metadata from "./block.json";
 import "./geo-content.css";
 
 
 registerBlockType(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
-    const { geoRules = [] } = attributes;
+    const { localRules = [], globalRuleIds = [] } = attributes;
     const blockProps = useBlockProps({
       className: "geo-target-block",
     });
@@ -21,12 +22,17 @@ registerBlockType(metadata.name, {
     return (
       <>
         <InspectorControls>
-          <PanelBody title="Geo Targeting Rules" initialOpen={true}>
-            <GeoRules 
-              rules={geoRules}
-              onChange={(newRules) => {
-                setAttributes({ geoRules: newRules });
-              }}
+          <PanelBody title="Global Rules" initialOpen={true}>
+            <GlobalRuleSelector
+              globalRules={window.geoUtilsSettings?.globalRules || []}
+              selectedRuleIds={globalRuleIds}
+              onChange={(newIds) => setAttributes({ globalRuleIds: newIds })}
+            />
+          </PanelBody>
+          <PanelBody title="Local Rules" initialOpen={false}>
+            <GeoRules
+              rules={localRules}
+              onChange={(newRules) => setAttributes({ localRules: newRules })}
             />
           </PanelBody>
         </InspectorControls>

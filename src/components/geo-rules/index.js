@@ -29,10 +29,11 @@ export const continents = [
   { label: "South America", value: "SA" },
 ];
 
-export function GeoRules({ rules, onChange }) {
+export function GeoRules({ rules, onChange, isGlobal = false }) {
   const addRule = () => {
     const newRule = {
-      name: `Rule ${rules.length + 1}`,
+      id: Date.now().toString(),
+      name: isGlobal ? `Rule ${rules.length + 1}` : undefined,
       conditions: [{
         type: "country",
         value: ""

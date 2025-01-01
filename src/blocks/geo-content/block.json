@@ -8,26 +8,13 @@
   "description": "TESTING.",
   "example": {},
   "attributes": {
-    "geoRules": {
+    "localRules": {
       "type": "array",
-      "default": [],
-      "items": {
-        "type": "object",
-        "properties": {
-          "conditions": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": { "type": "string" },
-                "value": { "type": "string" }
-              }
-            }
-          },
-          "action": { "type": "string" },
-          "operator": { "type": "string", "default": "AND" }
-        }
-      }
+      "default": []
+    },
+    "globalRuleIds": {
+      "type": "array",
+      "default": []
     }
   },
   "supports": {},
