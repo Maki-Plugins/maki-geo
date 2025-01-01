@@ -10,7 +10,24 @@
   "attributes": {
     "geoRules": {
       "type": "array",
-      "default": []
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "conditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          },
+          "action": { "type": "string" },
+          "operator": { "type": "string", "default": "AND" }
+        }
+      }
     }
   },
   "supports": {},

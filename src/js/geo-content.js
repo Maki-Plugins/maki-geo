@@ -9,7 +9,7 @@ async function initGeoTargeting() {
     const blocks = document.querySelectorAll(".gu-geo-target-block");
     blocks.forEach((block) => {
       const rules = JSON.parse(block.dataset.rules);
-      const shouldShow = evaluateGeoRules(rules, response.country);
+      const shouldShow = evaluateGeoRules(rules, response);
       block.style.display = shouldShow ? "block" : "none";
     });
   } catch (error) {
@@ -21,17 +21,34 @@ async function initGeoTargeting() {
   }
 }
 
-function evaluateGeoRules(rules, userCountry) {
+function evaluateGeoRules(rules, locationData) {
   console.log(`Rules: ${JSON.stringify(rules)}`);
-  console.log(`Country: ${userCountry}`);
+  console.log(`Location data: ${JSON.stringify(locationData)}`);
+  
   if (!rules.length) return true;
 
-  const matchingRule = rules.find(
-    (rule) => rule.country.toLowerCase() === userCountry.toLowerCase()
-  );
+  // Find first matching rule
+  const matchingRule = rules.find(rule => {
+    // Evaluate all conditions based on the operator (AND/OR)
+    const results = rule.conditions.map(condition => {
+      switch (condition.type) {
+        case 'country':
+          return condition.value.toLowerCase() === locationData.country.toLowerCase();
+        case 'city':
+          return condition.value.toLowerCase() === locationData.city.toLowerCase();
+        case 'continent':
+          return condition.value.toLowerCase() === locationData.continent.toLowerCase();
+        default:
+          return false;
+      }
+    });
 
-  console.log(`Show?: ${matchingRule ? matchingRule.action === "show" : true}`);
+    return rule.operator === 'OR' 
+      ? results.some(result => result) // OR: any condition true
+      : results.every(result => result); // AND: all conditions true
+  });
 
+  console.log(`Matching rule: ${JSON.stringify(matchingRule)}`);
   return matchingRule ? matchingRule.action === "show" : true;
 }
 

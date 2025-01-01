@@ -87,8 +87,18 @@ function delete_geo_rule($request) {
 }
 
 function validate_rule($rule) {
-    return isset($rule['type']) && 
-           isset($rule['value']) && 
-           isset($rule['action']) &&
-           in_array($rule['action'], array('show', 'hide'));
+    // Validate basic rule structure
+    if (!isset($rule['conditions']) || !is_array($rule['conditions']) || 
+        !isset($rule['action']) || !in_array($rule['action'], array('show', 'hide'))) {
+        return false;
+    }
+
+    // Validate each condition
+    foreach ($rule['conditions'] as $condition) {
+        if (!isset($condition['type']) || !isset($condition['value'])) {
+            return false;
+        }
+    }
+
+    return true;
 }
