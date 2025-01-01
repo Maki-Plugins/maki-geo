@@ -10,7 +10,6 @@ import {
   Dashicon,
 } from "@wordpress/components";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import "./style.css";
 
 export const locationTypes = {
   continent: "Continent",
@@ -38,9 +37,9 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
         ...rule.conditions,
         {
           type: "country",
-          value: ""
-        }
-      ]
+          value: "",
+        },
+      ],
     };
     onChange(newRule);
   };
@@ -50,7 +49,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
       ...rule,
       conditions: rule.conditions.map((condition, i) =>
         i === conditionIndex ? { ...condition, ...updates } : condition
-      )
+      ),
     };
     onChange(newRule);
   };
@@ -58,7 +57,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
   const removeCondition = (conditionIndex) => {
     const newRule = {
       ...rule,
-      conditions: rule.conditions.filter((_, i) => i !== conditionIndex)
+      conditions: rule.conditions.filter((_, i) => i !== conditionIndex),
     };
     onChange(newRule);
   };
@@ -116,7 +115,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
         <div className="visibility-toggle">
           <label>Content Visibility</label>
           <ButtonGroup>
-            <Button 
+            <Button
               variant={rule.action === "show" ? "primary" : "secondary"}
               onClick={() => onChange({ ...rule, action: "show" })}
             >
@@ -141,14 +140,11 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
           ]}
           onChange={(operator) => onChange({ ...rule, operator })}
         />
-        
+
         <DragDropContext
           onDragEnd={(result) => {
             if (!result.destination) return;
-            reorderConditions(
-              result.source.index,
-              result.destination.index
-            );
+            reorderConditions(result.source.index, result.destination.index);
           }}
         >
           <Droppable droppableId="conditions">
@@ -204,7 +200,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
             )}
           </Droppable>
         </DragDropContext>
-        
+
         <Button
           variant="secondary"
           isSmall

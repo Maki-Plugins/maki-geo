@@ -252,6 +252,8 @@ function gu_enqueue_admin_scripts($hook)
         return;
     }
 
+    wp_enqueue_style('geoutils-admin-style', plugin_dir_url(__FILE__) . 'admin.css');
+
     wp_enqueue_script(
         'geoutils-admin',
         plugin_dir_url(__FILE__) . '../../build/admin.js',
@@ -265,7 +267,6 @@ function gu_enqueue_admin_scripts($hook)
         'nonce' => wp_create_nonce('geoutils_save_rules'),
         'rules' => get_option('geoutils_rules', [])
     ]);
-
 }
 
 add_action('admin_menu', 'gu_add_admin_menu');

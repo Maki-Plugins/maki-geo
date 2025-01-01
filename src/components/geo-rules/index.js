@@ -6,12 +6,10 @@ import {
   CardHeader,
   CardBody,
   Flex,
-  FlexItem,
   ButtonGroup,
   Dashicon,
 } from "@wordpress/components";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import "./style.css";
 
 export const locationTypes = {
   continent: "Continent",
@@ -36,12 +34,14 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
     const newRule = {
       id: Date.now().toString(),
       name: isGlobal ? `Rule ${rules.length + 1}` : undefined,
-      conditions: [{
-        type: "country",
-        value: ""
-      }],
+      conditions: [
+        {
+          type: "country",
+          value: "",
+        },
+      ],
       operator: "AND",
-      action: "show"
+      action: "show",
     };
     onChange([...rules, newRule]);
   };
@@ -59,7 +59,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
     const newRules = [...rules];
     newRules[ruleIndex].conditions.push({
       type: "country",
-      value: ""
+      value: "",
     });
     onChange(newRules);
   };
@@ -68,7 +68,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
     const newRules = [...rules];
     newRules[ruleIndex].conditions[conditionIndex] = {
       ...newRules[ruleIndex].conditions[conditionIndex],
-      ...updates
+      ...updates,
     };
     onChange(newRules);
   };
@@ -97,7 +97,9 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
           <SelectControl
             value={condition.value}
             options={continents}
-            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
+            onChange={(value) =>
+              updateCondition(ruleIndex, conditionIndex, { value })
+            }
           />
         );
       case "ip":
@@ -105,7 +107,9 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
           <TextControl
             placeholder="e.g. 192.168.1.0/24"
             value={condition.value}
-            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
+            onChange={(value) =>
+              updateCondition(ruleIndex, conditionIndex, { value })
+            }
           />
         );
       default:
@@ -113,7 +117,9 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
           <TextControl
             placeholder={`Enter ${locationTypes[condition.type]}`}
             value={condition.value}
-            onChange={(value) => updateCondition(ruleIndex, conditionIndex, { value })}
+            onChange={(value) =>
+              updateCondition(ruleIndex, conditionIndex, { value })
+            }
           />
         );
     }
@@ -142,7 +148,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
             <div className="visibility-toggle">
               <label>Content Visibility</label>
               <ButtonGroup>
-                <Button 
+                <Button
                   variant={rule.action === "show" ? "primary" : "secondary"}
                   onClick={() => updateRule(ruleIndex, { action: "show" })}
                 >
@@ -167,7 +173,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
               ]}
               onChange={(operator) => updateRule(ruleIndex, { operator })}
             />
-            
+
             <DragDropContext
               onDragEnd={(result) => {
                 if (!result.destination) return;
@@ -213,11 +219,17 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
                                 })
                               }
                             />
-                            {renderConditionInput(condition, ruleIndex, conditionIndex)}
+                            {renderConditionInput(
+                              condition,
+                              ruleIndex,
+                              conditionIndex
+                            )}
                             <Button
                               isDestructive
                               isSmall
-                              onClick={() => removeCondition(ruleIndex, conditionIndex)}
+                              onClick={() =>
+                                removeCondition(ruleIndex, conditionIndex)
+                              }
                               disabled={rule.conditions.length === 1}
                             >
                               Remove
@@ -231,7 +243,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
                 )}
               </Droppable>
             </DragDropContext>
-            
+
             <Button
               variant="secondary"
               isSmall
@@ -243,7 +255,7 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
           </CardBody>
         </Card>
       ))}
-      
+
       <Button
         variant="primary"
         className="geo-rule-add-button"

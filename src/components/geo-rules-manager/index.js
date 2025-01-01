@@ -1,18 +1,19 @@
 import { Button } from "@wordpress/components";
 import { GeoRuleEditor } from "../geo-rule-editor";
-import "./style.css";
 
 export function GeoRulesManager({ rules, onChange }) {
   const addRule = () => {
     const newRule = {
       id: Date.now().toString(),
       name: `Rule ${rules.length + 1}`,
-      conditions: [{
-        type: "country",
-        value: ""
-      }],
+      conditions: [
+        {
+          type: "country",
+          value: "",
+        },
+      ],
       operator: "AND",
-      action: "show"
+      action: "show",
     };
     onChange([...rules, newRule]);
   };
@@ -45,12 +46,8 @@ export function GeoRulesManager({ rules, onChange }) {
           </Button>
         </div>
       ))}
-      
-      <Button
-        variant="primary"
-        onClick={addRule}
-        className="add-rule-button"
-      >
+
+      <Button variant="primary" onClick={addRule} className="add-rule-button">
         Add Global Rule
       </Button>
     </div>
