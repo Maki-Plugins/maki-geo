@@ -11,14 +11,20 @@ function AdminGeoRules() {
     setRules(savedRules);
   }, []);
 
-  const handleRulesChange = (newRules) => {
-    setRules(newRules);
-    // Save to WordPress options via AJAX
-    jQuery.post(ajaxurl, {
-      action: "save_geo_rules",
-      rules: JSON.stringify(newRules),
-      nonce: window.geoUtilsSettings.nonce,
-    });
+  const handleRulesChange = async (newRules) => {
+    try {
+      const response = await wp.apiFetch({
+        path: 'geoutils/v1/rules',
+        method: 'POST',
+        data: newRules
+      });
+      
+      if (response.success) {
+        setRules(newRules);
+      }
+    } catch (error) {
+      console.error('Failed to save rules:', error);
+    }
   };
 
   return (

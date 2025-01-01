@@ -241,15 +241,3 @@ add_action('admin_menu', 'gu_add_admin_menu');
 add_action('admin_init', 'gu_register_settings');
 add_action('admin_enqueue_scripts', 'gu_enqueue_admin_scripts');
 
-// Add AJAX handler for saving rules
-add_action('wp_ajax_save_geo_rules', function () {
-    check_ajax_referer('geoutils_save_rules', 'nonce');
-
-    if (!current_user_can('manage_options')) {
-        wp_send_json_error('Unauthorized');
-    }
-
-    $rules = json_decode(stripslashes($_POST['rules']), true);
-    update_option('geoutils_rules', $rules);
-    wp_send_json_success();
-});
