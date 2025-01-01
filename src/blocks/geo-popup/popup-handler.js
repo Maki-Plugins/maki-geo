@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+(function() {
     const popups = document.querySelectorAll('.geo-popup-overlay');
 
     popups.forEach(popup => {
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
     });
-});
+})();
 
 function showPopup(popup) {
     popup.classList.add('is-active');

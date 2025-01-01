@@ -41,9 +41,18 @@ function enqueue_geo_target_scripts()
     // Enqueue the geo popup styles
     wp_enqueue_style(
         'geo-utils-popup-style',
-        plugins_url('blocks/geo-popup/style.css', __FILE__),
+        plugins_url('../build/blocks/geo-popup/style.css', __FILE__),
         [],
         '1.0.0'
+    );
+
+    // Enqueue the popup handler script
+    wp_enqueue_script(
+        'geo-utils-popup-handler',
+        plugins_url('../build/blocks/geo-popup/popup-handler.js', __FILE__),
+        [],
+        '1.0.0',
+        true
     );
 }
 
