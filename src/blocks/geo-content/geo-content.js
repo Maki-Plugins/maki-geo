@@ -15,6 +15,7 @@ import {
   Flex,
   FlexItem,
 } from "@wordpress/components";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import metadata from "./block.json";
 import "./geo-content.css";
 
@@ -98,12 +99,37 @@ registerBlockType(metadata.name, {
       <>
         <InspectorControls>
           <PanelBody title="Geo Targeting Rules" initialOpen={true}>
-            <div className="geo-rules-container">
-              {geoRules.map((rule, index) => (
-                <Card key={index} className="geo-rule-card">
-                  <CardHeader>
+            <DragDropContext onDragEnd={(result) => {
+              if (!result.destination) return;
+              
+              const newRules = Array.from(geoRules);
+              const [reorderedRule] = newRules.splice(result.source.index, 1);
+              newRules.splice(result.destination.index, 0, reorderedRule);
+              
+              setAttributes({ geoRules: newRules });
+            }}>
+              <Droppable droppableId="geo-rules">
+                {(provided) => (
+                  <div 
+                    className="geo-rules-container"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    {geoRules.map((rule, index) => (
+                      <Draggable 
+                        key={index} 
+                        draggableId={`rule-${index}`} 
+                        index={index}
+                      >
+                        {(provided) => (
+                <Card 
+                  className="geo-rule-card"
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                >
+                  <CardHeader {...provided.dragHandleProps}>
                     <Flex align="center">
-                      <FlexItem>Rule {index + 1}</FlexItem>
+                      <FlexItem>⋮⋮ Rule {index + 1}</FlexItem>
                       <Button
                         isDestructive
                         isSmall
@@ -135,8 +161,11 @@ registerBlockType(metadata.name, {
                     {renderRuleInput(rule, index)}
                   </CardBody>
                 </Card>
-              ))}
-              <Button
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    <Button
                 variant="primary"
                 className="geo-rule-add-button"
                 onClick={addGeoRule}

@@ -37,6 +37,11 @@
 .geo-rule-card {
     margin-bottom: 16px;
     border: 1px solid #e2e4e7;
+    cursor: grab;
+}
+
+.geo-rule-card:active {
+    cursor: grabbing;
 }
 
 .geo-rule-card .components-card__header {
