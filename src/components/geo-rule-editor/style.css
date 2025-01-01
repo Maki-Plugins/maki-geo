@@ -61,3 +61,26 @@
     color: #757575;
     padding: 0 8px;
 }
+.visibility-toggle {
+  margin-bottom: 16px;
+}
+
+.visibility-toggle label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.visibility-toggle .components-button-group {
+  display: flex;
+  gap: 4px;
+}
+
+.visibility-toggle .components-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visibility-toggle .dashicon {
+  margin-right: 4px;
+}

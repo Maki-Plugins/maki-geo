@@ -7,6 +7,8 @@ import {
   CardBody,
   Flex,
   FlexItem,
+  ButtonGroup,
+  Dashicon,
 } from "@wordpress/components";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./style.css";
@@ -137,15 +139,25 @@ export function GeoRules({ rules, onChange, isGlobal = false }) {
             </Flex>
           </CardHeader>
           <CardBody>
-            <SelectControl
-              label="Action"
-              value={rule.action}
-              options={[
-                { label: "Show Content", value: "show" },
-                { label: "Hide Content", value: "hide" },
-              ]}
-              onChange={(action) => updateRule(ruleIndex, { action })}
-            />
+            <div className="visibility-toggle">
+              <label>Content Visibility</label>
+              <ButtonGroup>
+                <Button 
+                  variant={rule.action === "show" ? "primary" : "secondary"}
+                  onClick={() => updateRule(ruleIndex, { action: "show" })}
+                >
+                  <Dashicon icon="visibility" />
+                  Show
+                </Button>
+                <Button
+                  variant={rule.action === "hide" ? "primary" : "secondary"}
+                  onClick={() => updateRule(ruleIndex, { action: "hide" })}
+                >
+                  <Dashicon icon="hidden" />
+                  Hide
+                </Button>
+              </ButtonGroup>
+            </div>
             <SelectControl
               label="Operator"
               value={rule.operator}
