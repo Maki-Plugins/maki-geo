@@ -56,7 +56,6 @@ registerBlockType(metadata.name, {
                                 value={triggerDelay}
                                 onChange={(value) => setAttributes({ triggerDelay: value })}
                                 min={0}
-                                max={60}
                             />
                         )}
                         <SelectControl
