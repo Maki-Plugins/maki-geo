@@ -117,18 +117,26 @@ registerBlockType(metadata.name, {
             triggerDelay,
         } = attributes;
 
-        const blockProps = useBlockProps.save({
+        // Create wrapper props for the overlay
+        const wrapperProps = useBlockProps.save({
+            className: 'geo-popup-overlay'
+        });
+
+        // Create props for the container
+        const containerProps = {
             className: 'geo-popup-container',
             style: popupStyle,
             'data-trigger': triggerType,
             'data-delay': triggerDelay,
-        });
+        };
 
         return (
-            <div {...blockProps}>
-                <button className="geo-popup-close" aria-label="Close popup">×</button>
-                {popupTitle && <h3 className="geo-popup-title">{popupTitle}</h3>}
-                <div dangerouslySetInnerHTML={{ __html: popupContent }} />
+            <div {...wrapperProps}>
+                <div {...containerProps}>
+                    <button className="geo-popup-close" aria-label="Close popup">×</button>
+                    {popupTitle && <h3 className="geo-popup-title">{popupTitle}</h3>}
+                    <div dangerouslySetInnerHTML={{ __html: popupContent }} />
+                </div>
             </div>
         );
     },
