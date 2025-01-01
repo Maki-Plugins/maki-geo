@@ -39,17 +39,20 @@ function get_geo_rules() {
 
 function create_geo_rule($request) {
     verify_nonce();
-    $rule = json_decode($request->get_body(), true);
+    $new_rules = json_decode($request->get_body(), true);
     
-    if (!validate_rule($rule)) {
-        return new WP_Error('invalid_rule', 'Invalid rule format', array('status' => 400));
+    if (!is_array($new_rules)) {
+        return new WP_Error('invalid_rules', 'Invalid rules format', array('status' => 400));
     }
 
-    $rules = get_option('geoutils_rules', array());
-    $rules[] = $rule;
-    update_option('geoutils_rules', $rules);
-    
-    return array('success' => true, 'rule' => $rule);
+    foreach ($new_rules as $rule) {
+        if (!validate_rule($rule)) {
+            return new WP_Error('invalid_rule', 'Invalid rule format', array('status' => 400));
+        }
+    }
+
+    update_option('geoutils_rules', $new_rules);
+    return array('success' => true, 'rules' => $new_rules);
 }
 
 function update_geo_rule($request) {
