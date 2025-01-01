@@ -260,9 +260,15 @@ function gu_enqueue_admin_scripts($hook)
         true
     );
 
+    // Admin script data
     wp_localize_script('geoutils-admin', 'geoUtilsSettings', [
         'nonce' => wp_create_nonce('geoutils_save_rules'),
         'rules' => get_option('geoutils_rules', [])
+    ]);
+
+    // Block editor script data
+    wp_localize_script('wp-blocks', 'geoUtilsSettings', [
+        'globalRules' => get_option('geoutils_rules', [])
     ]);
 }
 

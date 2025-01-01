@@ -18,7 +18,7 @@ registerBlockType(metadata.name, {
       className: "geo-target-block",
     });
 
-    const globalRules = window.geoUtilsSettings?.globalRules || [];
+    const globalRules = window.geoUtilsSettings?.rules || [];
 
     const handleRuleTypeChange = (newType) => {
       setSelectedType(newType);
