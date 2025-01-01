@@ -55,3 +55,4 @@ function gu_create_geo_popup_block()
 add_action('init', 'gu_create_geo_popup_block');
 
 require_once("src/index.php");
+require_once("src/admin/settings-page.php");
