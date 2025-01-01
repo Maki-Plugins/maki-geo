@@ -24,17 +24,8 @@ registerBlockType(metadata.name, {
           <PanelBody title="Geo Targeting Rules" initialOpen={true}>
             <GeoRules 
               rules={geoRules}
-              onChange={async (newRules) => {
-                try {
-                  await wp.apiFetch({
-                    path: 'geoutils/v1/rules',
-                    method: 'POST',
-                    data: newRules
-                  });
-                  setAttributes({ geoRules: newRules });
-                } catch (error) {
-                  console.error('Failed to update rules:', error);
-                }
+              onChange={(newRules) => {
+                setAttributes({ geoRules: newRules });
               }}
             />
           </PanelBody>
