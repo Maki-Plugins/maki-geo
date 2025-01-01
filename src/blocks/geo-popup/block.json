@@ -4,7 +4,7 @@
   "name": "geo-utils/geo-popup",
   "version": "0.0.1",
   "title": "Geo Popup",
-  "category": "widgets",
+  "category": "geoutils-category",
   "icon": "admin-site",
   "description": "Create location-based popup content",
   "supports": {
