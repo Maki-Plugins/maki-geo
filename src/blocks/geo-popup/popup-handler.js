@@ -52,10 +52,16 @@ function closePopup(popup) {
 
 function handleExitIntent(popup) {
     let shouldShow = true;
-    document.addEventListener('mouseleave', (e) => {
-        if (e.clientY <= 0 && shouldShow) {
+    
+    const handleMouseMove = (e) => {
+        // Check if the mouse is moving towards the top of the viewport
+        if (e.clientY < 10 && shouldShow) {
             showPopup(popup);
             shouldShow = false;
+            // Remove the event listener after showing the popup
+            document.removeEventListener('mousemove', handleMouseMove);
         }
-    });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
 }
