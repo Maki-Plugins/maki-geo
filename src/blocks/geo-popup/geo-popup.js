@@ -1,8 +1,8 @@
 import { registerBlockType } from '@wordpress/blocks';
 import {
     useBlockProps,
-    RichText,
     InspectorControls,
+    InnerBlocks
 } from '@wordpress/block-editor';
 import {
     PanelBody,
@@ -18,8 +18,6 @@ registerBlockType(metadata.name, {
     edit: ({ attributes, setAttributes }) => {
         const {
             geoRules = [],
-            popupContent,
-            popupTitle,
             popupStyle,
             triggerType,
             triggerDelay,
@@ -84,24 +82,8 @@ registerBlockType(metadata.name, {
                 </InspectorControls>
 
                 <div {...blockProps}>
-                    <div className="geo-popup-editor__section">
-                        <div className="geo-popup-editor__section-title">Popup Content</div>
-                        <TextControl
-                            label="Popup Title"
-                            value={popupTitle}
-                            onChange={(value) => setAttributes({ popupTitle: value })}
-                        />
-                        <RichText
-                            tagName="div"
-                            value={popupContent}
-                            onChange={(value) => setAttributes({ popupContent: value })}
-                            placeholder="Enter popup content..."
-                        />
-                    </div>
-
-                    <div className="geo-popup-preview" style={popupStyle}>
-                        <h3>{popupTitle || 'Popup Title'}</h3>
-                        <div dangerouslySetInnerHTML={{ __html: popupContent }} />
+                    <div className="geo-popup-editor__content" style={popupStyle}>
+                        <InnerBlocks />
                     </div>
                 </div>
             </>
@@ -110,8 +92,6 @@ registerBlockType(metadata.name, {
 
     save: ({ attributes }) => {
         const {
-            popupContent,
-            popupTitle,
             popupStyle,
             triggerType,
             triggerDelay,
@@ -134,8 +114,7 @@ registerBlockType(metadata.name, {
             <div {...wrapperProps}>
                 <div {...containerProps}>
                     <button className="geo-popup-close" aria-label="Close popup">×</button>
-                    {popupTitle && <h3 className="geo-popup-title">{popupTitle}</h3>}
-                    <div dangerouslySetInnerHTML={{ __html: popupContent }} />
+                    <InnerBlocks.Content />
                 </div>
             </div>
         );
