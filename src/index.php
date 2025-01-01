@@ -60,4 +60,4 @@ function enqueue_geo_target_scripts()
 
 require_once("blocks/setup.php");
 require_once("api/location.php");
-require_once("api/location.php");
+require_once("api/geo-rules.php");
