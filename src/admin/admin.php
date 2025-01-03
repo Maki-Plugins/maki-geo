@@ -140,6 +140,12 @@ function gu_render_settings_page()
             margin: 10px 0;
             color: #2271b1;
         }
+
+        .geo-rules-save-button {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: right;
+        }
     </style>
 
     <script>

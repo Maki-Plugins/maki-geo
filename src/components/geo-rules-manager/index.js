@@ -15,7 +15,7 @@ export function GeoRulesManager({ rules, onChange }) {
       operator: "AND",
       action: "show",
     };
-    onChange([...rules, newRule]);
+    onChange([...rules, newRule]); // This now just updates the local state
   };
 
   const updateRule = (index, updatedRule) => {
