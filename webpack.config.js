@@ -21,14 +21,19 @@ module.exports = {
     rules: [
       ...defaultConfig.module.rules,
       {
-        test: /\.js$/,
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env", "@babel/preset-react"],
+            },
           },
-        },
+          {
+            loader: "ts-loader",
+          },
+        ],
       },
     ],
   },
