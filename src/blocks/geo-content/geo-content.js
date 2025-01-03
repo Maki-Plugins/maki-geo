@@ -25,18 +25,18 @@ registerBlockType<BlockAttributes>(metadata.name, {
 
     const globalRules = window.geoUtilsData?.globalRules || [];
 
-    const createDefaultRule = () => ({
+    const createDefaultRule = (): GeoRule => ({
       conditions: [
         {
-          type: 'country' as const,
+          type: 'country',
           value: '',
         },
       ],
-      operator: 'AND' as const,
-      action: 'show' as const,
+      operator: 'AND',
+      action: 'show',
     });
 
-    const handleRuleTypeChange = (newType: 'local' | 'global') => {
+    const handleRuleTypeChange = (newType: 'local' | 'global'): void => {
       setSelectedType(newType);
       setAttributes({
         ruleType: newType,
