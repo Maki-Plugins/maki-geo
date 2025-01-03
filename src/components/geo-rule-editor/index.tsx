@@ -204,7 +204,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                           )}
                           onChange={(type) =>
                             updateCondition(conditionIndex, {
-                              type,
+                              type: type as GeoCondition["type"],
                               value: "",
                             })
                           }
