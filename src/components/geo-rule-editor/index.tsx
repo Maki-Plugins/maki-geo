@@ -16,7 +16,7 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import { FC } from "react";
-import { GeoRule, GlobalRule } from "../../types";
+import { GeoCondition, GeoRule, GlobalRule } from "../../types";
 
 interface GeoRuleEditorProps {
   rule: GlobalRule;
@@ -52,7 +52,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   showName = false,
 }) => {
   const addCondition = () => {
-    const newRule = {
+    const newRule: GlobalRule = {
       ...rule,
       conditions: [
         ...rule.conditions,
@@ -165,7 +165,9 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
             { label: "Match ALL conditions (AND)", value: "AND" },
             { label: "Match ANY condition (OR)", value: "OR" },
           ]}
-          onChange={(operator) => onChange({ ...rule, operator })}
+          onChange={(operator) =>
+            onChange({ ...rule, operator: operator as GlobalRule["operator"] })
+          }
         />
 
         <DragDropContext

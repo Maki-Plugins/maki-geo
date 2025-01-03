@@ -5,7 +5,7 @@ export interface GeoRule {
 }
 
 export interface GeoCondition {
-  type: "country" | "city" | "continent";
+  type: "continent" | "country" | "region" | "city" | "ip";
   value: string;
 }
 
