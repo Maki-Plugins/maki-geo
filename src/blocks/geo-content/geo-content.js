@@ -1,30 +1,42 @@
-import { registerBlockType } from "@wordpress/blocks";
+import { registerBlockType } from '@wordpress/blocks';
 import {
   InnerBlocks,
   InspectorControls,
   useBlockProps,
-} from "@wordpress/block-editor";
-import { PanelBody, RadioControl, Button } from "@wordpress/components";
-import { GeoRuleEditor } from "../../components/geo-rule-editor";
-import { useState } from "@wordpress/element";
-import metadata from "./block.json";
-import "./geo-content.css";
+} from '@wordpress/block-editor';
+import { PanelBody, RadioControl } from '@wordpress/components';
+import { GeoRuleEditor } from '../../components/geo-rule-editor';
+import { useState } from '@wordpress/element';
+import metadata from './block.json';
+import { BlockAttributes, GeoRule } from '../../types';
+import './geo-content.css';
 
-registerBlockType(metadata.name, {
+registerBlockType<BlockAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
     const {
-      ruleType = "global",
+      ruleType = 'local',
       localRule = null,
       globalRuleId = null,
     } = attributes;
-    const [selectedType, setSelectedType] = useState(ruleType);
+    const [selectedType, setSelectedType] = useState<'local' | 'global'>(ruleType);
     const blockProps = useBlockProps({
-      className: "geo-target-block",
+      className: 'geo-target-block',
     });
 
     const globalRules = window.geoUtilsData?.globalRules || [];
 
-    const handleRuleTypeChange = (newType) => {
+    const createDefaultRule = (): GeoRule => ({
+      conditions: [
+        {
+          type: 'country',
+          value: '',
+        },
+      ],
+      operator: 'AND',
+      action: 'show',
+    });
+
+    const handleRuleTypeChange = (newType: 'local' | 'global') => {
       setSelectedType(newType);
       setAttributes({
         ruleType: newType,
@@ -33,17 +45,6 @@ registerBlockType(metadata.name, {
         globalRuleId: newType === "global" ? globalRuleId : null,
       });
     };
-
-    const createDefaultRule = () => ({
-      conditions: [
-        {
-          type: "country",
-          value: "",
-        },
-      ],
-      operator: "AND",
-      action: "show",
-    });
 
     return (
       <>
