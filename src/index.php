@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Plugin Name:       GeoUtils
+ * Plugin Name:       Maki Geo
  * Description:       Geo targeting
  * Version:           0.0.1
  * Requires at least: 6.6
  * Requires PHP:      7.2
  *
- * @package           geo-utils
+ * @package maki-geo
  */
 
 if (! defined('ABSPATH')) {
@@ -26,10 +26,12 @@ function register_geo_target_assets()
         true
     );
 
-    wp_localize_script('geo-target-frontend', 'geoUtilsData', [
+    wp_localize_script(
+        'geo-target-frontend', 'geoUtilsData', [
         'endpoint' => rest_url('geoutils/v1/location'),
         'nonce' => wp_create_nonce('wp_rest')
-    ]);
+        ]
+    );
 }
 
 add_action('wp_enqueue_scripts', 'enqueue_geo_target_scripts');
@@ -58,6 +60,6 @@ function enqueue_geo_target_scripts()
 
 
 
-require_once("blocks/setup.php");
-require_once("api/location.php");
-require_once("api/geo-rules.php");
+require_once "blocks/setup.php";
+require_once "api/location.php";
+require_once "api/geo-rules.php";
