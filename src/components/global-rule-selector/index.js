@@ -1,6 +1,18 @@
 import { SelectControl } from "@wordpress/components";
+import { FC } from "react";
+import { GlobalRule } from "../../types";
 
-export function GlobalRuleSelector({ globalRules, selectedRuleIds, onChange }) {
+interface GlobalRuleSelectorProps {
+  globalRules: GlobalRule[];
+  selectedRuleIds: string[];
+  onChange: (newIds: string[]) => void;
+}
+
+export const GlobalRuleSelector: FC<GlobalRuleSelectorProps> = ({
+  globalRules,
+  selectedRuleIds,
+  onChange,
+}) => {
   return (
     <div className="global-rule-selector">
       <SelectControl
@@ -11,8 +23,8 @@ export function GlobalRuleSelector({ globalRules, selectedRuleIds, onChange }) {
           label: rule.name,
           value: rule.id,
         }))}
-        onChange={(newIds) => onChange(newIds)}
+        onChange={(newIds: string[]) => onChange(newIds)}
       />
     </div>
   );
-}
+};
