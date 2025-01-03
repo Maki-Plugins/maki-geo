@@ -4,12 +4,14 @@ import {
   InspectorControls,
   useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, RadioControl } from '@wordpress/components';
+import { PanelBody, RadioControl, SelectControl } from '@wordpress/components';
 import { GeoRuleEditor } from '../../components/geo-rule-editor';
 import { useState } from '@wordpress/element';
 import metadata from './block.json';
-import { BlockAttributes, GeoRule } from '../../types';
+import { BlockAttributes, GeoRule, GlobalRule } from '../../types';
 import './geo-content.css';
+
+type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
 
 registerBlockType<BlockAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
@@ -63,13 +65,13 @@ registerBlockType<BlockAttributes>(metadata.name, {
             {selectedType === "global" && (
               <select
                 value={globalRuleId || ""}
-                onChange={(e) =>
+                onChange={(e: SelectChangeEvent) =>
                   setAttributes({ globalRuleId: e.target.value })
                 }
                 style={{ width: "100%", marginTop: "10px" }}
               >
                 <option value="">Select a global rule</option>
-                {globalRules.map((rule) => (
+                {(globalRules as GlobalRule[]).map((rule) => (
                   <option key={rule.id} value={rule.id}>
                     {rule.name}
                   </option>

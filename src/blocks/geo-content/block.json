@@ -22,7 +22,7 @@
     }
   },
   "supports": {},
-  "editorScript": "file:./geo-content.js",
+  "editorScript": "file:./geo-content.tsx",
   "editorStyle": "file:./geo-content.css",
   "render": "file:./render.php"
 }
