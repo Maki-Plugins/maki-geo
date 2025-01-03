@@ -13,7 +13,7 @@ interface ApiResponse {
 declare global {
   interface Window {
     geoUtilsSettings?: {
-      rules: GlobalRule[];
+      globalRules: GlobalRule[];
     };
   }
 }
@@ -24,7 +24,7 @@ function AdminGeoRules(): JSX.Element {
 
   useEffect(() => {
     // Load initial rules from WordPress options
-    const savedRules = window.geoUtilsSettings?.rules || [];
+    const savedRules = window.geoUtilsSettings?.globalRules || [];
     setRules(savedRules);
   }, []);
 
@@ -56,12 +56,12 @@ function AdminGeoRules(): JSX.Element {
     <div className="geo-rules-admin-wrapper">
       <GeoRulesManager rules={rules} onChange={handleRulesChange} />
       <div className="geo-rules-save-button">
-        <button 
+        <button
           className="button button-primary"
           onClick={handleSave}
           disabled={isSaving}
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>
