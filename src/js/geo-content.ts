@@ -40,7 +40,7 @@ async function initGeoTargeting(): Promise<void> {
 
       console.log(JSON.stringify(block.dataset));
 
-      const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
+      const shouldShow = rule ? evaluateGeoRules([rule], response) : true;
       block.style.display = shouldShow ? "block" : "none";
     });
   } catch (error) {
@@ -52,7 +52,7 @@ async function initGeoTargeting(): Promise<void> {
   }
 }
 
-function evaluateGeoRules(rules: GeoRule[], locationData: LocationData): boolean {
+export function evaluateGeoRules(rules: GeoRule[], locationData: LocationData): boolean {
   console.log(`Rules: ${JSON.stringify(rules)}`);
   console.log(`Location data: ${JSON.stringify(locationData)}`);
 
