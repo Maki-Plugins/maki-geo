@@ -1,14 +1,13 @@
 import { Button } from "@wordpress/components";
 import { GeoRuleEditor } from "../geo-rule-editor";
 import { GlobalRule } from "../../types";
-import { FC } from 'react';
 
 interface GeoRulesManagerProps {
   rules: GlobalRule[];
   onChange: (rules: GlobalRule[]) => void;
 }
 
-export const GeoRulesManager: FC<GeoRulesManagerProps> = ({ rules, onChange }) => {
+export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
   const addRule = () => {
     const newRule: GlobalRule = {
       id: Date.now().toString(),
@@ -41,7 +40,9 @@ export const GeoRulesManager: FC<GeoRulesManagerProps> = ({ rules, onChange }) =
         <div key={rule.id} className="geo-rule-wrapper">
           <GeoRuleEditor
             rule={rule}
-            onChange={(updatedRule) => updateRule(index, updatedRule)}
+            onChange={(updatedRule: GlobalRule) =>
+              updateRule(index, updatedRule)
+            }
             showName={true}
           />
           <div className="rule-actions">

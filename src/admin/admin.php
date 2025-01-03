@@ -273,7 +273,7 @@ function gu_enqueue_admin_scripts($hook)
     wp_localize_script(
         'geoutils-admin', 'geoUtilsSettings', [
         'nonce' => wp_create_nonce('geoutils_save_rules'),
-        'rules' => get_option('geoutils_rules', [])
+        'globalRules' => get_option('geoutils_rules', [])
         ]
     );
 }
