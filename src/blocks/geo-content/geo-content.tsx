@@ -1,29 +1,35 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType } from "@wordpress/blocks";
 import {
   InnerBlocks,
   InspectorControls,
   useBlockProps,
-} from '@wordpress/block-editor';
-import { PanelBody, RadioControl, SelectControl } from '@wordpress/components';
-import { GeoRuleEditor } from '../../components/geo-rule-editor';
-import { useState } from '@wordpress/element';
-import metadata from './block.json';
-import { BlockAttributes, GeoRule, GlobalRule } from '../../types';
-import './geo-content.css';
-import React from 'react';
+} from "@wordpress/block-editor";
+import { PanelBody, RadioControl } from "@wordpress/components";
+import { GeoRuleEditor } from "../../components/geo-rule-editor";
+import { useState } from "@wordpress/element";
+import metadata from "./block.json";
+import { BlockAttributes, GeoRule, GlobalRule } from "../../types";
+import "./geo-content.css";
+import React from "react";
 
 interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> {}
 
-registerBlockType<BlockAttributes>(metadata.name, {
+const { name, ...settings } = metadata;
+
+//@ts-ignore
+registerBlockType<BlockAttributes>(name, {
+  ...settings,
   edit: ({ attributes, setAttributes }) => {
     const {
-      ruleType = 'local',
+      ruleType = "local",
       localRule = null,
       globalRuleId = null,
     } = attributes;
-    const [selectedType, setSelectedType] = useState<'local' | 'global'>(ruleType);
+    const [selectedType, setSelectedType] = useState<"local" | "global">(
+      ruleType
+    );
     const blockProps = useBlockProps({
-      className: 'geo-target-block',
+      className: "geo-target-block",
     });
 
     const globalRules: GlobalRule[] = window.geoUtilsData?.globalRules || [];
@@ -31,15 +37,15 @@ registerBlockType<BlockAttributes>(metadata.name, {
     const createDefaultRule = (): GeoRule => ({
       conditions: [
         {
-          type: 'country',
-          value: '',
+          type: "country",
+          value: "",
         },
       ],
-      operator: 'AND',
-      action: 'show',
+      operator: "AND",
+      action: "show",
     });
 
-    const handleRuleTypeChange = (newType: 'local' | 'global'): void => {
+    const handleRuleTypeChange = (newType: "local" | "global"): void => {
       setSelectedType(newType);
       setAttributes({
         ruleType: newType,
@@ -58,9 +64,11 @@ registerBlockType<BlockAttributes>(metadata.name, {
               selected={selectedType}
               options={[
                 { label: "Create Local Rule", value: "local" },
-                { label: "Use Global Rule", value: "global" }
+                { label: "Use Global Rule", value: "global" },
               ]}
-              onChange={handleRuleTypeChange}
+              onChange={(value) =>
+                handleRuleTypeChange(value === "local" ? "local" : "global")
+              }
             />
 
             {selectedType === "global" && (
@@ -83,7 +91,9 @@ registerBlockType<BlockAttributes>(metadata.name, {
             {selectedType === "local" && (
               <GeoRuleEditor
                 rule={localRule || createDefaultRule()}
-                onChange={(newRule) => setAttributes({ localRule: newRule })}
+                onChange={(newRule: GeoRule) =>
+                  setAttributes({ localRule: newRule })
+                }
                 showName={false}
               />
             )}
@@ -93,11 +103,11 @@ registerBlockType<BlockAttributes>(metadata.name, {
         <div {...blockProps}>
           <div className="geo-target-block__label">
             Geo Targeted Content
-            {(
+            {
               <span className="geo-target-type">
                 ({selectedType === "global" ? "Global Rule" : "Local Rule"})
               </span>
-            )}
+            }
           </div>
           <InnerBlocks
             renderAppender={() => <InnerBlocks.ButtonBlockAppender />}

@@ -15,8 +15,7 @@ $block_id = wp_unique_id('gu-geo-target-');
 $wrapped_content = sprintf(
     '<div class="gu-geo-target-block" id="%s" style="display: none;" data-rules="%s">%s</div>',
     esc_attr($block_id),
-    esc_attr(wp_json_encode($attributes['localRules'] ?? [])),
-    esc_attr(wp_json_encode($attributes['globalRuleIds'] ?? [])),
+    esc_attr(wp_json_encode($attributes['localRule'] ?? $attributes['globalRuleId'] ?? [])),
     $content
 );
 

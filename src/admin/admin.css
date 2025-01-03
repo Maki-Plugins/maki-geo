@@ -104,18 +104,12 @@
     font-size: 16px;
 }
 
-.visibility-toggle {
-    margin-bottom: 20px;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #dcdcde;
-}
-
 .visibility-toggle label {
+    font-size: 11px;
     font-weight: 500;
     color: #1e1e1e;
-    margin-bottom: 10px;
+    padding-bottom: 14px;
+    text-transform: uppercase;
 }
 
 .visibility-toggle .components-button-group {

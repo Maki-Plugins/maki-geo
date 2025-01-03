@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./build",
-    "target": "es5",
-    "module": "esnext",
+    "target": "es2016",
+    "module": "CommonJS",
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
@@ -15,7 +15,15 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "checkJs": false /* Enable error reporting in type-checked JavaScript files. */,
+
+    /* Type Checking */
+    "strictNullChecks": true /* When type checking, take into account `null` and `undefined`. */,
+    "noImplicitThis": true /* Enable error reporting when `this` is given the type `any`. */,
+    "alwaysStrict": true /* Ensure 'use strict' is always emitted. */,
+    "noUnusedLocals": true /* Enable error reporting when a local variables aren't read. */,
+    "noUnusedParameters": true /* Raise an error when a function parameter isn't read */
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "build"]

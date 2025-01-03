@@ -1,4 +1,4 @@
-import { GeoRule, GlobalRule } from '../types';
+import { GeoRule, GlobalRule } from "../types";
 
 interface LocationData {
   country: string;
@@ -24,7 +24,9 @@ async function initGeoTargeting(): Promise<void> {
     });
     console.log(`API response: ${JSON.stringify(response)}`);
 
-    const blocks = document.querySelectorAll<HTMLElement>(".gu-geo-target-block");
+    const blocks = document.querySelectorAll<HTMLElement>(
+      ".gu-geo-target-block"
+    );
     const globalRules = window.geoUtilsSettings?.globalRules || [];
 
     blocks.forEach((block) => {
@@ -52,7 +54,10 @@ async function initGeoTargeting(): Promise<void> {
   }
 }
 
-export function evaluateGeoRules(rules: GeoRule[], locationData: LocationData): boolean {
+function evaluateGeoRules(
+  rules: GeoRule[],
+  locationData: LocationData
+): boolean {
   console.log(`Rules: ${JSON.stringify(rules)}`);
   console.log(`Location data: ${JSON.stringify(locationData)}`);
 
@@ -64,11 +69,18 @@ export function evaluateGeoRules(rules: GeoRule[], locationData: LocationData): 
     const results = rule.conditions.map((condition) => {
       switch (condition.type) {
         case "country":
-          return condition.value.toLowerCase() === locationData.country.toLowerCase();
+          return (
+            condition.value.toLowerCase() === locationData.country.toLowerCase()
+          );
         case "city":
-          return condition.value.toLowerCase() === locationData.city.toLowerCase();
+          return (
+            condition.value.toLowerCase() === locationData.city.toLowerCase()
+          );
         case "continent":
-          return condition.value.toLowerCase() === locationData.continent.toLowerCase();
+          return (
+            condition.value.toLowerCase() ===
+            locationData.continent.toLowerCase()
+          );
         default:
           return false;
       }

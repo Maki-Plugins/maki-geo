@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 function gu_render_settings_page()
 {
-?>
+    ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
@@ -165,7 +165,7 @@ function gu_render_settings_page()
             tabs.forEach(tab => tab.addEventListener('click', switchTab));
         });
     </script>
-<?php
+    <?php
 }
 
 function gu_register_settings()
@@ -211,26 +211,26 @@ function gu_render_debug_mode_field()
 {
     $options = get_option('geoutils_options');
     $debug_mode = isset($options['debug_mode']) ? $options['debug_mode'] : 0;
-?>
+    ?>
     <label>
         <input type="checkbox" name="geoutils_options[debug_mode]" value="1" <?php checked(1, $debug_mode); ?> />
         Enable debug logging
     </label>
     <p class="description">When enabled, additional debugging information will be logged.</p>
-<?php
+    <?php
 }
 
 function gu_render_default_action_field()
 {
     $options = get_option('geoutils_rules_options');
     $default_action = isset($options['default_action']) ? $options['default_action'] : 'show';
-?>
+    ?>
     <select name="geoutils_rules_options[default_action]">
         <option value="show" <?php selected('show', $default_action); ?>>Show Content</option>
         <option value="hide" <?php selected('hide', $default_action); ?>>Hide Content</option>
     </select>
     <p class="description">Default action when no geo rules match.</p>
-<?php
+    <?php
 }
 
 function gu_add_admin_menu()
@@ -252,21 +252,24 @@ function gu_enqueue_admin_scripts($hook)
         return;
     }
 
+    wp_enqueue_style('wp-edit-blocks');  // For block editor styles
     wp_enqueue_style('geoutils-admin-style', plugin_dir_url(__FILE__) . 'admin.css');
 
+    $script_args = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
     wp_enqueue_script(
         'geoutils-admin',
         plugin_dir_url(__FILE__) . '../../build/admin.js',
-        ['wp-element', 'wp-components', 'jquery'],
-        '1.0.0',
+        $script_args['dependencies'], $script_args['version'],
         true
     );
 
     // Admin script data
-    wp_localize_script('geoutils-admin', 'geoUtilsSettings', [
+    wp_localize_script(
+        'geoutils-admin', 'geoUtilsSettings', [
         'nonce' => wp_create_nonce('geoutils_save_rules'),
         'rules' => get_option('geoutils_rules', [])
-    ]);
+        ]
+    );
 }
 
 add_action('admin_menu', 'gu_add_admin_menu');

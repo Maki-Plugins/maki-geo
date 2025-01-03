@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     ...defaultConfig.entry(),
     admin: path.resolve(__dirname, "src/admin/index.js"),
+    "geo-content-frontend": path.resolve(__dirname, "src/js/geo-content.ts"),
   },
   output: {
     path: path.resolve(__dirname, "build"),
@@ -32,6 +33,10 @@ module.exports = {
           },
           {
             loader: "ts-loader",
+            options: {
+              configFile: "tsconfig.json",
+              transpileOnly: true,
+            },
           },
         ],
       },

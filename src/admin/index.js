@@ -1,4 +1,5 @@
 import { render } from "@wordpress/element";
+import apiFetch from "@wordpress/api-fetch";
 import { GeoRulesManager } from "../components/geo-rules-manager";
 import { useState, useEffect } from "react";
 
@@ -13,17 +14,17 @@ function AdminGeoRules() {
 
   const handleRulesChange = async (newRules) => {
     try {
-      const response = await wp.apiFetch({
-        path: 'geoutils/v1/rules',
-        method: 'POST',
-        data: newRules
+      const response = await apiFetch({
+        path: "geoutils/v1/rules",
+        method: "POST",
+        data: newRules,
       });
-      
+
       if (response.success) {
         setRules(newRules);
       }
     } catch (error) {
-      console.error('Failed to save rules:', error);
+      console.error("Failed to save rules:", error);
     }
   };
 
