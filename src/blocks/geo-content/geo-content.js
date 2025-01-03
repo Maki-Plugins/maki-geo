@@ -10,8 +10,9 @@ import { useState } from '@wordpress/element';
 import metadata from './block.json';
 import { BlockAttributes, GeoRule, GlobalRule } from '../../types';
 import './geo-content.css';
+import React from 'react';
 
-type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
+interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> {}
 
 registerBlockType<BlockAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }) => {
@@ -25,7 +26,7 @@ registerBlockType<BlockAttributes>(metadata.name, {
       className: 'geo-target-block',
     });
 
-    const globalRules = window.geoUtilsData?.globalRules || [];
+    const globalRules: GlobalRule[] = window.geoUtilsData?.globalRules || [];
 
     const createDefaultRule = (): GeoRule => ({
       conditions: [
@@ -71,7 +72,7 @@ registerBlockType<BlockAttributes>(metadata.name, {
                 style={{ width: "100%", marginTop: "10px" }}
               >
                 <option value="">Select a global rule</option>
-                {(globalRules as GlobalRule[]).map((rule) => (
+                {globalRules.map((rule) => (
                   <option key={rule.id} value={rule.id}>
                     {rule.name}
                   </option>
