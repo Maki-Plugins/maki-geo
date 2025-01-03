@@ -9,9 +9,21 @@ import {
   ButtonGroup,
   Dashicon,
 } from "@wordpress/components";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
+import { FC } from 'react';
+import { GeoRule, GlobalRule } from "../../types";
 
-export const locationTypes = {
+interface GeoRuleEditorProps {
+  rule: GlobalRule;
+  onChange: (rule: GlobalRule) => void;
+  showName?: boolean;
+}
+
+interface LocationType {
+  [key: string]: string;
+}
+
+export const locationTypes: LocationType = {
   continent: "Continent",
   country: "Country",
   region: "State/Province",
@@ -29,7 +41,7 @@ export const continents = [
   { label: "South America", value: "SA" },
 ];
 
-export function GeoRuleEditor({ rule, onChange, showName = false }) {
+export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({ rule, onChange, showName = false }) => {
   const addCondition = () => {
     const newRule = {
       ...rule,
@@ -44,7 +56,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
     onChange(newRule);
   };
 
-  const updateCondition = (conditionIndex, updates) => {
+  const updateCondition = (conditionIndex: number, updates: Partial<GeoRule['conditions'][0]>) => {
     const newRule = {
       ...rule,
       conditions: rule.conditions.map((condition, i) =>
@@ -62,14 +74,14 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
     onChange(newRule);
   };
 
-  const reorderConditions = (startIndex, endIndex) => {
+  const reorderConditions = (startIndex: number, endIndex: number) => {
     const newConditions = [...rule.conditions];
     const [removed] = newConditions.splice(startIndex, 1);
     newConditions.splice(endIndex, 0, removed);
     onChange({ ...rule, conditions: newConditions });
   };
 
-  const renderConditionInput = (condition, conditionIndex) => {
+  const renderConditionInput = (condition: GeoRule['conditions'][0], conditionIndex: number) => {
     switch (condition.type) {
       case "continent":
         return (
@@ -142,7 +154,7 @@ export function GeoRuleEditor({ rule, onChange, showName = false }) {
         />
 
         <DragDropContext
-          onDragEnd={(result) => {
+          onDragEnd={(result: DropResult) => {
             if (!result.destination) return;
             reorderConditions(result.source.index, result.destination.index);
           }}
