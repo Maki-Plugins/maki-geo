@@ -20,7 +20,7 @@ function register_geo_target_assets()
 {
     wp_register_script(
         'geo-target-frontend',
-        plugins_url('js/geo-content.js', __FILE__),
+        plugins_url('build/js/geo-content.js', __FILE__),
         ['wp-api-fetch'],
         '1.0.0',
         true
