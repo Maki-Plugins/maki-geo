@@ -1,15 +1,17 @@
 <?php
 
 // Set up own category
-add_filter('block_categories_all', function ($categories, $post) {
-    return array_merge(
-        array(
+add_filter(
+    'block_categories_all', function ($categories, $post) {
+        return array_merge(
             array(
-                'slug'  => 'geoutils-category',
-                'title' => 'GeoUtils Blocks',
+            array(
+                'slug'  => 'maki-geo-category',
+                'title' => 'Maki Geo Blocks',
                 'icon'  => 'location',
             ),
-        ),
-        $categories
-    );
-}, 10, 2);
+            ),
+            $categories
+        );
+    }, 10, 2
+);

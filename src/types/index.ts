@@ -38,7 +38,7 @@ export interface LocationData {
 
 declare global {
   interface Window {
-    geoUtilsData?: {
+    makiGeoData?: {
       globalRules: GlobalGeoRule[];
     };
   }

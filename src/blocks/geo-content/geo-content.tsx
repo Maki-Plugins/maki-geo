@@ -38,8 +38,6 @@ registerBlockType<BlockAttributes>(name, {
       className: "geo-target-block",
     });
 
-    const globalRules: GlobalGeoRule[] = window.geoUtilsData?.globalRules || [];
-
     const createDefaultRule = (): LocalGeoRule => ({
       ruleType: "local",
       conditions: [

@@ -27,8 +27,8 @@ function register_geo_target_assets()
     );
 
     wp_localize_script(
-        'geo-target-frontend', 'geoUtilsData', [
-        'endpoint' => rest_url('geoutils/v1/location'),
+        'geo-target-frontend', 'makiGeoData', [
+        'endpoint' => rest_url('maki-geo/v1/location'),
         'nonce' => wp_create_nonce('wp_rest')
         ]
     );

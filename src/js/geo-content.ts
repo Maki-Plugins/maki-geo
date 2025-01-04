@@ -2,7 +2,7 @@ import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types";
 
 declare global {
   interface Window {
-    geoUtilsSettings?: {
+    makiGeoSettings?: {
       globalRules: GlobalGeoRule[];
     };
     wp: {
@@ -14,7 +14,7 @@ declare global {
 async function initGeoTargeting(): Promise<void> {
   try {
     const response = await window.wp.apiFetch({
-      path: "geoutils/v1/location",
+      path: "maki-geo/v1/location",
     });
     console.log(`API response: ${JSON.stringify(response)}`);
 
@@ -24,7 +24,7 @@ async function initGeoTargeting(): Promise<void> {
     const blocks = document.querySelectorAll<HTMLElement>(
       `.${blocksClass}, .${popupsClass}`
     );
-    const globalRules = window.geoUtilsSettings?.globalRules || [];
+    const globalRules = window.makiGeoSettings?.globalRules || [];
 
     blocks.forEach((block) => {
       const ruleType = block.dataset.ruletype;
@@ -44,7 +44,7 @@ async function initGeoTargeting(): Promise<void> {
         block.dataset.geoAllowed = shouldShow.toString();
         block.dataset.geoReady = "true";
         // Dispatch event to notify popup handler
-        block.dispatchEvent(new CustomEvent('geoRuleEvaluated'));
+        block.dispatchEvent(new CustomEvent("geoRuleEvaluated"));
       } else {
         // For regular blocks, set display directly
         block.style.display = shouldShow ? "block" : "none";

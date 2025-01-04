@@ -22,7 +22,7 @@ export const GeoRulesPanel: React.FC<GeoRulesPanelProps> = ({
   onLocalRuleChange,
   onGlobalRuleIdChange,
 }) => {
-  const globalRules: GlobalGeoRule[] = window.geoUtilsData?.globalRules || [];
+  const globalRules: GlobalGeoRule[] = window.makiGeoData?.globalRules || [];
 
   const createDefaultRule = (): LocalGeoRule => ({
     ruleType: "local",
@@ -52,7 +52,9 @@ export const GeoRulesPanel: React.FC<GeoRulesPanelProps> = ({
       {ruleType === "global" && (
         <select
           value={globalRuleId || ""}
-          onChange={(e: SelectChangeEvent) => onGlobalRuleIdChange(e.target.value)}
+          onChange={(e: SelectChangeEvent) =>
+            onGlobalRuleIdChange(e.target.value)
+          }
           style={{ width: "100%", marginTop: "10px" }}
         >
           <option value="">Select a global rule</option>

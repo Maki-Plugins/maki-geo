@@ -5,7 +5,7 @@ require_once 'utils.php';
 add_action(
     'rest_api_init', function () {
         register_rest_route(
-            'geoutils/v1', '/rules', array(
+            'maki-geo/v1', '/rules', array(
             array(
             'methods' => 'GET',
             'callback' => 'get_geo_rules',
@@ -39,7 +39,7 @@ add_action(
 function get_geo_rules()
 {
     verify_nonce();
-    return get_option('geoutils_rules', array());
+    return get_option('maki_geo_rules', array());
 }
 
 function create_geo_rule($request)
@@ -57,7 +57,7 @@ function create_geo_rule($request)
         }
     }
 
-    update_option('geoutils_rules', $new_rules);
+    update_option('maki_geo_rules', $new_rules);
     return array('success' => true, 'rules' => $new_rules);
 }
 
@@ -71,13 +71,13 @@ function update_geo_rule($request)
         return new WP_Error('invalid_request', 'Invalid request', array('status' => 400));
     }
 
-    $rules = get_option('geoutils_rules', array());
+    $rules = get_option('maki_geo_rules', array());
     if (!isset($rules[$index])) {
         return new WP_Error('not_found', 'Rule not found', array('status' => 404));
     }
 
     $rules[$index] = $rule;
-    update_option('geoutils_rules', $rules);
+    update_option('maki_geo_rules', $rules);
     
     return array('success' => true, 'rule' => $rule);
 }
@@ -91,13 +91,13 @@ function delete_geo_rule($request)
         return new WP_Error('invalid_request', 'Invalid index', array('status' => 400));
     }
 
-    $rules = get_option('geoutils_rules', array());
+    $rules = get_option('maki_geo_rules', array());
     if (!isset($rules[$index])) {
         return new WP_Error('not_found', 'Rule not found', array('status' => 404));
     }
 
     array_splice($rules, $index, 1);
-    update_option('geoutils_rules', $rules);
+    update_option('maki_geo_rules', $rules);
     
     return array('success' => true);
 }
@@ -105,7 +105,7 @@ function delete_geo_rule($request)
 function delete_all_geo_rules()
 {
     verify_nonce();
-    update_option('geoutils_rules', array());
+    update_option('maki_geo_rules', array());
     return array('success' => true);
 }
 

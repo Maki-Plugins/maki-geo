@@ -50,8 +50,8 @@ function gu_render_settings_page()
                     <h2>General Settings</h2>
                     <form method="post" action="options.php">
                         <?php
-                        settings_fields('geoutils_settings');
-                        do_settings_sections('geoutils_settings');
+                        settings_fields('maki_geo_settings');
+                        do_settings_sections('maki_geo_settings');
                         submit_button();
                         ?>
                         <hr />
@@ -69,7 +69,7 @@ function gu_render_settings_page()
 
                                 try {
                                     const response = await wp.apiFetch({
-                                        path: 'geoutils/v1/rules',
+                                        path: 'maki-geo/v1/rules',
                                         method: 'DELETE',
                                     });
 
@@ -177,49 +177,49 @@ function gu_render_settings_page()
 function gu_register_settings()
 {
     // General Settings
-    register_setting('geoutils_settings', 'geoutils_options');
+    register_setting('maki_geo_settings', 'maki_geo_options');
 
     add_settings_section(
-        'geoutils_general_section',
+        'maki_geo_general_section',
         'General Settings',
         null,
-        'geoutils_settings'
+        'maki_geo_settings'
     );
 
     add_settings_field(
         'debug_mode',
         'Debug Mode',
         'gu_render_debug_mode_field',
-        'geoutils_settings',
-        'geoutils_general_section'
+        'maki_geo_settings',
+        'maki_geo_general_section'
     );
 
     // Geo Rules Settings
-    register_setting('geoutils_rules', 'geoutils_rules_options');
+    register_setting('maki_geo_rules', 'maki_geo_rules_options');
 
     add_settings_section(
-        'geoutils_rules_section',
+        'maki_geo_rules_section',
         'Default Geo Rules',
         null,
-        'geoutils_rules'
+        'maki_geo_rules'
     );
 
     add_settings_field(
         'default_action',
         'Default Action',
         'gu_render_default_action_field',
-        'geoutils_rules',
-        'geoutils_rules_section'
+        'maki_geo_rules',
+        'maki_geo_rules_section'
     );
 }
 
 function gu_render_debug_mode_field()
 {
-    $options = get_option('geoutils_options');
+    $options = get_option('maki_geo_options');
     $debug_mode = isset($options['debug_mode']) ? $options['debug_mode'] : 0;
     ?>
     <label>
-        <input type="checkbox" name="geoutils_options[debug_mode]" value="1" <?php checked(1, $debug_mode); ?> />
+        <input type="checkbox" name="maki_geo_options[debug_mode]" value="1" <?php checked(1, $debug_mode); ?> />
         Enable debug logging
     </label>
     <p class="description">When enabled, additional debugging information will be logged.</p>
@@ -228,10 +228,10 @@ function gu_render_debug_mode_field()
 
 function gu_render_default_action_field()
 {
-    $options = get_option('geoutils_rules_options');
+    $options = get_option('maki_geo_rules_options');
     $default_action = isset($options['default_action']) ? $options['default_action'] : 'show';
     ?>
-    <select name="geoutils_rules_options[default_action]">
+    <select name="maki_geo_rules_options[default_action]">
         <option value="show" <?php selected('show', $default_action); ?>>Show Content</option>
         <option value="hide" <?php selected('hide', $default_action); ?>>Hide Content</option>
     </select>
@@ -242,10 +242,10 @@ function gu_render_default_action_field()
 function gu_add_admin_menu()
 {
     add_menu_page(
-        'GeoUtils Settings',
-        'GeoUtils',
+        'Maki Geo Settings',
+        'Maki Geo',
         'manage_options',
-        'geoutils-settings',
+        'maki-geo-settings',
         'gu_render_settings_page',
         'dashicons-admin-site',
         30
@@ -254,16 +254,16 @@ function gu_add_admin_menu()
 
 function gu_enqueue_admin_scripts($hook)
 {
-    if ($hook !== 'toplevel_page_geoutils-settings') {
+    if ($hook !== 'toplevel_page_maki-geo-settings') {
         return;
     }
 
     wp_enqueue_style('wp-edit-blocks');  // For block editor styles
-    wp_enqueue_style('geoutils-admin-style', plugin_dir_url(__FILE__) . 'admin.css');
+    wp_enqueue_style('maki-geo-admin-style', plugin_dir_url(__FILE__) . 'admin.css');
 
     $script_args = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
     wp_enqueue_script(
-        'geoutils-admin',
+        'maki-geo-admin',
         plugin_dir_url(__FILE__) . '../../build/admin.js',
         $script_args['dependencies'], $script_args['version'],
         true
@@ -271,9 +271,9 @@ function gu_enqueue_admin_scripts($hook)
 
     // Admin script data
     wp_localize_script(
-        'geoutils-admin', 'geoUtilsSettings', [
-        'nonce' => wp_create_nonce('geoutils_save_rules'),
-        'globalRules' => get_option('geoutils_rules', [])
+        'maki-geo-admin', 'makiGeoSettings', [
+        'nonce' => wp_create_nonce('maki_geo_save_rules'),
+        'globalRules' => get_option('maki_geo_rules', [])
         ]
     );
 }

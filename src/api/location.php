@@ -1,13 +1,17 @@
 <?php
 
-require_once('utils.php');
+require_once 'utils.php';
 
-add_action('rest_api_init', function () {
-    register_rest_route('geoutils/v1', '/location', array(
-        'methods' => 'GET',
-        'callback' => 'get_geolocation_data',
-    ));
-});
+add_action(
+    'rest_api_init', function () {
+        register_rest_route(
+            'maki-geo/v1', '/location', array(
+            'methods' => 'GET',
+            'callback' => 'get_geolocation_data',
+            )
+        );
+    }
+);
 
 function get_debug_data()
 {
