@@ -51,7 +51,6 @@
 .geo-condition {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
@@ -66,6 +65,10 @@
 .geo-condition:active {
     cursor: grabbing;
     transform: translateY(0);
+}
+
+.geo-condition .components-select-control {
+    margin-bottom: 0px;
 }
 
 .geo-rule-card .components-card__header {
