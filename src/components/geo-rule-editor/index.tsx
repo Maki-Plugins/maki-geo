@@ -187,11 +187,17 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                 {...provided.droppableProps}
               >
                 {rule.conditions.map((condition, conditionIndex) => (
-                  <Draggable
-                    key={conditionIndex}
-                    draggableId={`condition-${conditionIndex}`}
-                    index={conditionIndex}
-                  >
+                  <>
+                    {conditionIndex > 0 && (
+                      <div style={{ textAlign: 'center', padding: '4px 0', color: '#757575' }}>
+                        {rule.operator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    )}
+                    <Draggable
+                      key={conditionIndex}
+                      draggableId={`condition-${conditionIndex}`}
+                      index={conditionIndex}
+                    >
                     {(provided) => (
                       <div
                         className="geo-condition"
@@ -235,6 +241,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                       </div>
                     )}
                   </Draggable>
+                  </>
                 ))}
                 {provided.placeholder}
               </div>
