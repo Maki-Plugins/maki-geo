@@ -145,12 +145,20 @@ registerBlockType<PopupAttributes>(metadata.name, {
   },
 
   save: ({ attributes }: SaveProps) => {
-    const { popupStyle, triggerType, triggerDelay, localRule, globalRuleId } = attributes;
+    const {
+      popupStyle,
+      triggerType,
+      triggerDelay,
+      localRule,
+      globalRuleId,
+      ruleType,
+    } = attributes;
 
     const wrapperProps = useBlockProps.save({
       className: "geo-popup-overlay",
       style: { display: "none" },
-      "data-rules": JSON.stringify(localRule ?? globalRuleId ?? []),
+      "data-ruleType": ruleType,
+      "data-rule": JSON.stringify(localRule ?? globalRuleId ?? []),
     });
 
     const containerProps = {

@@ -70,10 +70,6 @@
     gap: 8px;
 }
 
-.block-editor .geo-condition .components-flex > span {
-    /* margin-left: 24px; */
-}
-
 .block-editor .geo-condition .components-button.is-destructive {
     align-self: flex-end;
     margin-top: 4px;

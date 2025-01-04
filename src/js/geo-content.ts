@@ -32,68 +32,68 @@ async function initGeoTargeting(): Promise<void> {
     const globalRules = window.geoUtilsSettings?.globalRules || [];
 
     blocks.forEach((block) => {
-      console.log(`Block: ${JSON.stringify(block.dataset)}`);
-      const ruleType = block.dataset.ruleType;
+      const ruleType = block.dataset.ruletype;
       let rule: GeoRuleBase | null = null;
 
       if (ruleType === "local") {
-        rule = JSON.parse(block.dataset.localRule || "null");
+        rule = JSON.parse(block.dataset.rule || "null");
       } else if (ruleType === "global") {
-        const globalRuleId = block.dataset.globalRuleId;
+        const globalRuleId = JSON.parse(block.dataset.rule || "null");
         rule = globalRules.find((r) => r.id === globalRuleId) || null;
       }
 
-      const shouldShow = rule ? evaluateGeoRules([rule], response) : true;
+      const shouldShow = rule ? evaluateGeoRules(rule, response) : true;
       block.style.display = shouldShow ? "block" : "none";
     });
   } catch (error) {
     console.error("Geo targeting error:", error);
-    // Show all blocks on error
+    // Hide all blocks on error
     document
-      .querySelectorAll<HTMLElement>(".gu-geo-target-block")
-      .forEach((block) => (block.style.display = "block"));
+      .querySelectorAll<HTMLElement>(".gu-geo-target-block, .geo-popup-overlay")
+      .forEach((block) => {
+        block.style.display = "none";
+      });
   }
 }
 
 function evaluateGeoRules(
-  rules: GeoRuleBase[],
+  rule: GeoRuleBase,
   locationData: LocationData
 ): boolean {
-  console.log(`Rules: ${JSON.stringify(rules)}`);
-  console.log(`Location data: ${JSON.stringify(locationData)}`);
+  // console.log(`Rules: ${JSON.stringify(rule)}`);
+  // console.log(`Location data: ${JSON.stringify(locationData)}`);
 
-  if (!rules.length) return true;
+  if (!rule.conditions.length) return true;
 
-  // Evaluate each rule
-  for (const rule of rules) {
-    // Evaluate each condition within the rule
-    const conditionResults = rule.conditions.map(condition => {
-      const locationValue = locationData[condition.type].toLowerCase();
-      const conditionValue = condition.value.toLowerCase();
-      
-      if (condition.operator === "is") {
-        return locationValue === conditionValue;
-      } else { // "is not"
-        return locationValue !== conditionValue;
-      }
-    });
+  // Evaluate each condition within the rule
+  const conditionResults = rule.conditions.map((condition) => {
+    const locationValue = locationData[condition.type].toLowerCase();
+    const conditionValue = condition.value.toLowerCase();
 
-    // Combine conditions based on operator
-    let ruleResult: boolean;
-    if (rule.operator === "AND") {
-      ruleResult = conditionResults.every(result => result);
-    } else { // "OR"
-      ruleResult = conditionResults.some(result => result);
+    if (condition.operator === "is") {
+      return locationValue === conditionValue;
+    } else {
+      // "is not"
+      return locationValue !== conditionValue;
     }
+  });
 
-    // Apply rule action
-    if (ruleResult) {
-      return rule.action === "show";
-    }
+  // Combine conditions based on operator
+  let ruleResult: boolean;
+  if (rule.operator === "AND") {
+    ruleResult = conditionResults.every((result) => result);
+  } else {
+    // "OR"
+    ruleResult = conditionResults.some((result) => result);
   }
 
-  // If no rules match, show by default
-  return true;
+  // Apply rule action
+  if (ruleResult) {
+    return rule.action === "show";
+  }
+
+  // If no rules match, do the opposite
+  return rule.action === "hide";
 }
 
 document.addEventListener("DOMContentLoaded", initGeoTargeting);

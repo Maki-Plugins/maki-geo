@@ -95,12 +95,13 @@ registerBlockType<BlockAttributes>(name, {
     );
   },
   save: ({ attributes }) => {
-    const { localRule, globalRuleId } = attributes;
-    
+    const { localRule, globalRuleId, ruleType } = attributes;
+
     const blockProps = useBlockProps.save({
       className: "gu-geo-target-block",
       style: { display: "none" },
-      "data-rules": JSON.stringify(localRule ?? globalRuleId ?? [])
+      "data-ruleType": ruleType,
+      "data-rule": JSON.stringify(localRule ?? globalRuleId ?? []),
     });
 
     return (
