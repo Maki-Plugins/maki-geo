@@ -60,17 +60,21 @@
     gap: 8px;
 }
 
+.block-editor .geo-condition .components-base-control, .block-editor .geo-condition .components-select-control {
+    margin-bottom: 0px;
+}
+
 /* Editor-specific styles */
-.wp-block .geo-condition .components-flex {
+.block-editor .geo-condition .components-flex {
     flex-direction: column;
     gap: 8px;
 }
 
-.wp-block .geo-condition .components-flex > span {
-    margin-left: 24px;
+.block-editor .geo-condition .components-flex > span {
+    /* margin-left: 24px; */
 }
 
-.wp-block .geo-condition .components-button.is-destructive {
+.block-editor .geo-condition .components-button.is-destructive {
     align-self: flex-end;
     margin-top: 4px;
 }

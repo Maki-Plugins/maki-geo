@@ -189,8 +189,14 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                 {rule.conditions.map((condition, conditionIndex) => (
                   <>
                     {conditionIndex > 0 && (
-                      <div style={{ textAlign: 'center', padding: '4px 0', color: '#757575' }}>
-                        {rule.operator === 'AND' ? 'AND' : 'OR'}
+                      <div
+                        style={{
+                          textAlign: "center",
+                          margin: "-10px 0",
+                          color: "#757575",
+                        }}
+                      >
+                        {rule.operator === "AND" ? "and" : "or"}
                       </div>
                     )}
                     <Draggable
@@ -198,49 +204,49 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                       draggableId={`condition-${conditionIndex}`}
                       index={conditionIndex}
                     >
-                    {(provided) => (
-                      <div
-                        className="geo-condition"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                      >
-                        <Flex
-                          {...provided.dragHandleProps}
-                          justify="inherit"
-                          gap={2}
+                      {(provided) => (
+                        <div
+                          className="geo-condition"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
                         >
-                          <div>⋮⋮</div>
-                          <span>When</span>
-                          <SelectControl
-                            __nextHasNoMarginBottom={true}
-                            value={condition.type}
-                            options={Object.entries(locationTypes).map(
-                              ([value, label]) => ({
-                                value,
-                                label,
-                              })
-                            )}
-                            onChange={(type) =>
-                              updateCondition(conditionIndex, {
-                                type: type as GeoCondition["type"],
-                                value: "",
-                              })
-                            }
-                          />
-                          <span>is</span>
-                          {renderConditionInput(condition, conditionIndex)}
-                          <Button
-                            isDestructive
-                            isSmall
-                            onClick={() => removeCondition(conditionIndex)}
-                            disabled={rule.conditions.length === 1}
+                          <Flex
+                            {...provided.dragHandleProps}
+                            justify="inherit"
+                            gap={2}
                           >
-                            Remove
-                          </Button>
-                        </Flex>
-                      </div>
-                    )}
-                  </Draggable>
+                            <div>⋮⋮</div>
+                            <span>When</span>
+                            <SelectControl
+                              __nextHasNoMarginBottom={true}
+                              value={condition.type}
+                              options={Object.entries(locationTypes).map(
+                                ([value, label]) => ({
+                                  value,
+                                  label,
+                                })
+                              )}
+                              onChange={(type) =>
+                                updateCondition(conditionIndex, {
+                                  type: type as GeoCondition["type"],
+                                  value: "",
+                                })
+                              }
+                            />
+                            <span>is</span>
+                            {renderConditionInput(condition, conditionIndex)}
+                            <Button
+                              isDestructive
+                              isSmall
+                              onClick={() => removeCondition(conditionIndex)}
+                              disabled={rule.conditions.length === 1}
+                            >
+                              Remove
+                            </Button>
+                          </Flex>
+                        </div>
+                      )}
+                    </Draggable>
                   </>
                 ))}
                 {provided.placeholder}
