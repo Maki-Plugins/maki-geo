@@ -63,6 +63,37 @@ function evaluateGeoRules(
   console.log(`Location data: ${JSON.stringify(locationData)}`);
 
   if (!rules.length) return true;
+
+  // Evaluate each rule
+  for (const rule of rules) {
+    // Evaluate each condition within the rule
+    const conditionResults = rule.conditions.map(condition => {
+      const locationValue = locationData[condition.type].toLowerCase();
+      const conditionValue = condition.value.toLowerCase();
+      
+      if (condition.operator === "is") {
+        return locationValue === conditionValue;
+      } else { // "is not"
+        return locationValue !== conditionValue;
+      }
+    });
+
+    // Combine conditions based on operator
+    let ruleResult: boolean;
+    if (rule.operator === "AND") {
+      ruleResult = conditionResults.every(result => result);
+    } else { // "OR"
+      ruleResult = conditionResults.some(result => result);
+    }
+
+    // Apply rule action
+    if (ruleResult) {
+      return rule.action === "show";
+    }
+  }
+
+  // If no rules match, show by default
+  return true;
 }
 
 document.addEventListener("DOMContentLoaded", initGeoTargeting);
