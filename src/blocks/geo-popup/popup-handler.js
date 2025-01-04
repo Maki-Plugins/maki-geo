@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Handle different trigger types
     switch (triggerType) {
       case "immediate":
-        // showPopup(popup);
+        showPopup(popup);
         break;
       case "delayed":
         setTimeout(() => showPopup(popup), delay * 1000);
