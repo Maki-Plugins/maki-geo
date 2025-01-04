@@ -16,6 +16,7 @@ import {
 } from "../../types";
 import "./geo-content.css";
 import React from "react";
+import { GeoRulesPanel } from "../../components/geo-rules-panel";
 
 interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> {}
 
@@ -70,7 +71,9 @@ registerBlockType<BlockAttributes>(name, {
             localRule={localRule}
             globalRuleId={globalRuleId}
             onRuleTypeChange={handleRuleTypeChange}
-            onLocalRuleChange={(newRule) => setAttributes({ localRule: newRule })}
+            onLocalRuleChange={(newRule) =>
+              setAttributes({ localRule: newRule })
+            }
             onGlobalRuleIdChange={(id) => setAttributes({ globalRuleId: id })}
           />
         </InspectorControls>
