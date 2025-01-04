@@ -196,22 +196,26 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                         {...provided.draggableProps}
                       >
                         <div {...provided.dragHandleProps}>⋮⋮</div>
-                        <SelectControl
-                          value={condition.type}
-                          options={Object.entries(locationTypes).map(
-                            ([value, label]) => ({
-                              value,
-                              label,
-                            })
-                          )}
-                          onChange={(type) =>
-                            updateCondition(conditionIndex, {
-                              type: type as GeoCondition["type"],
-                              value: "",
-                            })
-                          }
-                        />
-                        {renderConditionInput(condition, conditionIndex)}
+                        <Flex align="center" gap={2}>
+                          <span>When</span>
+                          <SelectControl
+                            value={condition.type}
+                            options={Object.entries(locationTypes).map(
+                              ([value, label]) => ({
+                                value,
+                                label,
+                              })
+                            )}
+                            onChange={(type) =>
+                              updateCondition(conditionIndex, {
+                                type: type as GeoCondition["type"],
+                                value: "",
+                              })
+                            }
+                          />
+                          <span>is</span>
+                          {renderConditionInput(condition, conditionIndex)}
+                        </Flex>
                         <Button
                           isDestructive
                           isSmall
