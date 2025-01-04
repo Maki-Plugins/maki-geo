@@ -135,4 +135,15 @@
 .visibility-toggle .dashicon {
   margin-right: 4px;
 }
+
+.geo-rule-conditions .components-button-group {
+  display: inline-flex;
+}
+
+.geo-rule-conditions .components-button-group .components-button {
+  height: 24px;
+  min-width: 50px;
+  padding: 0 8px;
+  font-size: 12px;
+}
 /* geo-rule-editor css END */

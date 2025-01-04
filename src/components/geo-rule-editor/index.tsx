@@ -161,17 +161,6 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
             </Button>
           </ButtonGroup>
         </div>
-        <SelectControl
-          label="Operator"
-          value={rule.operator}
-          options={[
-            { label: "Match ALL conditions (AND)", value: "AND" },
-            { label: "Match ANY condition (OR)", value: "OR" },
-          ]}
-          onChange={(operator) =>
-            onChange({ ...rule, operator: operator as GlobalRule["operator"] })
-          }
-        />
 
         <DragDropContext
           onDragEnd={(result: DropResult) => {
@@ -189,14 +178,23 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                 {rule.conditions.map((condition, conditionIndex) => (
                   <>
                     {conditionIndex > 0 && (
-                      <div
-                        style={{
-                          textAlign: "center",
-                          margin: "-10px 0",
-                          color: "#757575",
-                        }}
-                      >
-                        {rule.operator === "AND" ? "and" : "or"}
+                      <div style={{ textAlign: "center", margin: "-10px 0" }}>
+                        <ButtonGroup>
+                          <Button
+                            variant={rule.operator === "AND" ? "primary" : "secondary"}
+                            onClick={() => onChange({ ...rule, operator: "AND" })}
+                            size="small"
+                          >
+                            AND
+                          </Button>
+                          <Button
+                            variant={rule.operator === "OR" ? "primary" : "secondary"}
+                            onClick={() => onChange({ ...rule, operator: "OR" })}
+                            size="small"
+                          >
+                            OR
+                          </Button>
+                        </ButtonGroup>
                       </div>
                     )}
                     <Draggable
