@@ -40,9 +40,11 @@ async function initGeoTargeting(): Promise<void> {
       const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
 
       if (block.classList.contains(popupsClass)) {
-        // For popups, store the evaluation result as a data attribute
+        // For popups, store the evaluation result and mark as ready
         block.dataset.geoAllowed = shouldShow.toString();
-        // Don't set display style - let popup-handler.js handle that
+        block.dataset.geoReady = "true";
+        // Dispatch event to notify popup handler
+        block.dispatchEvent(new CustomEvent('geoRuleEvaluated'));
       } else {
         // For regular blocks, set display directly
         block.style.display = shouldShow ? "block" : "none";
