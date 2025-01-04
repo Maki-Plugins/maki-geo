@@ -56,7 +56,7 @@ async function initGeoTargeting(): Promise<void> {
   }
 }
 
-function evaluateGeoRules(
+export function evaluateGeoRules(
   rule: GeoRuleBase,
   locationData: LocationData
 ): boolean {
