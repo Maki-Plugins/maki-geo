@@ -28,6 +28,14 @@ export interface BlockAttributes {
   globalRuleId: string | null;
 }
 
+export interface LocationData {
+  continent: string;
+  country: string;
+  region: string;
+  city: string;
+  ip: string;
+}
+
 declare global {
   interface Window {
     geoUtilsData?: {

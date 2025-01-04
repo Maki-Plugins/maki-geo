@@ -136,6 +136,14 @@ registerBlockType<PopupAttributes>(metadata.name, {
         </InspectorControls>
 
         <div {...blockProps}>
+          <div className="geo-target-block__label">
+            Geo Targeted Popup{" "}
+            {
+              <span className="geo-target-type">
+                ({ruleType === "global" ? "Global Rule" : "Local Rule"})
+              </span>
+            }
+          </div>
           <div className="geo-popup-editor__content" style={popupStyle}>
             <InnerBlocks />
           </div>
