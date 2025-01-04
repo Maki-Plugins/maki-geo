@@ -45,5 +45,5 @@
   "editorScript": "file:./geo-popup.tsx",
   "editorStyle": "file:./geo-popup.css",
   "style": "file:./style.css",
-  "script": "file:./popup-handler.js"
+  "script": ["file:./popup-handler.js", "file:../../../js/geo-content.js"]
 }

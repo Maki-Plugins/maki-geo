@@ -25,7 +25,7 @@ async function initGeoTargeting(): Promise<void> {
     console.log(`API response: ${JSON.stringify(response)}`);
 
     const blocks = document.querySelectorAll<HTMLElement>(
-      ".gu-geo-target-block"
+      ".gu-geo-target-block, .geo-popup-overlay"
     );
     const globalRules = window.geoUtilsSettings?.globalRules || [];
 
