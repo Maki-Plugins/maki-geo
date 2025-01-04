@@ -1,30 +1,32 @@
 import { Button } from "@wordpress/components";
 import { GeoRuleEditor } from "../geo-rule-editor";
-import { GlobalRule } from "../../types";
+import { GeoRule, GlobalGeoRule } from "../../types";
 
 interface GeoRulesManagerProps {
-  rules: GlobalRule[];
-  onChange: (rules: GlobalRule[]) => void;
+  rules: GlobalGeoRule[];
+  onChange: (rules: GlobalGeoRule[]) => void;
 }
 
 export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
   const addRule = () => {
-    const newRule: GlobalRule = {
+    const newRule: GlobalGeoRule = {
       id: Date.now().toString(),
       name: `Rule ${rules.length + 1}`,
       conditions: [
         {
           type: "country",
           value: "",
+          operator: "is",
         },
       ],
       operator: "AND",
       action: "show",
+      ruleType: "global",
     };
     onChange([...rules, newRule]);
   };
 
-  const updateRule = (index: number, updatedRule: GlobalRule) => {
+  const updateRule = (index: number, updatedRule: GlobalGeoRule) => {
     const newRules = [...rules];
     newRules[index] = updatedRule;
     onChange(newRules);
@@ -40,8 +42,8 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
         <div key={rule.id} className="geo-rule-wrapper">
           <GeoRuleEditor
             rule={rule}
-            onChange={(updatedRule: GlobalRule) =>
-              updateRule(index, updatedRule)
+            onChange={(updatedRule: GeoRule) =>
+              updateRule(index, updatedRule as GlobalGeoRule)
             }
             showName={true}
           />
@@ -59,7 +61,7 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
       ))}
 
       <Button variant="primary" onClick={addRule} className="add-rule-button">
-        Add Global Rule
+        Add Global Geo Rule
       </Button>
     </div>
   );

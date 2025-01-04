@@ -1,4 +1,4 @@
-export interface GeoRule {
+export interface GeoRuleBase {
   conditions: GeoCondition[];
   operator: "AND" | "OR";
   action: "show" | "hide";
@@ -10,21 +10,28 @@ export interface GeoCondition {
   operator: "is" | "is not";
 }
 
-export interface GlobalRule extends GeoRule {
+export interface GlobalGeoRule extends GeoRuleBase {
   id: string;
   name: string;
+  ruleType: "global";
 }
+
+export interface LocalGeoRule extends GeoRuleBase {
+  ruleType: "local";
+}
+
+export type GeoRule = GlobalGeoRule | LocalGeoRule;
 
 export interface BlockAttributes {
   ruleType: "local" | "global";
-  localRule: GeoRule | null;
+  localRule: LocalGeoRule | null;
   globalRuleId: string | null;
 }
 
 declare global {
   interface Window {
     geoUtilsData?: {
-      globalRules: GlobalRule[];
+      globalRules: GlobalGeoRule[];
     };
   }
 }

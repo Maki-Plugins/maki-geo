@@ -8,7 +8,12 @@ import { PanelBody, RadioControl } from "@wordpress/components";
 import { GeoRuleEditor } from "../../components/geo-rule-editor";
 import { useState } from "@wordpress/element";
 import metadata from "./block.json";
-import { BlockAttributes, GeoRule, GlobalRule } from "../../types";
+import {
+  BlockAttributes,
+  GeoRule,
+  GlobalGeoRule,
+  LocalGeoRule,
+} from "../../types";
 import "./geo-content.css";
 import React from "react";
 
@@ -32,13 +37,15 @@ registerBlockType<BlockAttributes>(name, {
       className: "geo-target-block",
     });
 
-    const globalRules: GlobalRule[] = window.geoUtilsData?.globalRules || [];
+    const globalRules: GlobalGeoRule[] = window.geoUtilsData?.globalRules || [];
 
-    const createDefaultRule = (): GeoRule => ({
+    const createDefaultRule = (): LocalGeoRule => ({
+      ruleType: "local",
       conditions: [
         {
           type: "country",
           value: "",
+          operator: "is",
         },
       ],
       operator: "AND",
@@ -92,7 +99,7 @@ registerBlockType<BlockAttributes>(name, {
               <GeoRuleEditor
                 rule={localRule || createDefaultRule()}
                 onChange={(newRule: GeoRule) =>
-                  setAttributes({ localRule: newRule })
+                  setAttributes({ localRule: newRule as LocalGeoRule })
                 }
                 showName={false}
               />

@@ -16,11 +16,11 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import { FC } from "react";
-import { GeoCondition, GeoRule, GlobalRule } from "../../types";
+import { GeoCondition, GeoRule, GeoRuleBase } from "../../types";
 
 interface GeoRuleEditorProps {
-  rule: GlobalRule;
-  onChange: (rule: GlobalRule) => void;
+  rule: GeoRule;
+  onChange: (rule: GeoRule) => void;
   showName?: boolean;
 }
 
@@ -52,14 +52,14 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   showName = false,
 }) => {
   const addCondition = () => {
-    const newRule: GlobalRule = {
+    const newRule: GeoRule = {
       ...rule,
       conditions: [
         ...rule.conditions,
         {
           type: "country",
           value: "",
-          operator: "is"
+          operator: "is",
         },
       ],
     };
@@ -68,7 +68,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
 
   const updateCondition = (
     conditionIndex: number,
-    updates: Partial<GeoRule["conditions"][0]>
+    updates: Partial<GeoRuleBase["conditions"][0]>
   ) => {
     const newRule = {
       ...rule,
@@ -95,7 +95,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   };
 
   const renderConditionInput = (
-    condition: GeoRule["conditions"][0],
+    condition: GeoRuleBase["conditions"][0],
     conditionIndex: number
   ) => {
     switch (condition.type) {
@@ -138,7 +138,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
           align="stretch"
           justify="space-between"
         >
-          {showName && (
+          {showName && rule.ruleType === "global" && (
             <>
               <label>Name</label>
               <TextControl
@@ -187,7 +187,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                 {rule.conditions.map((condition, conditionIndex) => (
                   <>
                     {conditionIndex > 0 && (
-                      <div style={{ textAlign: "center", margin: "-10px 0" }}>
+                      <div style={{ textAlign: "center", margin: "-9px 0" }}>
                         <ButtonGroup>
                           <Button
                             variant={
@@ -257,7 +257,8 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                               ]}
                               onChange={(operator) =>
                                 updateCondition(conditionIndex, {
-                                  operator: operator as GeoCondition["operator"],
+                                  operator:
+                                    operator as GeoCondition["operator"],
                                 })
                               }
                             />

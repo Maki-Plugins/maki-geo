@@ -8,6 +8,10 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.geo-rule-wrapper{
+    max-width: 600px;
+}
+
 .geo-rule-card {
     margin-bottom: 8px;
     border: 1px solid #dcdcde;
@@ -71,6 +75,10 @@
     margin-bottom: 0px;
 }
 
+.geo-rule-card-header{
+    width:100%;
+}
+
 .geo-rule-card .components-card__header {
     background-color: #f6f7f7;
     border-bottom: 1px solid #dcdcde;
@@ -107,12 +115,15 @@
     font-size: 16px;
 }
 
-.visibility-toggle label {
+.geo-rule-card label {
     font-size: 11px;
     font-weight: 500;
     color: #1e1e1e;
-    padding-bottom: 14px;
     text-transform: uppercase;
+}
+
+.visibility-toggle label {
+    padding-bottom: 14px;
 }
 
 .visibility-toggle .components-button-group {

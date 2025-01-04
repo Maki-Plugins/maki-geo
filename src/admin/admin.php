@@ -12,7 +12,7 @@ function gu_render_settings_page()
 
         <nav class="nav-tab-wrapper">
             <a href="#dashboard" class="nav-tab nav-tab-active">Dashboard</a>
-            <a href="#geo-rules" class="nav-tab">Geo Rules</a>
+            <a href="#geo-rules" class="nav-tab">Global Geo Rules</a>
             <a href="#settings" class="nav-tab">Settings</a>
         </nav>
 
@@ -39,8 +39,8 @@ function gu_render_settings_page()
 
             <div id="geo-rules" class="gu-admin-tab">
                 <div class="gu-admin-card">
-                    <h2>Geo Rules Management</h2>
-                    <p>Configure default geo-targeting rules that apply site-wide.</p>
+                    <h2>Global Geo Rules</h2>
+                    <p>Configure global geo-targeting rules that apply site-wide.</p>
                     <div id="geo-rules-admin"></div>
                 </div>
             </div>

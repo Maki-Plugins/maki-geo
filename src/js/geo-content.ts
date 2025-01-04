@@ -1,4 +1,4 @@
-import { GeoRule, GlobalRule } from "../types";
+import { GeoRuleBase, GlobalGeoRule } from "../types";
 
 interface LocationData {
   country: string;
@@ -9,7 +9,7 @@ interface LocationData {
 declare global {
   interface Window {
     geoUtilsSettings?: {
-      globalRules: GlobalRule[];
+      globalRules: GlobalGeoRule[];
     };
     wp: {
       apiFetch: (options: { path: string }) => Promise<LocationData>;
@@ -31,7 +31,7 @@ async function initGeoTargeting(): Promise<void> {
 
     blocks.forEach((block) => {
       const ruleType = block.dataset.ruleType;
-      let rule: GeoRule | null = null;
+      let rule: GeoRuleBase | null = null;
 
       if (ruleType === "local") {
         rule = JSON.parse(block.dataset.localRule || "null");
@@ -55,7 +55,7 @@ async function initGeoTargeting(): Promise<void> {
 }
 
 function evaluateGeoRules(
-  rules: GeoRule[],
+  rules: GeoRuleBase[],
   locationData: LocationData
 ): boolean {
   console.log(`Rules: ${JSON.stringify(rules)}`);
@@ -70,13 +70,18 @@ function evaluateGeoRules(
       let matches = false;
       switch (condition.type) {
         case "country":
-          matches = condition.value.toLowerCase() === locationData.country.toLowerCase();
+          matches =
+            condition.value.toLowerCase() ===
+            locationData.country.toLowerCase();
           break;
         case "city":
-          matches = condition.value.toLowerCase() === locationData.city.toLowerCase();
+          matches =
+            condition.value.toLowerCase() === locationData.city.toLowerCase();
           break;
         case "continent":
-          matches = condition.value.toLowerCase() === locationData.continent.toLowerCase();
+          matches =
+            condition.value.toLowerCase() ===
+            locationData.continent.toLowerCase();
           break;
         default:
           return false;

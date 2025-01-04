@@ -1,25 +1,26 @@
 import { render } from "@wordpress/element";
+import { Button } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
 import { GeoRulesManager } from "../components/geo-rules-manager";
 import { useState, useEffect } from "react";
-import { GlobalRule } from "../types";
+import { GlobalGeoRule } from "../types";
 
 interface ApiResponse {
   success: boolean;
-  rules?: GlobalRule[];
+  rules?: GlobalGeoRule[];
   message?: string;
 }
 
 declare global {
   interface Window {
     geoUtilsSettings?: {
-      globalRules: GlobalRule[];
+      globalRules: GlobalGeoRule[];
     };
   }
 }
 
 function AdminGeoRules(): JSX.Element {
-  const [rules, setRules] = useState<GlobalRule[]>([]);
+  const [rules, setRules] = useState<GlobalGeoRule[]>([]);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ function AdminGeoRules(): JSX.Element {
     setRules(savedRules);
   }, []);
 
-  const handleRulesChange = (newRules: GlobalRule[]): void => {
+  const handleRulesChange = (newRules: GlobalGeoRule[]): void => {
     setRules(newRules);
   };
 
@@ -56,13 +57,14 @@ function AdminGeoRules(): JSX.Element {
     <div className="geo-rules-admin-wrapper">
       <GeoRulesManager rules={rules} onChange={handleRulesChange} />
       <div className="geo-rules-save-button">
-        <button
-          className="button button-primary"
+        <Button
+          variant="primary"
           onClick={handleSave}
           disabled={isSaving}
+          className="add-rule-button"
         >
           {isSaving ? "Saving..." : "Save Changes"}
-        </button>
+        </Button>
       </div>
     </div>
   );

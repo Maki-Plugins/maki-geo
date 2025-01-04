@@ -1,43 +1,49 @@
 <?php
 
-require_once('utils.php');
+require_once 'utils.php';
 
-add_action('rest_api_init', function () {
-    register_rest_route('geoutils/v1', '/rules', array(
-        array(
+add_action(
+    'rest_api_init', function () {
+        register_rest_route(
+            'geoutils/v1', '/rules', array(
+            array(
             'methods' => 'GET',
             'callback' => 'get_geo_rules',
             'permission_callback' => 'is_user_logged_in',
-        ),
-        array(
+            ),
+            array(
             'methods' => 'DELETE',
             'callback' => 'delete_all_geo_rules',
             'permission_callback' => 'is_user_logged_in',
-        ),
-        array(
+            ),
+            array(
             'methods' => 'POST',
             'callback' => 'create_geo_rule',
             'permission_callback' => 'is_user_logged_in',
-        ),
-        array(
+            ),
+            array(
             'methods' => 'PUT',
             'callback' => 'update_geo_rule',
             'permission_callback' => 'is_user_logged_in',
-        ),
-        array(
+            ),
+            array(
             'methods' => 'DELETE',
             'callback' => 'delete_geo_rule',
             'permission_callback' => 'is_user_logged_in',
-        )
-    ));
-});
+            )
+            )
+        );
+    }
+);
 
-function get_geo_rules() {
+function get_geo_rules()
+{
     verify_nonce();
     return get_option('geoutils_rules', array());
 }
 
-function create_geo_rule($request) {
+function create_geo_rule($request)
+{
     verify_nonce();
     $new_rules = json_decode($request->get_body(), true);
     
@@ -55,7 +61,8 @@ function create_geo_rule($request) {
     return array('success' => true, 'rules' => $new_rules);
 }
 
-function update_geo_rule($request) {
+function update_geo_rule($request)
+{
     verify_nonce();
     $rule = json_decode($request->get_body(), true);
     $index = isset($_GET['index']) ? intval($_GET['index']) : -1;
@@ -75,7 +82,8 @@ function update_geo_rule($request) {
     return array('success' => true, 'rule' => $rule);
 }
 
-function delete_geo_rule($request) {
+function delete_geo_rule($request)
+{
     verify_nonce();
     $index = isset($_GET['index']) ? intval($_GET['index']) : -1;
     
@@ -94,13 +102,15 @@ function delete_geo_rule($request) {
     return array('success' => true);
 }
 
-function delete_all_geo_rules() {
+function delete_all_geo_rules()
+{
     verify_nonce();
     update_option('geoutils_rules', array());
     return array('success' => true);
 }
 
-function validate_rule($rule) {
+function validate_rule($rule)
+{
     // Validate basic rule structure
     if (!isset($rule['conditions']) || !is_array($rule['conditions'])) {
         return false;
