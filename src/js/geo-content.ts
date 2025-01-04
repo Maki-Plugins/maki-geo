@@ -39,12 +39,14 @@ async function initGeoTargeting(): Promise<void> {
 
       const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
 
-      // Show the block or popup by adding the flex or block display style
-      const showStyle = block.classList.contains(popupsClass)
-        ? "flex"
-        : "block";
-      console.log(`show style: ${showStyle}`);
-      block.style.display = shouldShow ? showStyle : "none";
+      if (block.classList.contains(popupsClass)) {
+        // For popups, store the evaluation result as a data attribute
+        block.dataset.geoAllowed = shouldShow.toString();
+        // Don't set display style - let popup-handler.js handle that
+      } else {
+        // For regular blocks, set display directly
+        block.style.display = shouldShow ? "block" : "none";
+      }
     });
   } catch (error) {
     console.error("Geo targeting error:", error);

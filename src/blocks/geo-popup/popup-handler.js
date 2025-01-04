@@ -33,10 +33,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function showPopup(popup) {
-  popup.style.display = "flex";
-  // Force a reflow before adding the active class
-  void popup.offsetWidth;
-  popup.classList.add("is-active");
+  // Only show popup if geo targeting allows it
+  if (popup.dataset.geoAllowed === "true") {
+    popup.style.display = "flex";
+    // Force a reflow before adding the active class
+    void popup.offsetWidth;
+    popup.classList.add("is-active");
+  }
 }
 
 function closePopup(popup) {
