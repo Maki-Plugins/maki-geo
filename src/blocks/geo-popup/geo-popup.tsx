@@ -11,6 +11,7 @@ import {
   RangeControl,
   ColorPicker,
 } from "@wordpress/components";
+import { GeoRulesPanel } from "../../components/geo-rules-panel";
 import metadata from "./block.json";
 import "./geo-popup.css";
 
@@ -25,6 +26,9 @@ interface PopupAttributes {
   popupStyle: PopupStyle;
   triggerType: "immediate" | "delayed" | "exit";
   triggerDelay: number;
+  ruleType: "local" | "global";
+  localRule: LocalGeoRule | null;
+  globalRuleId: string | null;
 }
 
 interface EditProps {
@@ -39,7 +43,7 @@ interface SaveProps {
 //@ts-ignore
 registerBlockType<PopupAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }: EditProps) => {
-    const { popupStyle, triggerType, triggerDelay } = attributes;
+    const { popupStyle, triggerType, triggerDelay, ruleType, localRule, globalRuleId } = attributes;
 
     const blockProps = useBlockProps({
       className: "geo-popup-editor",
@@ -57,6 +61,14 @@ registerBlockType<PopupAttributes>(metadata.name, {
     return (
       <>
         <InspectorControls>
+          <GeoRulesPanel
+            ruleType={ruleType}
+            localRule={localRule}
+            globalRuleId={globalRuleId}
+            onRuleTypeChange={(type) => setAttributes({ ruleType: type })}
+            onLocalRuleChange={(rule) => setAttributes({ localRule: rule })}
+            onGlobalRuleIdChange={(id) => setAttributes({ globalRuleId: id })}
+          />
           <PanelBody title="Popup Settings">
             <SelectControl
               label="Trigger Type"
