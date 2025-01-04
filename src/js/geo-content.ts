@@ -1,12 +1,4 @@
-import { GeoRuleBase, GlobalGeoRule } from "../types";
-
-interface LocationData {
-  continent: string;
-  country: string;
-  region: string;
-  city: string;
-  ip: string;
-}
+import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types";
 
 declare global {
   interface Window {
@@ -26,8 +18,11 @@ async function initGeoTargeting(): Promise<void> {
     });
     console.log(`API response: ${JSON.stringify(response)}`);
 
+    const blocksClass = "gu-geo-target-block";
+    const popupsClass = "geo-popup-overlay";
+
     const blocks = document.querySelectorAll<HTMLElement>(
-      ".gu-geo-target-block, .geo-popup-overlay"
+      `.${blocksClass}, .${popupsClass}`
     );
     const globalRules = window.geoUtilsSettings?.globalRules || [];
 
@@ -42,28 +37,31 @@ async function initGeoTargeting(): Promise<void> {
         rule = globalRules.find((r) => r.id === globalRuleId) || null;
       }
 
-      const shouldShow = rule ? evaluateGeoRules(rule, response) : true;
-      block.style.display = shouldShow ? "block" : "none";
+      const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
+
+      // Show the block or popup by adding the flex or block display style
+      const showStyle = block.classList.contains(popupsClass)
+        ? "flex"
+        : "block";
+      console.log(`show style: ${showStyle}`);
+      block.style.display = shouldShow ? showStyle : "none";
     });
   } catch (error) {
     console.error("Geo targeting error:", error);
-    // Hide all blocks on error
-    document
-      .querySelectorAll<HTMLElement>(".gu-geo-target-block, .geo-popup-overlay")
-      .forEach((block) => {
-        block.style.display = "none";
-      });
   }
 }
 
-export function evaluateGeoRules(
+export function evaluateGeoRule(
   rule: GeoRuleBase,
   locationData: LocationData
 ): boolean {
   // console.log(`Rules: ${JSON.stringify(rule)}`);
   // console.log(`Location data: ${JSON.stringify(locationData)}`);
 
-  if (!rule.conditions.length) return true;
+  // Apply rule action if there are no conditions
+  if (!rule.conditions.length) {
+    return rule.action === "show";
+  }
 
   // Evaluate each condition within the rule
   const conditionResults = rule.conditions.map((condition) => {
