@@ -131,13 +131,21 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   return (
     <Card className="geo-rule-card">
       <CardHeader>
-        <Flex align="center" justify="space-between">
+        <Flex
+          className="geo-rule-card-header"
+          direction="column"
+          align="stretch"
+          justify="space-between"
+        >
           {showName && (
-            <TextControl
-              value={rule.name}
-              onChange={(name) => onChange({ ...rule, name })}
-              placeholder="Rule Name"
-            />
+            <>
+              <label>Name</label>
+              <TextControl
+                value={rule.name}
+                onChange={(name) => onChange({ ...rule, name })}
+                placeholder="Rule Name"
+              />
+            </>
           )}
         </Flex>
       </CardHeader>
@@ -181,18 +189,26 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                       <div style={{ textAlign: "center", margin: "-10px 0" }}>
                         <ButtonGroup>
                           <Button
-                            variant={rule.operator === "AND" ? "primary" : "secondary"}
-                            onClick={() => onChange({ ...rule, operator: "AND" })}
+                            variant={
+                              rule.operator === "AND" ? "primary" : "secondary"
+                            }
+                            onClick={() =>
+                              onChange({ ...rule, operator: "AND" })
+                            }
                             size="small"
                           >
-                            AND
+                            and
                           </Button>
                           <Button
-                            variant={rule.operator === "OR" ? "primary" : "secondary"}
-                            onClick={() => onChange({ ...rule, operator: "OR" })}
+                            variant={
+                              rule.operator === "OR" ? "primary" : "secondary"
+                            }
+                            onClick={() =>
+                              onChange({ ...rule, operator: "OR" })
+                            }
                             size="small"
                           >
-                            OR
+                            or
                           </Button>
                         </ButtonGroup>
                       </div>
