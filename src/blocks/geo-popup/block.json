@@ -34,7 +34,7 @@
     }
   },
   "textdomain": "geo-utils",
-  "editorScript": "file:./geo-popup.js",
+  "editorScript": "file:./geo-popup.tsx",
   "editorStyle": "file:./geo-popup.css",
   "style": "file:./style.css",
   "script": "file:./popup-handler.js"
