@@ -14,6 +14,7 @@ import {
 import { GeoRulesPanel } from "../../components/geo-rules-panel";
 import metadata from "./block.json";
 import "./geo-popup.css";
+import { LocalGeoRule } from "types";
 
 interface PopupStyle {
   width: string;
@@ -43,7 +44,14 @@ interface SaveProps {
 //@ts-ignore
 registerBlockType<PopupAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }: EditProps) => {
-    const { popupStyle, triggerType, triggerDelay, ruleType, localRule, globalRuleId } = attributes;
+    const {
+      popupStyle,
+      triggerType,
+      triggerDelay,
+      ruleType,
+      localRule,
+      globalRuleId,
+    } = attributes;
 
     const blockProps = useBlockProps({
       className: "geo-popup-editor",
