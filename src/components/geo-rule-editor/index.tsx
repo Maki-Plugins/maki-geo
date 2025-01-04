@@ -59,6 +59,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
         {
           type: "country",
           value: "",
+          operator: "is"
         },
       ],
     };
@@ -247,7 +248,19 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                                 })
                               }
                             />
-                            <span>is</span>
+                            <SelectControl
+                              __nextHasNoMarginBottom={true}
+                              value={condition.operator || "is"}
+                              options={[
+                                { value: "is", label: "is" },
+                                { value: "is not", label: "is not" },
+                              ]}
+                              onChange={(operator) =>
+                                updateCondition(conditionIndex, {
+                                  operator: operator as GeoCondition["operator"],
+                                })
+                              }
+                            />
                             {renderConditionInput(condition, conditionIndex)}
                             <Button
                               isDestructive

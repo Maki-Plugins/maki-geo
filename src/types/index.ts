@@ -7,6 +7,7 @@ export interface GeoRule {
 export interface GeoCondition {
   type: "continent" | "country" | "region" | "city" | "ip";
   value: string;
+  operator: "is" | "is not";
 }
 
 export interface GlobalRule extends GeoRule {

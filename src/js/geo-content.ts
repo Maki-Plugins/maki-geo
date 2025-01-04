@@ -67,23 +67,21 @@ function evaluateGeoRules(
   const matchingRule = rules.find((rule) => {
     // Evaluate all conditions based on the operator (AND/OR)
     const results = rule.conditions.map((condition) => {
+      let matches = false;
       switch (condition.type) {
         case "country":
-          return (
-            condition.value.toLowerCase() === locationData.country.toLowerCase()
-          );
+          matches = condition.value.toLowerCase() === locationData.country.toLowerCase();
+          break;
         case "city":
-          return (
-            condition.value.toLowerCase() === locationData.city.toLowerCase()
-          );
+          matches = condition.value.toLowerCase() === locationData.city.toLowerCase();
+          break;
         case "continent":
-          return (
-            condition.value.toLowerCase() ===
-            locationData.continent.toLowerCase()
-          );
+          matches = condition.value.toLowerCase() === locationData.continent.toLowerCase();
+          break;
         default:
           return false;
       }
+      return condition.operator === "is" ? matches : !matches;
     });
 
     return rule.operator === "OR"

@@ -118,7 +118,10 @@ function validate_rule($rule) {
 
     // Validate each condition
     foreach ($rule['conditions'] as $condition) {
-        if (!isset($condition['type']) || !isset($condition['value'])) {
+        if (!isset($condition['type']) || !isset($condition['value']) || !isset($condition['operator'])) {
+            return false;
+        }
+        if (!in_array($condition['operator'], array('is', 'is not'))) {
             return false;
         }
     }
