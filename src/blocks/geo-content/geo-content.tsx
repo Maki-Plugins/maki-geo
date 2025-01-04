@@ -65,46 +65,14 @@ registerBlockType<BlockAttributes>(name, {
     return (
       <>
         <InspectorControls>
-          <PanelBody title="Geo Targeting" initialOpen={true}>
-            <RadioControl
-              label="Rule Type"
-              selected={selectedType}
-              options={[
-                { label: "Create Local Rule", value: "local" },
-                { label: "Use Global Rule", value: "global" },
-              ]}
-              onChange={(value) =>
-                handleRuleTypeChange(value === "local" ? "local" : "global")
-              }
-            />
-
-            {selectedType === "global" && (
-              <select
-                value={globalRuleId || ""}
-                onChange={(e: SelectChangeEvent) =>
-                  setAttributes({ globalRuleId: e.target.value })
-                }
-                style={{ width: "100%", marginTop: "10px" }}
-              >
-                <option value="">Select a global rule</option>
-                {globalRules.map((rule) => (
-                  <option key={rule.id} value={rule.id}>
-                    {rule.name}
-                  </option>
-                ))}
-              </select>
-            )}
-
-            {selectedType === "local" && (
-              <GeoRuleEditor
-                rule={localRule || createDefaultRule()}
-                onChange={(newRule: GeoRule) =>
-                  setAttributes({ localRule: newRule as LocalGeoRule })
-                }
-                showName={false}
-              />
-            )}
-          </PanelBody>
+          <GeoRulesPanel
+            ruleType={selectedType}
+            localRule={localRule}
+            globalRuleId={globalRuleId}
+            onRuleTypeChange={handleRuleTypeChange}
+            onLocalRuleChange={(newRule) => setAttributes({ localRule: newRule })}
+            onGlobalRuleIdChange={(id) => setAttributes({ globalRuleId: id })}
+          />
         </InspectorControls>
 
         <div {...blockProps}>
