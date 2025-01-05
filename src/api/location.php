@@ -16,8 +16,10 @@ add_action(
 function get_debug_data()
 {
     return array(
-        'city' => 'Paris',
-        'country' => 'France'
+        'continent' => 'Europe',
+        'country' => 'France',
+        'region' => 'Île-de-France',
+        'city' => 'Paris'
     );
 }
 

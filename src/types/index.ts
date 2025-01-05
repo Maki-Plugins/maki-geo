@@ -34,6 +34,7 @@ export interface LocationData {
   region: string;
   city: string;
   ip: string;
+  language?: string;
 }
 
 declare global {
