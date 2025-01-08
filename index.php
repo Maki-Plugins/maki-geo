@@ -3,9 +3,11 @@
 /**
  * Plugin Name:       Maki Geo
  * Description:       Geo targeting
- * Version:           0.0.1
+ * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      7.2
+ * Author: Maki Plugins
+ * Author URI: https://makiplugins.com
  *
  * @package maki-geo
  */

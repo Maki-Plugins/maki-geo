@@ -1,4 +1,4 @@
-import { Button } from "@wordpress/components";
+import { Button, Dashicon } from "@wordpress/components";
 import { GeoRuleEditor } from "../geo-rule-editor";
 import { GeoRule, GlobalGeoRule } from "../../types";
 
@@ -38,7 +38,10 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
 
   return (
     <div className="geo-rules-manager">
-      {rules.map((rule, index) => (
+      <Button variant="primary" onClick={addRule} className="add-rule-button">
+        <Dashicon icon="plus" /> Add Global Geo Rule
+      </Button>
+      {rules.reverse().map((rule, index) => (
         <div key={rule.id} className="geo-rule-wrapper">
           <GeoRuleEditor
             rule={rule}
@@ -59,10 +62,6 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
           </div>
         </div>
       ))}
-
-      <Button variant="primary" onClick={addRule} className="add-rule-button">
-        Add Global Geo Rule
-      </Button>
     </div>
   );
 }

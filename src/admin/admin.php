@@ -47,7 +47,6 @@ function gu_render_settings_page()
 
             <div id="settings" class="gu-admin-tab">
                 <div class="gu-admin-card">
-                    <h2>General Settings</h2>
                     <form method="post" action="options.php">
                         <?php
                         settings_fields('maki_geo_settings');
@@ -144,7 +143,6 @@ function gu_render_settings_page()
         .geo-rules-save-button {
             margin-top: 20px;
             padding: 10px;
-            text-align: right;
         }
     </style>
 
@@ -259,7 +257,7 @@ function gu_enqueue_admin_scripts($hook)
     }
 
     wp_enqueue_style('wp-edit-blocks');  // For block editor styles
-    wp_enqueue_style('maki-geo-admin-style', plugin_dir_url(__FILE__) . 'admin.css');
+    wp_enqueue_style('maki-geo-admin-style', plugin_dir_url(__FILE__) . 'admin.css', array(), filemtime(plugin_dir_url(__FILE__) . 'admin.css'));
 
     $script_args = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
     wp_enqueue_script(
