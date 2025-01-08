@@ -4,7 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_get_location_data() {
+function mgeo_get_location_data()
+{
     static $location_data = null;
     
     if ($location_data === null) {
@@ -14,7 +15,8 @@ function mgeo_get_location_data() {
     return $location_data;
 }
 
-function mgeo_shortcode_handler($atts, $content, $tag) {
+function mgeo_shortcode_handler($atts, $content, $tag)
+{
     $defaults = array(
         'default' => 'Unknown',
         'lang' => 'en'
@@ -38,7 +40,8 @@ function mgeo_shortcode_handler($atts, $content, $tag) {
     return $value;
 }
 
-function mgeo_translate_location($value, $field, $lang) {
+function mgeo_translate_location($value, $field, $lang)
+{
     // Add translations for common countries
     $translations = [
         'nl' => [
@@ -63,3 +66,4 @@ add_shortcode('mgeo_continent', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
+
