@@ -70,9 +70,10 @@ function mgeo_country_flag_shortcode($atts)
     }
 
     $country_code = strtolower($location_data['country_code']);
-    $flag_path = plugin_dir_url(dirname(__DIR__)) . 'assets/flags/' . $country_code . '.svg';
+    $flag_path = plugin_dir_url(dirname(__DIR__)) . 'src/assets/flags/' . $country_code . '.svg';
     
-    return sprintf('<img src="%s" alt="%s flag" class="mgeo-country-flag" />', 
+    return sprintf(
+        '<img src="%s" alt="%s flag" class="mgeo-country-flag" />', 
         esc_url($flag_path), 
         esc_attr($location_data['country'])
     );
