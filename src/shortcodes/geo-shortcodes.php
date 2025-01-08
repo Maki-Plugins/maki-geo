@@ -63,6 +63,11 @@ function mgeo_translate_location($value, $field, $lang)
 
 function mgeo_country_flag_shortcode($atts)
 {
+    $defaults = array(
+        'size' => '24px'
+    );
+    
+    $atts = shortcode_atts($defaults, $atts);
     $location_data = mgeo_get_location_data();
     
     if (!$location_data || empty($location_data['country_code'])) {
@@ -72,10 +77,16 @@ function mgeo_country_flag_shortcode($atts)
     $country_code = strtolower($location_data['country_code']);
     $flag_path = plugin_dir_url(dirname(__DIR__)) . 'src/assets/flags/' . $country_code . '.svg';
     
+    // Ensure size has a unit
+    if (is_numeric($atts['size'])) {
+        $atts['size'] .= 'px';
+    }
+    
     return sprintf(
-        '<img src="%s" alt="%s flag" class="mgeo-country-flag" />', 
+        '<img src="%s" alt="%s flag" class="mgeo-country-flag" style="width: %s; height: auto;" />', 
         esc_url($flag_path), 
-        esc_attr($location_data['country'])
+        esc_attr($location_data['country']),
+        esc_attr($atts['size'])
     );
 }
 
