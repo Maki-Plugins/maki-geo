@@ -61,9 +61,27 @@ function mgeo_translate_location($value, $field, $lang)
     return $value;
 }
 
+function mgeo_country_flag_shortcode($atts)
+{
+    $location_data = mgeo_get_location_data();
+    
+    if (!$location_data || empty($location_data['country_code'])) {
+        return '';
+    }
+
+    $country_code = strtolower($location_data['country_code']);
+    $flag_path = plugin_dir_url(dirname(__DIR__)) . 'assets/flags/' . $country_code . '.svg';
+    
+    return sprintf('<img src="%s" alt="%s flag" class="mgeo-country-flag" />', 
+        esc_url($flag_path), 
+        esc_attr($location_data['country'])
+    );
+}
+
 // Register shortcodes
 add_shortcode('mgeo_continent', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
+add_shortcode('mgeo_country_flag', 'mgeo_country_flag_shortcode');
 
