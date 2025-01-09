@@ -96,10 +96,12 @@ add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
 add_shortcode('mgeo_country_flag', 'mgeo_country_flag_shortcode');
-add_shortcode('geo_content', 'mgeo_content_shortcode');
+add_shortcode('mgeo_content', 'mgeo_content_shortcode');
 
-function mgeo_content_shortcode($atts, $content = '') {
-    $attributes = shortcode_atts(array(
+function mgeo_content_shortcode($atts, $content = '')
+{
+    $attributes = shortcode_atts(
+        array(
         'rule' => '',        // For global rules
         'continent' => '',
         'country' => '',
@@ -108,14 +110,17 @@ function mgeo_content_shortcode($atts, $content = '') {
         'ip' => '',
         'match' => 'all',    // 'all' or 'any'
         'action' => 'show'   // 'show' or 'hide'
-    ), $atts);
+        ), $atts
+    );
 
     // Handle global rules
     if (!empty($attributes['rule'])) {
         $global_rules = get_option('maki_geo_global_rules', array());
-        $rule = array_filter($global_rules, function($r) use ($attributes) {
-            return $r['id'] === $attributes['rule'];
-        });
+        $rule = array_filter(
+            $global_rules, function ($r) use ($attributes) {
+                return $r['id'] === $attributes['rule'];
+            }
+        );
         
         if (empty($rule)) {
             return '';
@@ -156,7 +161,8 @@ function mgeo_content_shortcode($atts, $content = '') {
     return mgeo_evaluate_rule($rule, $content);
 }
 
-function mgeo_evaluate_rule($rule, $content) {
+function mgeo_evaluate_rule($rule, $content)
+{
     $location_data = mgeo_get_location_data();
     
     if (!$location_data) {
@@ -164,15 +170,17 @@ function mgeo_evaluate_rule($rule, $content) {
     }
 
     // Evaluate conditions
-    $results = array_map(function($condition) use ($location_data) {
-        $location_value = strtolower($location_data[$condition['type']]);
-        $condition_value = strtolower($condition['value']);
+    $results = array_map(
+        function ($condition) use ($location_data) {
+            $location_value = strtolower($location_data[$condition['type']]);
+            $condition_value = strtolower($condition['value']);
         
-        if ($condition['operator'] === 'is') {
-            return $location_value === $condition_value;
-        }
-        return $location_value !== $condition_value;
-    }, $rule['conditions']);
+            if ($condition['operator'] === 'is') {
+                return $location_value === $condition_value;
+            }
+            return $location_value !== $condition_value;
+        }, $rule['conditions']
+    );
 
     // Combine results based on operator
     $final_result = $rule['operator'] === 'AND' 
