@@ -6,7 +6,10 @@ module.exports = {
   entry: {
     ...defaultConfig.entry(),
     admin: path.resolve(__dirname, "src/admin/index.tsx"),
-    "geo-content-frontend": path.resolve(__dirname, "src/js/geo-content.ts"),
+    "geo-content-frontend": path.resolve(
+      __dirname,
+      "src/geo-rules/evaluate-rule-frontend.ts"
+    ),
   },
   output: {
     path: path.resolve(__dirname, "build"),
