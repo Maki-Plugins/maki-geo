@@ -100,8 +100,37 @@ add_shortcode('mgeo_content', 'mgeo_content_shortcode');
 
 function mgeo_content_shortcode($atts, $content = '')
 {
-    $attributes = shortcode_atts(
-        array(
+    // Check targeting method
+    $options = get_option('maki_geo_options', array());
+    $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
+
+    if ($method === 'client') {
+        // Return block for client-side processing
+        $attributes = shortcode_atts(array(
+            'rule' => '',
+            'continent' => '',
+            'country' => '',
+            'region' => '',
+            'city' => '',
+            'ip' => '',
+            'match' => 'all',
+            'action' => 'show'
+        ), $atts);
+
+        // Convert attributes to data attributes
+        $data_atts = array_map(function($key, $value) {
+            return sprintf('data-%s="%s"', esc_attr($key), esc_attr($value));
+        }, array_keys($attributes), array_values($attributes));
+
+        return sprintf(
+            '<div class="gu-geo-target-block" style="display: none" %s>%s</div>',
+            implode(' ', $data_atts),
+            do_shortcode($content)
+        );
+    }
+
+    // Server-side processing
+    $attributes = shortcode_atts(array(
         'rule' => '',        // For global rules
         'continent' => '',
         'country' => '',

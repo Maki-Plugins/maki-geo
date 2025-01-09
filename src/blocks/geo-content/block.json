@@ -23,6 +23,5 @@
   },
   "supports": {},
   "editorScript": "file:./geo-content.tsx",
-  "editorStyle": "file:./geo-content.css",
-  "render": "file:./render.php"
+  "editorStyle": "file:./geo-content.css"
 }

@@ -192,6 +192,14 @@ function gu_register_settings()
         'maki_geo_general_section'
     );
 
+    add_settings_field(
+        'geo_targeting_method',
+        'Geo Targeting Method',
+        'gu_render_geo_targeting_method_field',
+        'maki_geo_settings',
+        'maki_geo_general_section'
+    );
+
     // Geo Rules Settings
     register_setting('maki_geo_rules', 'maki_geo_rules_options');
 
@@ -209,6 +217,22 @@ function gu_register_settings()
         'maki_geo_rules',
         'maki_geo_rules_section'
     );
+}
+
+function gu_render_geo_targeting_method_field()
+{
+    $options = get_option('maki_geo_options', array());
+    $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
+    ?>
+    <select name="maki_geo_options[geo_targeting_method]">
+        <option value="server" <?php selected('server', $method); ?>>Server-side (Default)</option>
+        <option value="client" <?php selected('client', $method); ?>>Client-side (AJAX)</option>
+    </select>
+    <p class="description">
+        Server-side: Processes geo-targeting rules when the page loads.<br>
+        Client-side: Uses AJAX to evaluate rules in the browser. Better with caching but requires JavaScript.
+    </p>
+    <?php
 }
 
 function gu_render_debug_mode_field()
