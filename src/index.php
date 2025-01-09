@@ -18,6 +18,7 @@ add_action('init', 'register_geo_target_assets');
 
 function register_geo_target_assets()
 {
+    // Registering for use when geo targeted content is embedded on the frontend
     wp_register_script(
         'geo-target-frontend',
         plugins_url('../build/geo-content-frontend.js', __FILE__),
@@ -40,27 +41,16 @@ function enqueue_geo_target_scripts()
 {
     wp_enqueue_script('geo-target-frontend');
 
-    // Enqueue the geo popup styles
-    wp_enqueue_style(
-        'geo-utils-popup-style',
-        plugins_url('blocks/geo-popup/style.css', __FILE__),
-        [],
-        '1.0.0'
-    );
-
-    // Enqueue the popup handler script
-    wp_enqueue_script(
-        'geo-utils-popup-handler',
-        plugins_url('blocks/geo-popup/popup-handler.js', __FILE__),
-        [],
-        '1.0.0',
-        true // Load in footer
-    );
+    // Enqueue the geo popup styles and script
+    mgeo_enqueue('geo-utils-popup-style', 'build/blocks/geo-popup/style.css');
+    mgeo_enqueue('geo-utils-popup-handler', 'build/blocks/geo-popup/popup-handler.js');
 }
 
 
 
+require_once "admin/admin.php";
 require_once "blocks/setup.php";
 require_once "api/location.php";
 require_once "api/geo-rules.php";
 require_once "shortcodes/geo-shortcodes.php";
+require_once "wp_utils.php";

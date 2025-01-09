@@ -257,15 +257,11 @@ function gu_enqueue_admin_scripts($hook)
     }
 
     wp_enqueue_style('wp-edit-blocks');  // For block editor styles
-    wp_enqueue_style('maki-geo-admin-style', plugin_dir_url(__FILE__) . 'admin.css', array(), filemtime(plugin_dir_url(__FILE__) . 'admin.css'));
+    
+    mgeo_enqueue('maki-geo-admin-style', 'src/admin/admin.css', 'style');
 
     $script_args = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
-    wp_enqueue_script(
-        'maki-geo-admin',
-        plugin_dir_url(__FILE__) . '../../build/admin.js',
-        $script_args['dependencies'], $script_args['version'],
-        true
-    );
+    mgeo_enqueue('maki-geo-admin', 'build/admin.js', 'script', $script_args['dependencies']);
 
     // Admin script data
     wp_localize_script(

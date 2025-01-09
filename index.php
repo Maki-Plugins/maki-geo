@@ -66,4 +66,3 @@ function mgeo_create_geo_popup_block()
 add_action('init', 'mgeo_create_geo_popup_block');
 
 require_once "src/index.php";
-require_once "src/admin/admin.php";

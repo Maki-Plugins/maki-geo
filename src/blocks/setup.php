@@ -1,5 +1,8 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    exit;
+}
 // Set up own category
 add_filter(
     'block_categories_all', function ($categories, $post) {
