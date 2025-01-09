@@ -4,8 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once dirname(__DIR__) . '/geo-rules/evaluate-rule-backend.php';
-
 function mgeo_get_location_data()
 {
     static $location_data = null;
@@ -92,13 +90,6 @@ function mgeo_country_flag_shortcode($atts)
     );
 }
 
-// Register shortcodes
-add_shortcode('mgeo_continent', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_country_flag', 'mgeo_country_flag_shortcode');
-add_shortcode('mgeo_content', 'mgeo_content_shortcode');
 
 function mgeo_content_shortcode($atts, $content = '')
 {
@@ -108,7 +99,8 @@ function mgeo_content_shortcode($atts, $content = '')
 
     if ($method === 'client') {
         // Return block for client-side processing
-        $attributes = shortcode_atts(array(
+        $attributes = shortcode_atts(
+            array(
             'rule' => '',
             'continent' => '',
             'country' => '',
@@ -117,12 +109,15 @@ function mgeo_content_shortcode($atts, $content = '')
             'ip' => '',
             'match' => 'all',
             'action' => 'show'
-        ), $atts);
+            ), $atts
+        );
 
         // Convert attributes to data attributes
-        $data_atts = array_map(function($key, $value) {
-            return sprintf('data-%s="%s"', esc_attr($key), esc_attr($value));
-        }, array_keys($attributes), array_values($attributes));
+        $data_atts = array_map(
+            function ($key, $value) {
+                return sprintf('data-%s="%s"', esc_attr($key), esc_attr($value));
+            }, array_keys($attributes), array_values($attributes)
+        );
 
         return sprintf(
             '<div class="gu-geo-target-block" style="display: none" %s>%s</div>',
@@ -137,7 +132,8 @@ function mgeo_content_shortcode($atts, $content = '')
         return '';
     }
 
-    $attributes = shortcode_atts(array(
+    $attributes = shortcode_atts(
+        array(
         'rule' => '',        // For global rules
         'continent' => '',
         'country' => '',
@@ -146,7 +142,8 @@ function mgeo_content_shortcode($atts, $content = '')
         'ip' => '',
         'match' => 'all',    // 'all' or 'any'
         'action' => 'show'   // 'show' or 'hide'
-    ), $atts);
+        ), $atts
+    );
 
     // Get the rule to evaluate
     $rule = mgeo_get_rule_from_attributes($attributes);
@@ -158,7 +155,8 @@ function mgeo_content_shortcode($atts, $content = '')
     return mgeo_evaluate_rule($rule, $location_data) ? do_shortcode($content) : '';
 }
 
-function mgeo_get_rule_from_attributes($attributes) {
+function mgeo_get_rule_from_attributes($attributes)
+{
     // Handle global rules
     if (!empty($attributes['rule'])) {
         $global_rules = get_option('maki_geo_global_rules', array());
@@ -199,3 +197,12 @@ function mgeo_get_rule_from_attributes($attributes) {
         'action' => $attributes['action']
     );
 }
+
+
+// Register shortcodes
+add_shortcode('mgeo_continent', 'mgeo_shortcode_handler');
+add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
+add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
+add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
+add_shortcode('mgeo_country_flag', 'mgeo_country_flag_shortcode');
+add_shortcode('mgeo_content', 'mgeo_content_shortcode');

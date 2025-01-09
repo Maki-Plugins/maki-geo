@@ -55,6 +55,13 @@ async function initGeoTargeting(): Promise<void> {
   }
 }
 
+/**
+ * Evaluates the given rule and location and returns if the content that is governed by this rule should be shown for this location.
+ * 
+ * @param rule The geo rule to evaluate
+ * @param locationData The location to evaluate and see if it fits the geo rule
+ * @returns Boolean value indicating if the content should be shown (true) or hidden (false)
+ */
 export function evaluateGeoRule(
   rule: GeoRuleBase,
   locationData: LocationData
