@@ -95,16 +95,46 @@ registerBlockType<BlockAttributes>(name, {
   save: ({ attributes }) => {
     const { localRule, globalRuleId, ruleType } = attributes;
 
-    const blockProps = useBlockProps.save({
-      className: "gu-geo-target-block",
-      style: { display: "none" },
-      "data-ruleType": ruleType,
-      "data-rule": JSON.stringify(localRule ?? globalRuleId ?? []),
-    });
+    if (ruleType === "global" && globalRuleId) {
+      return (
+        <div>
+          {`[geo_content rule="${globalRuleId}"]`}
+          <InnerBlocks.Content />
+          {`[/geo_content]`}
+        </div>
+      );
+    }
 
+    if (localRule) {
+      // Convert conditions to readable format
+      const parts: string[] = [];
+      
+      localRule.conditions.forEach(condition => {
+        const not = condition.operator === "is not" ? "!" : "";
+        parts.push(`${condition.type}="${not}${condition.value}"`);
+      });
+
+      if (localRule.operator === "OR") {
+        parts.push('match="any"');
+      }
+      
+      parts.push(`action="${localRule.action}"`);
+
+      return (
+        <div>
+          {`[geo_content ${parts.join(" ")}]`}
+          <InnerBlocks.Content />
+          {`[/geo_content]`}
+        </div>
+      );
+    }
+
+    // Fallback for empty rules
     return (
-      <div {...blockProps}>
+      <div>
+        {`[geo_content]`}
         <InnerBlocks.Content />
+        {`[/geo_content]`}
       </div>
     );
   },
