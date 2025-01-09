@@ -4,21 +4,14 @@ import {
   InspectorControls,
   useBlockProps,
 } from "@wordpress/block-editor";
-import { PanelBody, RadioControl } from "@wordpress/components";
-import { GeoRuleEditor } from "../../components/geo-rule-editor";
 import { useState } from "@wordpress/element";
 import metadata from "./block.json";
 import {
   BlockAttributes,
-  GeoRule,
-  GlobalGeoRule,
   LocalGeoRule,
 } from "../../types";
 import "./geo-content.css";
-import React from "react";
 import { GeoRulesPanel } from "../../components/geo-rules-panel";
-
-interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> {}
 
 const { name, ...settings } = metadata;
 
@@ -98,9 +91,9 @@ registerBlockType<BlockAttributes>(name, {
     if (ruleType === "global" && globalRuleId) {
       return (
         <div>
-          {`[geo_content rule="${globalRuleId}"]`}
+          {`[mgeo_content rule="${globalRuleId}"]`}
           <InnerBlocks.Content />
-          {`[/geo_content]`}
+          {`[/mgeo_content]`}
         </div>
       );
     }
@@ -108,7 +101,7 @@ registerBlockType<BlockAttributes>(name, {
     if (localRule) {
       // Convert conditions to readable format
       const parts: string[] = [];
-      
+
       localRule.conditions.forEach(condition => {
         const not = condition.operator === "is not" ? "!" : "";
         parts.push(`${condition.type}="${not}${condition.value}"`);
@@ -117,14 +110,14 @@ registerBlockType<BlockAttributes>(name, {
       if (localRule.operator === "OR") {
         parts.push('match="any"');
       }
-      
+
       parts.push(`action="${localRule.action}"`);
 
       return (
         <div>
-          {`[geo_content ${parts.join(" ")}]`}
+          {`[mgeo_content ${parts.join(" ")}]`}
           <InnerBlocks.Content />
-          {`[/geo_content]`}
+          {`[/mgeo_content]`}
         </div>
       );
     }
@@ -132,9 +125,9 @@ registerBlockType<BlockAttributes>(name, {
     // Fallback for empty rules
     return (
       <div>
-        {`[geo_content]`}
+        {`[mgeo_content]`}
         <InnerBlocks.Content />
-        {`[/geo_content]`}
+        {`[/mgeo_content]`}
       </div>
     );
   },

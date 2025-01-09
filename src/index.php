@@ -35,16 +35,7 @@ function register_geo_target_assets()
     );
 }
 
-add_action('wp_enqueue_scripts', 'enqueue_geo_target_scripts');
 
-function enqueue_geo_target_scripts()
-{
-    wp_enqueue_script('geo-target-frontend');
-
-    // Enqueue the geo popup styles and script
-    mgeo_enqueue('geo-utils-popup-style', 'build/blocks/geo-popup/style.css');
-    mgeo_enqueue('geo-utils-popup-handler', 'build/blocks/geo-popup/popup-handler.js');
-}
 
 
 
