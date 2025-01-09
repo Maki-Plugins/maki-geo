@@ -4,12 +4,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_evaluate_rule($rule, $content)
+function mgeo_evaluate_rule($rule, $location_data)
 {
-    $location_data = mgeo_get_location_data();
-    
-    if (!$location_data) {
-        return '';
+    if (empty($rule['conditions'])) {
+        return $rule['action'] === 'show';
     }
 
     // Evaluate conditions
@@ -30,10 +28,6 @@ function mgeo_evaluate_rule($rule, $content)
         ? !in_array(false, $results, true)
         : in_array(true, $results, true);
 
-    // Apply action
-    if ($final_result) {
-        return $rule['action'] === 'show' ? do_shortcode($content) : '';
-    }
-    
-    return $rule['action'] === 'show' ? '' : do_shortcode($content);
+    // Return whether content should be shown
+    return $final_result ? ($rule['action'] === 'show') : ($rule['action'] === 'hide');
 }

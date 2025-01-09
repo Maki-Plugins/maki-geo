@@ -132,6 +132,11 @@ function mgeo_content_shortcode($atts, $content = '')
     }
 
     // Server-side processing
+    $location_data = mgeo_get_location_data();
+    if (!$location_data) {
+        return '';
+    }
+
     $attributes = shortcode_atts(array(
         'rule' => '',        // For global rules
         'continent' => '',
@@ -141,9 +146,19 @@ function mgeo_content_shortcode($atts, $content = '')
         'ip' => '',
         'match' => 'all',    // 'all' or 'any'
         'action' => 'show'   // 'show' or 'hide'
-        ), $atts
-    );
+    ), $atts);
 
+    // Get the rule to evaluate
+    $rule = mgeo_get_rule_from_attributes($attributes);
+    if (!$rule) {
+        return '';
+    }
+
+    // Evaluate the rule and return content accordingly
+    return mgeo_evaluate_rule($rule, $location_data) ? do_shortcode($content) : '';
+}
+
+function mgeo_get_rule_from_attributes($attributes) {
     // Handle global rules
     if (!empty($attributes['rule'])) {
         $global_rules = get_option('maki_geo_global_rules', array());
@@ -153,12 +168,7 @@ function mgeo_content_shortcode($atts, $content = '')
             }
         );
         
-        if (empty($rule)) {
-            return '';
-        }
-        
-        $rule = reset($rule);
-        return mgeo_evaluate_rule($rule, $content);
+        return empty($rule) ? null : reset($rule);
     }
 
     // Build local rule from attributes
@@ -183,12 +193,9 @@ function mgeo_content_shortcode($atts, $content = '')
         }
     }
 
-    $rule = array(
+    return array(
         'conditions' => $conditions,
         'operator' => strtoupper($attributes['match']) === 'ANY' ? 'OR' : 'AND',
         'action' => $attributes['action']
     );
-
-    return mgeo_evaluate_rule($rule, $content);
 }
-
