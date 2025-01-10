@@ -97,29 +97,29 @@ function mgeo_content_shortcode($atts, $content = '')
     $options = get_option('maki_geo_options', array());
     $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
 
+    $attributes = shortcode_atts(
+        array(
+            'rule' => '',        // For global rules
+            'continent' => '',
+            'country' => '',
+            'region' => '',
+            'city' => '',
+            'ip' => '',
+            'match' => 'all',    // 'all' or 'any'
+            'action' => 'show'   // 'show' or 'hide'
+        ), 
+        $atts
+    );
+
+    // Get the rule structure
+    $rule = mgeo_get_rule_from_attributes($attributes);
+    if (!$rule) {
+        return '';
+    }
+
     if ($method === 'client') {
         // Enqueue the frontend script
         wp_enqueue_script('geo-target-frontend');
-
-        $attributes = shortcode_atts(
-            array(
-                'rule' => '',        // For global rules
-                'continent' => '',
-                'country' => '',
-                'region' => '',
-                'city' => '',
-                'ip' => '',
-                'match' => 'all',    // 'all' or 'any'
-                'action' => 'show'   // 'show' or 'hide'
-            ), 
-            $atts
-        );
-
-        // Get the rule structure
-        $rule = mgeo_get_rule_from_attributes($attributes);
-        if (!$rule) {
-            return '';
-        }
 
         // Determine if this is a local or global rule
         $ruleType = empty($attributes['rule']) ? 'local' : 'global';
@@ -136,25 +136,6 @@ function mgeo_content_shortcode($atts, $content = '')
     // Server-side processing
     $location_data = mgeo_get_location_data();
     if (!$location_data) {
-        return '';
-    }
-
-    $attributes = shortcode_atts(
-        array(
-        'rule' => '',        // For global rules
-        'continent' => '',
-        'country' => '',
-        'region' => '',
-        'city' => '',
-        'ip' => '',
-        'match' => 'all',    // 'all' or 'any'
-        'action' => 'show'   // 'show' or 'hide'
-        ), $atts
-    );
-
-    // Get the rule to evaluate
-    $rule = mgeo_get_rule_from_attributes($attributes);
-    if (!$rule) {
         return '';
     }
 
