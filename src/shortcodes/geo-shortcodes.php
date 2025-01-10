@@ -98,6 +98,15 @@ function mgeo_content_shortcode($atts, $content = '')
     $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
 
     if ($method === 'client') {
+        // Enqueue the frontend script
+        wp_enqueue_script(
+            'geo-target-frontend',
+            plugins_url('../geo-rules/evaluate-rule-frontend.js', __FILE__),
+            array('wp-api-fetch'),
+            '1.0.0',
+            true
+        );
+
         $attributes = shortcode_atts(
             array(
                 'rule' => '',        // For global rules
