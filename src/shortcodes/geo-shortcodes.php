@@ -98,30 +98,34 @@ function mgeo_content_shortcode($atts, $content = '')
     $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
 
     if ($method === 'client') {
-        // Return block for client-side processing
         $attributes = shortcode_atts(
             array(
-            'rule' => '',
-            'continent' => '',
-            'country' => '',
-            'region' => '',
-            'city' => '',
-            'ip' => '',
-            'match' => 'all',
-            'action' => 'show'
-            ), $atts
+                'rule' => '',        // For global rules
+                'continent' => '',
+                'country' => '',
+                'region' => '',
+                'city' => '',
+                'ip' => '',
+                'match' => 'all',    // 'all' or 'any'
+                'action' => 'show'   // 'show' or 'hide'
+            ), 
+            $atts
         );
 
-        // Convert attributes to data attributes
-        $data_atts = array_map(
-            function ($key, $value) {
-                return sprintf('data-%s="%s"', esc_attr($key), esc_attr($value));
-            }, array_keys($attributes), array_values($attributes)
-        );
+        // Get the rule structure
+        $rule = mgeo_get_rule_from_attributes($attributes);
+        if (!$rule) {
+            return '';
+        }
+
+        // Determine if this is a local or global rule
+        $ruleType = empty($attributes['rule']) ? 'local' : 'global';
+        $ruleData = $ruleType === 'global' ? $attributes['rule'] : json_encode($rule);
 
         return sprintf(
-            '<div class="gu-geo-target-block" style="display: none" %s>%s</div>',
-            implode(' ', $data_atts),
+            '<div class="gu-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s">%s</div>',
+            esc_attr($ruleType),
+            esc_attr($ruleData),
             do_shortcode($content)
         );
     }
