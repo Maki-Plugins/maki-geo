@@ -13,7 +13,7 @@ interface ApiResponse {
 
 declare global {
   interface Window {
-    makiGeoSettings?: {
+    makiGeoData?: {
       globalRules: GlobalGeoRule[];
     };
   }
@@ -25,7 +25,7 @@ function AdminGeoRules(): JSX.Element {
 
   useEffect(() => {
     // Load initial rules from WordPress options
-    const savedRules = window.makiGeoSettings?.globalRules || [];
+    const savedRules = window.makiGeoData?.globalRules || [];
     setRules(savedRules);
   }, []);
 

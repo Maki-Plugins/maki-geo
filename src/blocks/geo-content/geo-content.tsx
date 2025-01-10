@@ -124,11 +124,11 @@ registerBlockType<BlockAttributes>(name, {
 
     // Fallback for empty rules
     return (
-      <div>
+      <>
         {`[mgeo_content]`}
         <InnerBlocks.Content />
         {`[/mgeo_content]`}
-      </div>
+      </>
     );
   },
 });

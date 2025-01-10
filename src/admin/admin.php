@@ -231,7 +231,7 @@ function mgeo_enqueue_admin_scripts($hook)
 
     // Admin script data
     wp_localize_script(
-        'maki-geo-admin', 'makiGeoSettings', [
+        'maki-geo-admin', 'makiGeoData', [
         'nonce' => wp_create_nonce('maki_geo_save_rules'),
         'globalRules' => get_option('maki_geo_rules', [])
         ]

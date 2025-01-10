@@ -12,7 +12,7 @@ interface GeoRulesPanelProps {
   onGlobalRuleIdChange: (id: string) => void;
 }
 
-interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> {}
+interface SelectChangeEvent extends React.ChangeEvent<HTMLSelectElement> { }
 
 export const GeoRulesPanel: React.FC<GeoRulesPanelProps> = ({
   ruleType,

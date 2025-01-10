@@ -2,7 +2,7 @@ import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types";
 
 declare global {
   interface Window {
-    makiGeoSettings?: {
+    makiGeoData?: {
       globalRules: GlobalGeoRule[];
     };
     wp: {
@@ -24,7 +24,7 @@ async function initGeoTargeting(): Promise<void> {
     const blocks = document.querySelectorAll<HTMLElement>(
       `.${blocksClass}, .${popupsClass}`
     );
-    const globalRules = window.makiGeoSettings?.globalRules || [];
+    const globalRules = window.makiGeoData?.globalRules || [];
 
     blocks.forEach((block) => {
       const ruleType = block.dataset.ruletype;

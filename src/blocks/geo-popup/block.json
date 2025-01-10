@@ -1,7 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 2,
-  "name": "geo-utils/geo-popup",
+  "name": "maki-geo/geo-popup",
   "version": "0.0.1",
   "title": "Geo Popup",
   "category": "maki-geo-category",
@@ -41,7 +41,6 @@
       "default": 0
     }
   },
-  "textdomain": "geo-utils",
   "editorScript": "file:./geo-popup.tsx",
   "editorStyle": "file:./geo-popup.css",
   "style": "file:./style.css",
