@@ -99,13 +99,7 @@ function mgeo_content_shortcode($atts, $content = '')
 
     if ($method === 'client') {
         // Enqueue the frontend script
-        wp_enqueue_script(
-            'geo-target-frontend',
-            plugins_url('../geo-rules/evaluate-rule-frontend.js', __FILE__),
-            array('wp-api-fetch'),
-            '1.0.0',
-            true
-        );
+        wp_enqueue_script('geo-target-frontend');
 
         $attributes = shortcode_atts(
             array(
