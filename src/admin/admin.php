@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function gu_render_settings_page()
+function mgeo_render_settings_page()
 {
     ?>
     <div class="wrap">
@@ -88,64 +88,6 @@ function gu_render_settings_page()
         </div>
     </div>
 
-    <style>
-        .gu-admin-container {
-            margin-top: 20px;
-        }
-
-        .gu-admin-card {
-            background: white;
-            border: 1px solid #ccd0d4;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .gu-admin-card h2 {
-            margin-top: 0;
-        }
-
-        .gu-admin-tab {
-            display: none;
-        }
-
-        .gu-admin-tab.active {
-            display: block;
-        }
-
-        .gu-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .gu-stat-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .gu-stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #2271b1;
-        }
-
-        .gu-stat-text {
-            font-size: 18px;
-            margin: 10px 0;
-            color: #2271b1;
-        }
-
-        .geo-rules-save-button {
-            margin-top: 20px;
-            padding: 10px;
-        }
-    </style>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.nav-tab');
@@ -172,7 +114,7 @@ function gu_render_settings_page()
     <?php
 }
 
-function gu_register_settings()
+function mgeo_register_settings()
 {
     // General Settings
     register_setting('maki_geo_settings', 'maki_geo_options');
@@ -187,7 +129,7 @@ function gu_register_settings()
     add_settings_field(
         'debug_mode',
         'Debug Mode',
-        'gu_render_debug_mode_field',
+        'mgeo_render_debug_mode_field',
         'maki_geo_settings',
         'maki_geo_general_section'
     );
@@ -195,7 +137,7 @@ function gu_register_settings()
     add_settings_field(
         'geo_targeting_method',
         'Geo Targeting Method',
-        'gu_render_geo_targeting_method_field',
+        'mgeo_render_geo_targeting_method_field',
         'maki_geo_settings',
         'maki_geo_general_section'
     );
@@ -213,13 +155,13 @@ function gu_register_settings()
     add_settings_field(
         'default_action',
         'Default Action',
-        'gu_render_default_action_field',
+        'mgeo_render_default_action_field',
         'maki_geo_rules',
         'maki_geo_rules_section'
     );
 }
 
-function gu_render_geo_targeting_method_field()
+function mgeo_render_geo_targeting_method_field()
 {
     $options = get_option('maki_geo_options', array());
     $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
@@ -235,7 +177,7 @@ function gu_render_geo_targeting_method_field()
     <?php
 }
 
-function gu_render_debug_mode_field()
+function mgeo_render_debug_mode_field()
 {
     $options = get_option('maki_geo_options');
     $debug_mode = isset($options['debug_mode']) ? $options['debug_mode'] : 0;
@@ -248,7 +190,7 @@ function gu_render_debug_mode_field()
     <?php
 }
 
-function gu_render_default_action_field()
+function mgeo_render_default_action_field()
 {
     $options = get_option('maki_geo_rules_options');
     $default_action = isset($options['default_action']) ? $options['default_action'] : 'show';
@@ -261,20 +203,20 @@ function gu_render_default_action_field()
     <?php
 }
 
-function gu_add_admin_menu()
+function mgeo_add_admin_menu()
 {
     add_menu_page(
         'Maki Geo Settings',
         'Maki Geo',
         'manage_options',
         'maki-geo-settings',
-        'gu_render_settings_page',
+        'mgeo_render_settings_page',
         'dashicons-admin-site',
         30
     );
 }
 
-function gu_enqueue_admin_scripts($hook)
+function mgeo_enqueue_admin_scripts($hook)
 {
     if ($hook !== 'toplevel_page_maki-geo-settings') {
         return;
@@ -296,6 +238,6 @@ function gu_enqueue_admin_scripts($hook)
     );
 }
 
-add_action('admin_menu', 'gu_add_admin_menu');
-add_action('admin_init', 'gu_register_settings');
-add_action('admin_enqueue_scripts', 'gu_enqueue_admin_scripts');
+add_action('admin_menu', 'mgeo_add_admin_menu');
+add_action('admin_init', 'mgeo_register_settings');
+add_action('admin_enqueue_scripts', 'mgeo_enqueue_admin_scripts');
