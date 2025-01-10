@@ -16,6 +16,8 @@ if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
+require_once 'vendor/autoload.php';
+
 function mgeo_create_geo_content_block()
 {
     register_block_type(__DIR__ . '/build/blocks/geo-content');

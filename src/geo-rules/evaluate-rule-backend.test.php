@@ -5,10 +5,12 @@
  * @package Maki_Geo
  */
 
-class TestMaki extends WP_UnitTestCase {
+class TestEvaluateRuleBackend extends WP_UnitTestCase
+{
     private $mockLocationData;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->mockLocationData = array(
             'continent' => 'North America',
@@ -19,7 +21,8 @@ class TestMaki extends WP_UnitTestCase {
         );
     }
 
-    public function test_should_return_action_when_no_conditions() {
+    public function test_should_return_action_when_no_conditions()
+    {
         $rule = array(
             'conditions' => array(),
             'operator' => 'AND',
@@ -35,7 +38,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertFalse(mgeo_evaluate_rule($rule2, $this->mockLocationData));
     }
 
-    public function test_should_evaluate_single_is_condition() {
+    public function test_should_evaluate_single_is_condition()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'United States')
@@ -46,7 +50,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_evaluate_single_is_not_condition() {
+    public function test_should_evaluate_single_is_not_condition()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is not', 'value' => 'Canada')
@@ -57,7 +62,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_handle_multiple_conditions_with_and_operator() {
+    public function test_should_handle_multiple_conditions_with_and_operator()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'United States'),
@@ -69,7 +75,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_handle_multiple_conditions_with_or_operator() {
+    public function test_should_handle_multiple_conditions_with_or_operator()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'Canada'),
@@ -81,7 +88,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_handle_hide_action() {
+    public function test_should_handle_hide_action()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'United States')
@@ -92,7 +100,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertFalse(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_handle_case_insensitive_comparisons() {
+    public function test_should_handle_case_insensitive_comparisons()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'UNITED STATES'),
@@ -104,7 +113,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
     }
 
-    public function test_should_handle_complex_and_or_combinations() {
+    public function test_should_handle_complex_and_or_combinations()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'United States'),
@@ -128,7 +138,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule2, $this->mockLocationData));
     }
 
-    public function test_should_handle_ip_address_conditions() {
+    public function test_should_handle_ip_address_conditions()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'ip', 'operator' => 'is', 'value' => '192.168.1.1')
@@ -148,7 +159,8 @@ class TestMaki extends WP_UnitTestCase {
         $this->assertTrue(mgeo_evaluate_rule($rule2, $this->mockLocationData));
     }
 
-    public function test_should_handle_opposite_actions_when_conditions_not_met() {
+    public function test_should_handle_opposite_actions_when_conditions_not_met()
+    {
         $rule = array(
             'conditions' => array(
                 array('type' => 'country', 'operator' => 'is', 'value' => 'Canada')

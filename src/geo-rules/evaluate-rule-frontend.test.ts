@@ -1,5 +1,5 @@
-import { evaluateGeoRule } from "../evaluate-rule-frontend";
-import { GeoRuleBase, LocationData } from "../../types";
+import { evaluateGeoRule } from "./evaluate-rule-frontend";
+import { GeoRuleBase, LocationData } from "../types";
 
 describe("evaluateGeoRules", () => {
   const mockLocationData: LocationData = {

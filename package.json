@@ -1,8 +1,8 @@
 {
   "name": "maki-geo",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Geo targeting",
+  "author": "Maki Plugins",
   "main": "build/index.js",
   "scripts": {
     "build": "wp-scripts build --config webpack.config.js",
@@ -14,8 +14,9 @@
     "start": "wp-scripts start --config webpack.config.js",
     "start:hot": "wp-scripts start --hot --config webpack.config.js",
     "env": "wp-env",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "js-test": "jest",
+    "js-test:watch": "jest --watch",
+    "php-test": "wp-env run tests-cli --env-cwd=wp-content/plugins/maki-geo ./vendor/bin/phpunit"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
