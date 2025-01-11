@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once 'utils.php';
+require_once 'api-utils.php';
 
 add_action(
     'rest_api_init', function () {
