@@ -153,38 +153,66 @@ registerBlockType<PopupAttributes>(metadata.name, {
   },
 
   save: ({ attributes }: SaveProps) => {
-    const {
+    const { 
+      localRule, 
+      globalRuleId, 
+      ruleType,
       popupStyle,
       triggerType,
-      triggerDelay,
-      localRule,
-      globalRuleId,
-      ruleType,
+      triggerDelay 
     } = attributes;
 
-    const wrapperProps = useBlockProps.save({
-      className: "geo-popup-overlay",
-      style: { display: "none" },
-      "data-ruleType": ruleType,
-      "data-rule": JSON.stringify(localRule ?? globalRuleId ?? []),
-    });
+    const popupHtml = `
+<div class="geo-popup-overlay">
+  <div class="geo-popup-container" 
+       data-trigger="${triggerType}" 
+       data-delay="${triggerDelay}" 
+       style="${Object.entries(popupStyle).map(([key, value]) => `${key}:${value}`).join(';')}">
+    <button class="geo-popup-close" aria-label="Close popup">×</button>
+    <InnerBlocks.Content />
+  </div>
+</div>`;
 
-    const containerProps = {
-      className: "geo-popup-container",
-      style: popupStyle,
-      "data-trigger": triggerType,
-      "data-delay": triggerDelay,
-    };
+    if (ruleType === "global" && globalRuleId) {
+      return (
+        <div>
+          {`[mgeo_content rule="${globalRuleId}" display="flex"]`}
+          {popupHtml}
+          {`[/mgeo_content]`}
+        </div>
+      );
+    }
+
+    if (localRule) {
+      const parts: string[] = [];
+
+      localRule.conditions.forEach(condition => {
+        const not = condition.operator === "is not" ? "!" : "";
+        parts.push(`${condition.type}="${not}${condition.value}"`);
+      });
+
+      if (localRule.operator === "OR") {
+        parts.push('match="any"');
+      }
+
+      parts.push(`action="${localRule.action}"`);
+      parts.push('display="flex"');
+
+      return (
+        <div>
+          {`[mgeo_content ${parts.join(" ")}]`}
+          {popupHtml}
+          {`[/mgeo_content]`}
+        </div>
+      );
+    }
 
     return (
-      <div {...wrapperProps}>
-        <div {...containerProps}>
-          <button className="geo-popup-close" aria-label="Close popup">
-            ×
-          </button>
-          <InnerBlocks.Content />
-        </div>
-      </div>
+      <>
+        {`[mgeo_content display="flex"]`}
+        {popupHtml}
+        {`[/mgeo_content]`}
+      </>
     );
   },
 });

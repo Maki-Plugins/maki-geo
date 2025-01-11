@@ -106,7 +106,8 @@ function mgeo_content_shortcode($atts, $content = '')
             'city' => '',
             'ip' => '',
             'match' => 'all',    // 'all' or 'any'
-            'action' => 'show'   // 'show' or 'hide'
+            'action' => 'show',  // 'show' or 'hide'
+            'display' => 'block' // 'block' or 'flex'
         ), 
         $atts
     );
@@ -125,10 +126,17 @@ function mgeo_content_shortcode($atts, $content = '')
         $ruleType = empty($attributes['rule']) ? 'local' : 'global';
         $ruleData = $ruleType === 'global' ? $attributes['rule'] : json_encode($rule);
 
+        // If this is a popup, enqueue its assets
+        if ($attributes['display'] === 'flex') {
+            wp_enqueue_style('maki-geo-popup-style');
+            wp_enqueue_script('maki-geo-popup-handler');
+        }
+
         return sprintf(
-            '<div class="gu-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s">%s</div>',
+            '<div class="gu-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s" data-display="%s">%s</div>',
             esc_attr($ruleType),
             esc_attr($ruleData),
+            esc_attr($attributes['display']),
             do_shortcode($content)
         );
     }
@@ -140,7 +148,15 @@ function mgeo_content_shortcode($atts, $content = '')
     }
 
     // Evaluate the rule and return content accordingly
-    return mgeo_evaluate_rule($rule, $location_data) ? do_shortcode($content) : '';
+    if (mgeo_evaluate_rule($rule, $location_data)) {
+        return sprintf(
+            '<div style="display: %s">%s</div>',
+            esc_attr($attributes['display']),
+            do_shortcode($content)
+        );
+    }
+    
+    return '';
 }
 
 function mgeo_get_rule_from_attributes($attributes)

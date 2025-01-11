@@ -39,15 +39,12 @@ async function initGeoTargeting(): Promise<void> {
 
       const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
 
-      if (block.classList.contains(popupsClass)) {
-        // For popups, store the evaluation result and mark as ready
-        block.dataset.geoAllowed = shouldShow.toString();
-        block.dataset.geoReady = "true";
-        // Dispatch event to notify popup handler
-        block.dispatchEvent(new CustomEvent("geoRuleEvaluated"));
+      const displayType = block.dataset.display || 'block';
+
+      if (shouldShow) {
+          block.style.display = displayType;
       } else {
-        // For regular blocks, set display directly
-        block.style.display = shouldShow ? "block" : "none";
+          block.style.display = 'none';
       }
     });
   } catch (error) {
