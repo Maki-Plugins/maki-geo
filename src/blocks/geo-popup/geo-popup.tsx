@@ -162,22 +162,21 @@ registerBlockType<PopupAttributes>(metadata.name, {
       triggerDelay 
     } = attributes;
 
-    const popupHtml = `
-<div class="geo-popup-overlay">
-  <div class="geo-popup-container" 
-       data-trigger="${triggerType}" 
-       data-delay="${triggerDelay}" 
-       style="${Object.entries(popupStyle).map(([key, value]) => `${key}:${value}`).join(';')}">
-    <button class="geo-popup-close" aria-label="Close popup">×</button>
-    <InnerBlocks.Content />
-  </div>
-</div>`;
-
     if (ruleType === "global" && globalRuleId) {
       return (
         <div>
           {`[mgeo_content rule="${globalRuleId}" display="flex"]`}
-          {popupHtml}
+          <div className="geo-popup-overlay">
+            <div 
+              className="geo-popup-container" 
+              data-trigger={triggerType}
+              data-delay={triggerDelay}
+              style={popupStyle}
+            >
+              <button className="geo-popup-close" aria-label="Close popup">×</button>
+              <InnerBlocks.Content />
+            </div>
+          </div>
           {`[/mgeo_content]`}
         </div>
       );
@@ -185,7 +184,6 @@ registerBlockType<PopupAttributes>(metadata.name, {
 
     if (localRule) {
       const parts: string[] = [];
-
       localRule.conditions.forEach(condition => {
         const not = condition.operator === "is not" ? "!" : "";
         parts.push(`${condition.type}="${not}${condition.value}"`);
@@ -201,18 +199,38 @@ registerBlockType<PopupAttributes>(metadata.name, {
       return (
         <div>
           {`[mgeo_content ${parts.join(" ")}]`}
-          {popupHtml}
+          <div className="geo-popup-overlay">
+            <div 
+              className="geo-popup-container" 
+              data-trigger={triggerType}
+              data-delay={triggerDelay}
+              style={popupStyle}
+            >
+              <button className="geo-popup-close" aria-label="Close popup">×</button>
+              <InnerBlocks.Content />
+            </div>
+          </div>
           {`[/mgeo_content]`}
         </div>
       );
     }
 
     return (
-      <>
+      <div>
         {`[mgeo_content display="flex"]`}
-        {popupHtml}
+        <div className="geo-popup-overlay">
+          <div 
+            className="geo-popup-container" 
+            data-trigger={triggerType}
+            data-delay={triggerDelay}
+            style={popupStyle}
+          >
+            <button className="geo-popup-close" aria-label="Close popup">×</button>
+            <InnerBlocks.Content />
+          </div>
+        </div>
         {`[/mgeo_content]`}
-      </>
+      </div>
     );
   },
 });
