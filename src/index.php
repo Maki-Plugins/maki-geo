@@ -1,20 +1,8 @@
 <?php
-
-/**
- * Plugin Name:       Maki Geo
- * Description:       Geo targeting
- * Version:           0.0.1
- * Requires at least: 6.6
- * Requires PHP:      7.2
- *
- * @package maki-geo
- */
-
 if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
-add_action('init', 'register_geo_target_assets');
 
 function register_geo_target_assets()
 {
@@ -34,7 +22,7 @@ function register_geo_target_assets()
         ]
     );
 }
-
+add_action('init', 'register_geo_target_assets');
 
 
 // Register Gutenberg blocks
