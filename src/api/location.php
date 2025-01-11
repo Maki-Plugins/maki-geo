@@ -42,7 +42,7 @@ function get_geolocation_data()
         return $cached_data;
     }
 
-    $response = wp_remote_get("https://api.makiplugins.com/maki-geo/api/v1/getLocation?ip={$ip}"); // wp_remote_get("https://ipinfo.io/{$ip}/json"); // ?token=YOUR_API_KEY
+    $response = wp_remote_get("https://api.makiplugins.com/maki-geo/api/v1/getLocation?ip={$ip}");
     if (is_wp_error($response)) {
         return false;
     }
@@ -51,6 +51,6 @@ function get_geolocation_data()
     // TODO: Check for errors here
 
     $data = $responseObject['data'];
-    set_transient("geo_location_{$ip}", $data, HOUR_IN_SECONDS); // Disable cache temporarily
+    set_transient("geo_location_{$ip}", $data, HOUR_IN_SECONDS);
     return $data;
 }
