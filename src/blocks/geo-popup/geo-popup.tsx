@@ -14,6 +14,7 @@ import {
 import { GeoRulesPanel } from "../../components/geo-rules-panel";
 import metadata from "./block.json";
 import "./geo-popup.css";
+import "./style.css";
 import { LocalGeoRule } from "types";
 
 interface PopupStyle {
@@ -153,13 +154,13 @@ registerBlockType<PopupAttributes>(metadata.name, {
   },
 
   save: ({ attributes }: SaveProps) => {
-    const { 
-      localRule, 
-      globalRuleId, 
+    const {
+      localRule,
+      globalRuleId,
       ruleType,
       popupStyle,
       triggerType,
-      triggerDelay 
+      triggerDelay
     } = attributes;
 
     if (ruleType === "global" && globalRuleId) {
@@ -167,8 +168,8 @@ registerBlockType<PopupAttributes>(metadata.name, {
         <div>
           {`[mgeo_content rule="${globalRuleId}" display="flex"]`}
           <div className="geo-popup-overlay">
-            <div 
-              className="geo-popup-container" 
+            <div
+              className="geo-popup-container"
               data-trigger={triggerType}
               data-delay={triggerDelay}
               style={popupStyle}
@@ -200,8 +201,8 @@ registerBlockType<PopupAttributes>(metadata.name, {
         <div>
           {`[mgeo_content ${parts.join(" ")}]`}
           <div className="geo-popup-overlay">
-            <div 
-              className="geo-popup-container" 
+            <div
+              className="geo-popup-container"
               data-trigger={triggerType}
               data-delay={triggerDelay}
               style={popupStyle}
@@ -219,8 +220,8 @@ registerBlockType<PopupAttributes>(metadata.name, {
       <div>
         {`[mgeo_content display="flex"]`}
         <div className="geo-popup-overlay">
-          <div 
-            className="geo-popup-container" 
+          <div
+            className="geo-popup-container"
             data-trigger={triggerType}
             data-delay={triggerDelay}
             style={popupStyle}
