@@ -63,8 +63,7 @@ class TestLocation extends WP_UnitTestCase
         $ip = get_debug_ip();
         $this->assertEquals('86.94.131.20', $ip); 
         $this->assertMatchesRegularExpression(
-            '/^ 
- {1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $ip
+            '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $ip
         );        
     }
 
@@ -125,14 +124,12 @@ class TestLocation extends WP_UnitTestCase
             $cached_data, HOUR_IN_SECONDS
         );
 
-        // Add filter to ensure wp_remote_get is  
-        not called
+        // Add filter to ensure wp_remote_get is not called
         add_filter(
             'pre_http_request', 
             function ($preempt, $args, $url) {
                 $this->fail(
-                    'wp_remote_get should not 
-     be called when data is cached'
+                    'wp_remote_get should not be called when data is cached'
                 );
                         return false;
             }, 10, 3
@@ -152,8 +149,7 @@ class TestLocation extends WP_UnitTestCase
             function ($preempt, $args, $url) {
                  return new 
                 WP_Error(
-                    'http_request_failed', 'API request      
-     failed'
+                    'http_request_failed', 'API request failed'
                 );
             }, 10, 3
         );
