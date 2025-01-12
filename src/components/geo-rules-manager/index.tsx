@@ -41,27 +41,29 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
       <Button variant="primary" onClick={addRule} className="add-rule-button">
         <Dashicon icon="plus" /> Add Global Geo Rule
       </Button>
-      {rules.reverse().map((rule, index) => (
-        <div key={rule.id} className="geo-rule-wrapper">
-          <GeoRuleEditor
-            rule={rule}
-            onChange={(updatedRule: GeoRule) =>
-              updateRule(index, updatedRule as GlobalGeoRule)
-            }
-            showName={true}
-          />
-          <div className="rule-actions">
-            <Button
-              variant="secondary"
-              isDestructive
-              onClick={() => removeRule(index)}
-              className="remove-rule-button"
-            >
-              Remove Rule
-            </Button>
+      <div className="geo-rules-wrapper">
+        {rules.map((rule, index) => (
+          <div key={rule.id} className="geo-rule-wrapper">
+            <GeoRuleEditor
+              rule={rule}
+              onChange={(updatedRule: GeoRule) =>
+                updateRule(index, updatedRule as GlobalGeoRule)
+              }
+              showName={true}
+            />
+            <div className="rule-actions">
+              <Button
+                variant="secondary"
+                isDestructive
+                onClick={() => removeRule(index)}
+                className="remove-rule-button"
+              >
+                Remove Rule
+              </Button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
