@@ -166,7 +166,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
     if (ruleType === "global" && globalRuleId) {
       return (
         <div>
-          {`[mgeo_content rule="${globalRuleId}" display="flex"]`}
+          {`[mgeo_content rule="${globalRuleId}"]`}
           <div className="geo-popup-overlay">
             <div
               className="geo-popup-container"
@@ -195,7 +195,6 @@ registerBlockType<PopupAttributes>(metadata.name, {
       }
 
       parts.push(`action="${localRule.action}"`);
-      parts.push('display="flex"');
 
       return (
         <div>
@@ -218,7 +217,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
 
     return (
       <div>
-        {`[mgeo_content display="flex"]`}
+        {`[mgeo_content]`}
         <div className="geo-popup-overlay">
           <div
             className="geo-popup-container"

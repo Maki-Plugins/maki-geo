@@ -33,26 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function showPopup(popup) {
-  // If geo rules aren't evaluated yet, wait for them
-  if (!popup.dataset.geoReady) {
-    popup.addEventListener('geoRuleEvaluated', () => {
-      if (popup.dataset.geoAllowed === "true") {
-        popup.style.display = "flex";
-        // Force a reflow before adding the active class
-        void popup.offsetWidth;
-        popup.classList.add("is-active");
-      }
-    }, { once: true });
-    return;
-  }
-
-  // If geo rules are already evaluated, show immediately if allowed
-  if (popup.dataset.geoAllowed === "true") {
-    popup.style.display = "flex";
-    // Force a reflow before adding the active class
-    void popup.offsetWidth;
-    popup.classList.add("is-active");
-  }
+  popup.style.display = "flex";
+  // Force a reflow before adding the active class
+  void popup.offsetWidth;
+  popup.classList.add("is-active");
 }
 
 function closePopup(popup) {

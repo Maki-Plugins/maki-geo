@@ -19,10 +19,9 @@ async function initGeoTargeting(): Promise<void> {
     console.log(`API response: ${JSON.stringify(response)}`);
 
     const blocksClass = "gu-geo-target-block";
-    const popupsClass = "geo-popup-overlay";
 
     const blocks = document.querySelectorAll<HTMLElement>(
-      `.${blocksClass}, .${popupsClass}`
+      `.${blocksClass}`
     );
     const globalRules = window.makiGeoData?.globalRules || [];
 
@@ -39,12 +38,11 @@ async function initGeoTargeting(): Promise<void> {
 
       const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
 
-      const displayType = block.dataset.display || 'block';
 
       if (shouldShow) {
-          block.style.display = displayType;
+        block.style.display = 'block';
       } else {
-          block.style.display = 'none';
+        block.style.display = 'none';
       }
     });
   } catch (error) {
