@@ -5,34 +5,36 @@ if (!defined('ABSPATH')) {
 
 require_once 'api-utils.php';
 
+require_once 'permissions.php';
+
 add_action(
     'rest_api_init', function () {
         register_rest_route(
             'maki-geo/v1', '/rules', array(
             array(
-            'methods' => 'GET',
-            'callback' => 'get_geo_rules',
-            'permission_callback' => 'is_user_logged_in',
+                'methods' => 'GET',
+                'callback' => 'get_geo_rules',
+                'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
-            'methods' => 'DELETE',
-            'callback' => 'delete_all_geo_rules',
-            'permission_callback' => 'is_user_logged_in',
+                'methods' => 'DELETE',
+                'callback' => 'delete_all_geo_rules',
+                'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
-            'methods' => 'POST',
-            'callback' => 'create_geo_rule',
-            'permission_callback' => 'is_user_logged_in',
+                'methods' => 'POST',
+                'callback' => 'create_geo_rule',
+                'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
-            'methods' => 'PUT',
-            'callback' => 'update_geo_rule',
-            'permission_callback' => 'is_user_logged_in',
+                'methods' => 'PUT',
+                'callback' => 'update_geo_rule',
+                'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
-            'methods' => 'DELETE',
-            'callback' => 'delete_geo_rule',
-            'permission_callback' => 'is_user_logged_in',
+                'methods' => 'DELETE',
+                'callback' => 'delete_geo_rule',
+                'permission_callback' => 'mgeo_can_manage_rules',
             )
             )
         );

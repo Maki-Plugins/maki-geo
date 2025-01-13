@@ -5,12 +5,15 @@ if (!defined('ABSPATH')) {
 
 require_once 'api-utils.php';
 
+require_once 'permissions.php';
+
 add_action(
     'rest_api_init', function () {
         register_rest_route(
             'maki-geo/v1', '/location', array(
-            'methods' => 'GET',
-            'callback' => 'get_geolocation_data',
+                'methods' => 'GET',
+                'callback' => 'get_geolocation_data',
+                'permission_callback' => 'mgeo_can_view_location',
             )
         );
     }
