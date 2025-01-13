@@ -5,35 +5,33 @@ if (!defined('ABSPATH')) {
 
 require_once 'api-utils.php';
 
-require_once 'permissions.php';
-
 add_action(
     'rest_api_init', function () {
         register_rest_route(
             'maki-geo/v1', '/rules', array(
             array(
                 'methods' => 'GET',
-                'callback' => 'get_geo_rules',
+                'callback' => 'mgeo_get_global_geo_rules',
                 'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
                 'methods' => 'DELETE',
-                'callback' => 'delete_all_geo_rules',
+                'callback' => 'mgeo_delete_all_global_geo_rules',
                 'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
                 'methods' => 'POST',
-                'callback' => 'create_geo_rule',
+                'callback' => 'mgeo_create_global_geo_rule',
                 'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
                 'methods' => 'PUT',
-                'callback' => 'update_geo_rule',
+                'callback' => 'mgeo_update_global_geo_rule',
                 'permission_callback' => 'mgeo_can_manage_rules',
             ),
             array(
                 'methods' => 'DELETE',
-                'callback' => 'delete_geo_rule',
+                'callback' => 'mgeo_delete_global_geo_rule',
                 'permission_callback' => 'mgeo_can_manage_rules',
             )
             )
@@ -41,15 +39,15 @@ add_action(
     }
 );
 
-function get_geo_rules()
+function mgeo_get_global_geo_rules()
 {
-    verify_nonce();
+    mgeo_verify_nonce();
     return get_option('maki_geo_rules', array());
 }
 
-function create_geo_rule($request)
+function mgeo_create_global_geo_rule($request)
 {
-    verify_nonce();
+    mgeo_verify_nonce();
     $new_rules = json_decode($request->get_body(), true);
     
     if (!is_array($new_rules)) {
@@ -57,7 +55,7 @@ function create_geo_rule($request)
     }
 
     foreach ($new_rules as $rule) {
-        if (!validate_rule($rule)) {
+        if (!mgeo_validate_rule($rule)) {
             return new WP_Error('invalid_rule', 'Invalid rule format', array('status' => 400));
         }
     }
@@ -66,13 +64,13 @@ function create_geo_rule($request)
     return array('success' => true, 'rules' => $new_rules);
 }
 
-function update_geo_rule($request)
+function mgeo_update_global_geo_rule($request)
 {
-    verify_nonce();
+    mgeo_verify_nonce();
     $rule = json_decode($request->get_body(), true);
     $index = isset($_GET['index']) ? intval($_GET['index']) : -1;
     
-    if ($index < 0 || !validate_rule($rule)) {
+    if ($index < 0 || !mgeo_validate_rule($rule)) {
         return new WP_Error('invalid_request', 'Invalid request', array('status' => 400));
     }
 
@@ -87,9 +85,9 @@ function update_geo_rule($request)
     return array('success' => true, 'rule' => $rule);
 }
 
-function delete_geo_rule($request)
+function mgeo_delete_global_geo_rule($request)
 {
-    verify_nonce();
+    mgeo_verify_nonce();
     $index = isset($_GET['index']) ? intval($_GET['index']) : -1;
     
     if ($index < 0) {
@@ -107,14 +105,14 @@ function delete_geo_rule($request)
     return array('success' => true);
 }
 
-function delete_all_geo_rules()
+function mgeo_delete_all_global_geo_rules()
 {
-    verify_nonce();
+    mgeo_verify_nonce();
     update_option('maki_geo_rules', array());
     return array('success' => true);
 }
 
-function validate_rule($rule)
+function mgeo_validate_rule($rule)
 {
     // Validate basic rule structure
     if (!isset($rule['conditions']) || !is_array($rule['conditions'])) {

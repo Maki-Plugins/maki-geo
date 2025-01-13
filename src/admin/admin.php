@@ -85,7 +85,7 @@ function mgeo_add_admin_menu()
         'maki-geo-settings',
         'mgeo_render_settings_page',
         'dashicons-admin-site',
-        30
+        71
     );
 }
 

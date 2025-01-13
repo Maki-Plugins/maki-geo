@@ -9,7 +9,7 @@ function mgeo_get_location_data()
     static $location_data = null;
     
     if ($location_data === null) {
-        $location_data = get_geolocation_data();
+        $location_data = mgeo_get_geolocation_data();
     }
     
     return $location_data;

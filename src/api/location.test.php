@@ -37,13 +37,13 @@ class TestLocation extends WP_UnitTestCase
             3
         );
 
-        $result = get_geolocation_data();
+        $result = mgeo_get_geolocation_data();
 
         $this->assertIsArray($result);
         $this->assertEquals($mock_response["data"], $result);
 
         // Verify the data was cached
-        $cached_data = get_transient("geo_location_86.94.131.20");
+        $cached_data = get_transient("mgeo_geo_location_86.94.131.20");
         $this->assertEquals($mock_response["data"], $cached_data);
     }
 
@@ -58,7 +58,7 @@ class TestLocation extends WP_UnitTestCase
 
         // Set the cached data
         set_transient(
-            "geo_location_86.94.131.20",
+            "mgeo_geo_location_86.94.131.20",
             $cached_data,
             HOUR_IN_SECONDS
         );
@@ -76,7 +76,7 @@ class TestLocation extends WP_UnitTestCase
             3
         );
 
-        $result = get_geolocation_data();
+        $result = mgeo_get_geolocation_data();
 
         $this->assertEquals($cached_data, $result);
     }
@@ -96,12 +96,12 @@ class TestLocation extends WP_UnitTestCase
             3
         );
 
-        $result = get_geolocation_data();
+        $result = mgeo_get_geolocation_data();
 
         $this->assertFalse($result);
 
         // Verify no cache was set
-        $cached_data = get_transient("geo_location_86.94.131.20");
+        $cached_data = get_transient("mgeo_geo_location_86.94.131.20");
         $this->assertFalse($cached_data);
     }
 }

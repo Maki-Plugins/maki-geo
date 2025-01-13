@@ -5,21 +5,19 @@ if (!defined('ABSPATH')) {
 
 require_once 'api-utils.php';
 
-require_once 'permissions.php';
-
 add_action(
     'rest_api_init', function () {
         register_rest_route(
             'maki-geo/v1', '/location', array(
                 'methods' => 'GET',
-                'callback' => 'get_geolocation_data',
+                'callback' => 'mgeo_get_geolocation_data',
                 'permission_callback' => '__return_true',
             )
         );
     }
 );
 
-function get_debug_data()
+function mgeo_get_debug_data()
 {
     return array(
         'continent' => 'Europe',
@@ -30,17 +28,17 @@ function get_debug_data()
     );
 }
 
-function get_debug_ip()
+function mgeo_get_debug_ip()
 {
     return "86.94.131.20";
 }
 
 
-function get_geolocation_data()
+function mgeo_get_geolocation_data()
 {
-    verify_nonce();
-    $ip = get_debug_ip(); //$_SERVER['REMOTE_ADDR'];
-    $cached_data = get_transient("geo_location_{$ip}");
+    mgeo_verify_nonce();
+    $ip = mgeo_get_debug_ip(); //$_SERVER['REMOTE_ADDR'];
+    $cached_data = get_transient("mgeo_geo_location_{$ip}");
     if ($cached_data) {
         return $cached_data;
     }
@@ -54,6 +52,6 @@ function get_geolocation_data()
     // TODO: Check for errors here
 
     $data = $responseObject['data'];
-    set_transient("geo_location_{$ip}", $data, HOUR_IN_SECONDS);
+    set_transient("mgeo_geo_location_{$ip}", $data, HOUR_IN_SECONDS);
     return $data;
 }

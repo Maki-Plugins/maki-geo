@@ -4,7 +4,7 @@ if (! defined('ABSPATH')) {
 }
 
 
-function register_geo_target_assets()
+function mgeo_register_geo_target_assets()
 {
     // Registering for use when geo targeted content is embedded on the frontend
     wp_register_script(
@@ -22,7 +22,7 @@ function register_geo_target_assets()
         ]
     );
 }
-add_action('init', 'register_geo_target_assets');
+add_action('init', 'mgeo_register_geo_target_assets');
 
 
 // Register Gutenberg blocks

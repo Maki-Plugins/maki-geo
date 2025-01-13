@@ -4,7 +4,13 @@ if (!defined('ABSPATH')) {
 }
 
 
-function verify_nonce()
+function mgeo_can_manage_rules()
+{
+    return current_user_can('manage_options');
+}
+
+
+function mgeo_verify_nonce()
 {
     if (!isset($_SERVER['HTTP_X_WP_NONCE'])) {
         return new WP_Error('rest_forbidden', 'Invalid nonce.', array('status' => 403));
