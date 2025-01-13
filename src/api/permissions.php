@@ -8,6 +8,6 @@ function mgeo_can_manage_rules() {
 }
 
 function mgeo_can_view_location() {
-    // Allow all logged-in users to view location data
-    return is_user_logged_in();
+    // Allow public access to location data
+    return true;
 }

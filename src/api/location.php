@@ -13,7 +13,7 @@ add_action(
             'maki-geo/v1', '/location', array(
                 'methods' => 'GET',
                 'callback' => 'get_geolocation_data',
-                'permission_callback' => 'mgeo_can_view_location',
+                'permission_callback' => '__return_true',
             )
         );
     }
