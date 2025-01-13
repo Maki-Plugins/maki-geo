@@ -18,7 +18,7 @@ async function initGeoTargeting(): Promise<void> {
     });
     console.log(`API response: ${JSON.stringify(response)}`);
 
-    const blocksClass = "gu-geo-target-block";
+    const blocksClass = "mgeo-geo-target-block";
 
     const blocks = document.querySelectorAll<HTMLElement>(
       `.${blocksClass}`

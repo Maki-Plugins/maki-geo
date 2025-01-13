@@ -41,7 +41,7 @@ function mgeo_content_shortcode($atts, $content = '')
         }
 
         return sprintf(
-            '<div class="gu-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s" data-display="%s">%s</div>',
+            '<div class="mgeo-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s" data-display="%s">%s</div>',
             esc_attr($ruleType),
             esc_attr($ruleData),
             esc_attr($attributes['display']),
@@ -58,8 +58,7 @@ function mgeo_content_shortcode($atts, $content = '')
     // Evaluate the rule and return content accordingly
     if (mgeo_evaluate_rule($rule, $location_data)) {
         return sprintf(
-            '<div style="display: %s">%s</div>',
-            esc_attr($attributes['display']),
+            '<div>%s</div>',
             do_shortcode($content)
         );
     }

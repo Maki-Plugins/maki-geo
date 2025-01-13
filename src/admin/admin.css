@@ -146,11 +146,11 @@
 }
 
 
-.gu-admin-container {
+.mgeo-admin-container {
     margin-top: 20px;
 }
 
-.gu-admin-card {
+.mgeo-admin-card {
     background: white;
     border: 1px solid #ccd0d4;
     padding: 20px;
@@ -158,40 +158,40 @@
     border-radius: 4px;
 }
 
-.gu-admin-card h2 {
+.mgeo-admin-card h2 {
     margin-top: 0;
 }
 
-.gu-admin-tab {
+.mgeo-admin-tab {
     display: none;
 }
 
-.gu-admin-tab.active {
+.mgeo-admin-tab.active {
     display: block;
 }
 
-.gu-stats-grid {
+.mgeo-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
-.gu-stat-box {
+.mgeo-stat-box {
     background: #f8f9fa;
     padding: 15px;
     border-radius: 4px;
     text-align: center;
 }
 
-.gu-stat-number {
+.mgeo-stat-number {
     font-size: 24px;
     font-weight: bold;
     margin: 10px 0;
     color: #2271b1;
 }
 
-.gu-stat-text {
+.mgeo-stat-text {
     font-size: 18px;
     margin: 10px 0;
     color: #2271b1;

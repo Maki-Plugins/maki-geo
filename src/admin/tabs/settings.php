@@ -3,10 +3,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_render_settings_tab() {
+function mgeo_render_settings_tab()
+{
     ?>
-    <div id="settings" class="gu-admin-tab">
-        <div class="gu-admin-card">
+    <div id="settings" class="mgeo-admin-tab">
+        <div class="mgeo-admin-card">
             <form method="post" action="options.php">
                 <?php
                 settings_fields('maki_geo_settings');

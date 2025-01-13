@@ -3,7 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_render_tabs() {
+function mgeo_render_tabs()
+{
     ?>
     <nav class="nav-tab-wrapper">
         <a href="#dashboard" class="nav-tab nav-tab-active">Dashboard</a>
@@ -14,7 +15,7 @@ function mgeo_render_tabs() {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.nav-tab');
-            const tabContents = document.querySelectorAll('.gu-admin-tab');
+            const tabContents = document.querySelectorAll('.mgeo-admin-tab');
 
             function switchTab(e) {
                 e.preventDefault();

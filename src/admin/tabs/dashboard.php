@@ -3,23 +3,24 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_render_dashboard_tab() {
+function mgeo_render_dashboard_tab()
+{
     ?>
-    <div id="dashboard" class="gu-admin-tab active">
-        <div class="gu-admin-card">
+    <div id="dashboard" class="mgeo-admin-tab active">
+        <div class="mgeo-admin-card">
             <h2>Statistics Overview</h2>
-            <div class="gu-stats-grid">
-                <div class="gu-stat-box">
+            <div class="mgeo-stats-grid">
+                <div class="mgeo-stat-box">
                     <h3>Total Blocks</h3>
-                    <p class="gu-stat-number">0</p>
+                    <p class="mgeo-stat-number">0</p>
                 </div>
-                <div class="gu-stat-box">
+                <div class="mgeo-stat-box">
                     <h3>Active Rules</h3>
-                    <p class="gu-stat-number">0</p>
+                    <p class="mgeo-stat-number">0</p>
                 </div>
-                <div class="gu-stat-box">
+                <div class="mgeo-stat-box">
                     <h3>Top Country</h3>
-                    <p class="gu-stat-text">-</p>
+                    <p class="mgeo-stat-text">-</p>
                 </div>
             </div>
         </div>

@@ -9,14 +9,15 @@ require_once plugin_dir_path(__FILE__) . 'tabs/geo-rules.php';
 require_once plugin_dir_path(__FILE__) . 'tabs/settings.php';
 require_once plugin_dir_path(__FILE__) . 'tabs/tabs-manager.php';
 
-function mgeo_render_settings_page() {
+function mgeo_render_settings_page()
+{
     ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <?php 
         mgeo_render_tabs();
         ?>
-        <div class="gu-admin-container">
+        <div class="mgeo-admin-container">
             <?php
             mgeo_render_dashboard_tab();
             mgeo_render_geo_rules_tab();
