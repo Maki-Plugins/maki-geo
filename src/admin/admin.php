@@ -40,7 +40,7 @@ function mgeo_render_settings_page()
             <div id="geo-rules" class="gu-admin-tab">
                 <div class="gu-admin-card">
                     <h2>Global Geo Rules</h2>
-                    <p>Configure global geo-targeting rules that apply site-wide.</p>
+                    <p>Configure global geo-targeting rules that you can reuse site-wide.</p>
                     <div id="geo-rules-admin"></div>
                 </div>
             </div>
@@ -57,7 +57,7 @@ function mgeo_render_settings_page()
                         <h3>Danger Zone</h3>
                         <p>
                             <button type="button" id="delete-all-rules" class="button button-link-delete">
-                                Delete All Geo Rules
+                                Delete All Global Geo Rules
                             </button>
                         </p>
                         <script>
@@ -127,17 +127,9 @@ function mgeo_register_settings()
     );
 
     add_settings_field(
-        'debug_mode',
-        'Debug Mode',
-        'mgeo_render_debug_mode_field',
-        'maki_geo_settings',
-        'maki_geo_general_section'
-    );
-
-    add_settings_field(
-        'geo_targeting_method',
+        'client_server_mode',
         'Geo Targeting Method',
-        'mgeo_render_geo_targeting_method_field',
+        'mgeo_render_client_server_mode_field',
         'maki_geo_settings',
         'maki_geo_general_section'
     );
@@ -151,55 +143,22 @@ function mgeo_register_settings()
         null,
         'maki_geo_rules'
     );
-
-    add_settings_field(
-        'default_action',
-        'Default Action',
-        'mgeo_render_default_action_field',
-        'maki_geo_rules',
-        'maki_geo_rules_section'
-    );
 }
 
-function mgeo_render_geo_targeting_method_field()
+function mgeo_render_client_server_mode_field()
 {
     $options = get_option('maki_geo_options', array());
-    $method = isset($options['geo_targeting_method']) ? $options['geo_targeting_method'] : 'server';
+    $method = isset($options['client_server_mode']) ? $options['client_server_mode'] : 'server';
     ?>
-    <select name="maki_geo_options[geo_targeting_method]">
+    <select name="maki_geo_options[client_server_mode]">
         <option value="server" <?php selected('server', $method); ?>>Server-side (Default)</option>
-        <option value="client" <?php selected('client', $method); ?>>Client-side (AJAX)</option>
+        <option value="client" <?php selected('client', $method); ?>>Client-side</option>
     </select>
     <p class="description">
-        Server-side: Processes geo-targeting rules when the page loads.<br>
-        Client-side: Uses AJAX to evaluate rules in the browser. Better with caching but requires JavaScript.
+        Server-side: Processes geo location on the server when the page loads.<br>
+        Client-side: Uses AJAX to evaluate geo location in the browser. This works better with caching plugins but is slightly slower and requires javascript.<br>
+        <b>Our advise:</b> Use Server-side unless you're experiencing wrong location detection due to caching.
     </p>
-    <?php
-}
-
-function mgeo_render_debug_mode_field()
-{
-    $options = get_option('maki_geo_options');
-    $debug_mode = isset($options['debug_mode']) ? $options['debug_mode'] : 0;
-    ?>
-    <label>
-        <input type="checkbox" name="maki_geo_options[debug_mode]" value="1" <?php checked(1, $debug_mode); ?> />
-        Enable debug logging
-    </label>
-    <p class="description">When enabled, additional debugging information will be logged.</p>
-    <?php
-}
-
-function mgeo_render_default_action_field()
-{
-    $options = get_option('maki_geo_rules_options');
-    $default_action = isset($options['default_action']) ? $options['default_action'] : 'show';
-    ?>
-    <select name="maki_geo_rules_options[default_action]">
-        <option value="show" <?php selected('show', $default_action); ?>>Show Content</option>
-        <option value="hide" <?php selected('hide', $default_action); ?>>Hide Content</option>
-    </select>
-    <p class="description">Default action when no geo rules match.</p>
     <?php
 }
 
