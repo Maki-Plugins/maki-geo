@@ -4,113 +4,26 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mgeo_render_settings_page()
-{
+require_once plugin_dir_path(__FILE__) . 'tabs/dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'tabs/geo-rules.php';
+require_once plugin_dir_path(__FILE__) . 'tabs/settings.php';
+require_once plugin_dir_path(__FILE__) . 'tabs/tabs-manager.php';
+
+function mgeo_render_settings_page() {
     ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-
-        <nav class="nav-tab-wrapper">
-            <a href="#dashboard" class="nav-tab nav-tab-active">Dashboard</a>
-            <a href="#geo-rules" class="nav-tab">Global Geo Rules</a>
-            <a href="#settings" class="nav-tab">Settings</a>
-        </nav>
-
+        <?php 
+        mgeo_render_tabs();
+        ?>
         <div class="gu-admin-container">
-            <div id="dashboard" class="gu-admin-tab active">
-                <div class="gu-admin-card">
-                    <h2>Statistics Overview</h2>
-                    <div class="gu-stats-grid">
-                        <div class="gu-stat-box">
-                            <h3>Total Blocks</h3>
-                            <p class="gu-stat-number">0</p>
-                        </div>
-                        <div class="gu-stat-box">
-                            <h3>Active Rules</h3>
-                            <p class="gu-stat-number">0</p>
-                        </div>
-                        <div class="gu-stat-box">
-                            <h3>Top Country</h3>
-                            <p class="gu-stat-text">-</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="geo-rules" class="gu-admin-tab">
-                <div class="gu-admin-card">
-                    <h2>Global Geo Rules</h2>
-                    <p>Configure global geo-targeting rules that you can reuse site-wide.</p>
-                    <div id="geo-rules-admin"></div>
-                </div>
-            </div>
-
-            <div id="settings" class="gu-admin-tab">
-                <div class="gu-admin-card">
-                    <form method="post" action="options.php">
-                        <?php
-                        settings_fields('maki_geo_settings');
-                        do_settings_sections('maki_geo_settings');
-                        submit_button();
-                        ?>
-                        <hr />
-                        <h3>Danger Zone</h3>
-                        <p>
-                            <button type="button" id="delete-all-rules" class="button button-link-delete">
-                                Delete All Global Geo Rules
-                            </button>
-                        </p>
-                        <script>
-                            document.getElementById('delete-all-rules').addEventListener('click', async function() {
-                                if (!confirm('Are you sure you want to delete all geo rules? This action cannot be undone.')) {
-                                    return;
-                                }
-
-                                try {
-                                    const response = await wp.apiFetch({
-                                        path: 'maki-geo/v1/rules',
-                                        method: 'DELETE',
-                                    });
-
-                                    if (response.success) {
-                                        alert('All rules have been deleted successfully.');
-                                        window.location.reload();
-                                    }
-                                } catch (error) {
-                                    console.error('Failed to delete rules:', error);
-                                    alert('Failed to delete rules. Please try again.');
-                                }
-                            });
-                        </script>
-                    </form>
-                </div>
-            </div>
+            <?php
+            mgeo_render_dashboard_tab();
+            mgeo_render_geo_rules_tab();
+            mgeo_render_settings_tab();
+            ?>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.nav-tab');
-            const tabContents = document.querySelectorAll('.gu-admin-tab');
-
-            function switchTab(e) {
-                e.preventDefault();
-
-                // Remove active class from all tabs
-                tabs.forEach(tab => tab.classList.remove('nav-tab-active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-
-                // Add active class to clicked tab
-                e.target.classList.add('nav-tab-active');
-
-                // Show corresponding content
-                const targetId = e.target.getAttribute('href').substring(1);
-                document.getElementById(targetId).classList.add('active');
-            }
-
-            tabs.forEach(tab => tab.addEventListener('click', switchTab));
-        });
-    </script>
     <?php
 }
 
