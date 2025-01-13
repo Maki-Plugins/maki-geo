@@ -1,96 +1,65 @@
-=== Maki Geo ===
+=== Maki Geo – Geo target and Convert ===
 Contributors: makiplugins
-Tags: geo, geo targeting, geo fencing, location targeting
-Requires at least: 4.7
+Tags: geo, location, geo targeting, location targeting, geo location
+Requires at least: 6.6
 Tested up to: 6.7
 Stable tag: 1.0.0
-Requires PHP: 7.0
+Requires PHP: 7.3
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WIP! Use https://wpreadme.com/ and https://wordpress.org/plugins/developers/readme-validator/ to create this file.
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Easily personalize your website based on visitor location. Geo target users and maximize conversions. 
 
 == Description ==
+**[Maki Geo](https://makiplugins.com/ "Maki Geo")** helps you create content that resonates with local audiences by geo targeting. 
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
-A plugin by [Maki Plugins](https://makiplugins.com/ "Maki Plugins")
+## Features
+**🎯 Geo targeting:** Target visitors based on continent, country, state/province, city, or IP address with precision.
+**🧠 Smart Content Display:** Show different text, images, banners, JavaScript, and popups based on visitor location.
+**📍 Location information:** Display visitor's country, state city and flag anywhere on your website.
+**⚙️ Advanced Rule Editor:** Create complex targeting rules like "user in USA but _not_ in Texas" with our intuitive editor.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+## Use cases
+**💰 Affiliate Marketing**: Show location-specific bonuses, deals, and affiliate offers to maximize conversion rates & revenue in each region.
+**🛍️ E-commerce**: Display region-appropriate products, pricing, and shipping options based on visitor area.
+**🌎 Content Localization**: Deliver region-specific blog posts, news, and multimedia content that local audiences will love.
 
-A few notes about the sections above:
 
-* "Contributors" is a comma separated list of wordpress.org usernames
-* "Tags" is a comma separated list of tags that apply to the plugin
-* "Requires at least" is the lowest version that the plugin will work on
-* "Tested up to" is the highest version that you've *successfully used to test the plugin*
-* Stable tag must indicate the Subversion "tag" of the latest stable version
+## How it works
+* **Showing or hiding content based on user location.** Maki Geo contains Gutenberg blocks that can be set to show or hide based on a given geo location. You can fill these blocks with your custom content, like text, images or javascript.
+Alternatively, you can use the shortcode, for example: `[mgeo_content country="Canada"] Geo targeted content for Canada [/mgeo_content]`.
 
-Note that the `readme.txt` value of stable tag is the one that is the defining one for the plugin.  If the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used for displaying information about the plugin.
+* **Showing the user's location on your page.** These shortcodes are supported: `[mgeo_flag]`, `[mgeo_country]`, `[mgeo_region]` (for state or province) and `[mgeo_city]`.
 
-If you develop in trunk, you can update the trunk `readme.txt` to reflect changes in your in-development version, without having that information incorrectly disclosed about the current stable version that lacks those changes — as long as the trunk's `readme.txt` points to the correct stable tag.
+## Paid service
 
-If no stable tag is provided, your users may not get the correct version of your code.
-
-== Frequently Asked Questions ==
-
-= A question that someone might have =
-
-An answer to that question.
-
-= What about foo bar? =
-
-Answer to foo bar dilemma.
+Maki Geo works by requesting the user location from our location services API. You can use all features of the Maki Geo plugin for free for up to 1000 location API requests per month. After this, you're required to upgrade your license to support more requests by going to our website. 
 
 == Screenshots ==
 
 1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Screenshots are stored in the /assets directory.
 2. This is the second screen shot
 
+== Frequently Asked Questions ==
+
+= Is Maki Geo easy to use for non-technical users? =
+Yes, Maki Geo integrates into the default Gutenberg editor that you can use to customize your posts and pages. To show or hide content for specific locations, all you have to do is drag and drop your content into the Maki Geo Content block. The settings on the block allow you to choose the area it should target.
+
+For showing the country, state/province, city or flag of a user, we have easy shortcodes. For example, just put [mgeo_country] anywhere in your post and it will be converted to the name of the user's country.
+
+= Is Maki Geo free? =
+
+All features of the plugin are free to use by themselves, but the location API is limited to 1000 requests per month for free users. You can upgrade your license on [our website](https://makiplugins.com).
+
+An API request is used when a new IP address is used to visit your geo targeted content. We cache the IP so multiple requests by the same IP in a short timespan don't count as mutliple requests. Maki Geo doesn't consume a request on pages without geo targeted content.
+
+
 == Changelog ==
 
 = 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+* Initial version of Maki Geo.
 
 == Upgrade Notice ==
 
 = 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== A brief Markdown Example ==
-
-Markdown is what the parser uses to process much of the readme file.
-
-[markdown syntax]: https://daringfireball.net/projects/markdown/syntax
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Links require brackets and parenthesis:
-
-Here's a link to  and one to [Markdown's Syntax Documentation][markdown syntax]. Link titles are optional, naturally.
-
-Blockquotes are email style:
-
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-And Backticks for code:
-
-`<?php code(); ?>`
+Initial version of Maki Geo.
