@@ -9,7 +9,7 @@ import metadata from "./block.json";
 import {
   BlockAttributes,
   LocalGeoRule,
-} from "../../types";
+} from "../../types/types";
 import "./geo-content.css";
 import { GeoRulesPanel } from "../../components/geo-rules-panel";
 

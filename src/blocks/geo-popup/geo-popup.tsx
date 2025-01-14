@@ -15,7 +15,7 @@ import { GeoRulesPanel } from "../../components/geo-rules-panel";
 import metadata from "./block.json";
 import "./geo-popup.css";
 import "./style.css";
-import { LocalGeoRule } from "types";
+import { LocalGeoRule } from "types/types";
 
 interface PopupStyle {
   width: string;

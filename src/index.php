@@ -26,32 +26,9 @@ add_action('init', 'mgeo_register_geo_target_assets');
 
 
 // Register Gutenberg blocks
-function mgeo_create_geo_content_block()
+function mgeo_create_geo_content_blocks()
 {
     register_block_type(__DIR__ . '/../build/blocks/geo-content');
-
-    add_action(
-        'enqueue_block_assets', function () {
-            // Inline script data
-            $script = sprintf(
-                'window.makiGeoData = %s;',
-                wp_json_encode(
-                    [
-                    'nonce' => wp_create_nonce('wp_rest'),
-                    'globalRules' => get_option('maki_geo_rules', [])
-                    ]
-                )
-            );
-
-            // Add the inline script before the block's main script
-            wp_add_inline_script('maki-geo-geo-content-editor-script', $script, 'before');
-        }
-    );
-}
-add_action('init', 'mgeo_create_geo_content_block');
-
-function mgeo_create_geo_popup_block()
-{
     register_block_type(__DIR__ . '/../build/blocks/geo-popup');
 
     add_action(
@@ -68,13 +45,12 @@ function mgeo_create_geo_popup_block()
             );
 
             // Add the inline script before the block's main script
+            wp_add_inline_script('maki-geo-geo-content-editor-script', $script, 'before');
             wp_add_inline_script('maki-geo-geo-popup-editor-script', $script, 'before');
         }
     );
 }
-add_action('init', 'mgeo_create_geo_popup_block');
-
-
+add_action('init', 'mgeo_create_geo_content_blocks');
 
 
 require_once "admin/admin.php";

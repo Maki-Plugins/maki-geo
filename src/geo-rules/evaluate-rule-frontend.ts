@@ -1,4 +1,4 @@
-import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types";
+import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types/types";
 
 declare global {
   interface Window {

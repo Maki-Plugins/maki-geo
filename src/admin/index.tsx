@@ -3,7 +3,7 @@ import { Button } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
 import { GeoRulesManager } from "../components/geo-rules-manager";
 import { useState, useEffect } from "react";
-import { GlobalGeoRule } from "../types";
+import { GlobalGeoRule } from "../types/types";
 
 interface ApiResponse {
   success: boolean;

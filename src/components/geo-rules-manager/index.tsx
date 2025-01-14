@@ -1,6 +1,6 @@
 import { Button, Dashicon } from "@wordpress/components";
 import { GeoRuleEditor } from "../geo-rule-editor";
-import { GeoRule, GlobalGeoRule } from "../../types";
+import { GeoRule, GlobalGeoRule } from "../../types/types";
 
 interface GeoRulesManagerProps {
   rules: GlobalGeoRule[];

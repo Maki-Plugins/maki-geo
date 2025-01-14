@@ -16,7 +16,7 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import { FC } from "react";
-import { GeoCondition, GeoRule, GeoRuleBase } from "../../types";
+import { GeoCondition, GeoRule, GeoRuleBase } from "../../types/types";
 
 interface GeoRuleEditorProps {
   rule: GeoRule;
