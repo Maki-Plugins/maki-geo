@@ -71,7 +71,7 @@ registerBlockType<BlockAttributes>(name, {
 
         <div {...blockProps}>
           <div className="geo-target-block__label">
-            Geo Targeted Content{" "}
+            Maki Geo Targeted Content{" "}
             {
               <span className="geo-target-type">
                 ({selectedType === "global" ? "Global Rule" : "Local Rule"})

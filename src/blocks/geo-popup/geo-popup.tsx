@@ -138,7 +138,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
 
         <div {...blockProps}>
           <div className="geo-target-block__label">
-            Geo Targeted Popup{" "}
+            Maki Geo Targeted Popup{" "}
             {
               <span className="geo-target-type">
                 ({ruleType === "global" ? "Global Rule" : "Local Rule"})
