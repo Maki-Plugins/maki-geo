@@ -1,24 +1,28 @@
 <?php
 
-class mgeo_RequestLimiter {
+class mgeo_RequestLimiter
+{
     private $monthly_requests_option = 'mgeo_monthly_requests';
     private $last_reset_option = 'mgeo_last_reset';
     private $request_limit_option = 'mgeo_request_limit';
 
-    public function increment_counter() {
+    public function increment_counter()
+    {
         $this->check_monthly_reset();
         $current_count = get_option($this->monthly_requests_option, 0);
         update_option($this->monthly_requests_option, $current_count + 1);
     }
 
-    public function can_make_request() {
+    public function can_make_request()
+    {
         $this->check_monthly_reset();
         $current_count = get_option($this->monthly_requests_option, 0);
         $limit = $this->get_request_limit();
         return $current_count < $limit;
     }
 
-    private function check_monthly_reset() {
+    private function check_monthly_reset()
+    {
         $last_reset = get_option($this->last_reset_option, 0);
         $current_month = date('Y-m');
         $last_reset_month = date('Y-m', $last_reset);
@@ -29,7 +33,8 @@ class mgeo_RequestLimiter {
         }
     }
 
-    public function get_request_limit() {
+    public function get_request_limit()
+    {
         $options = get_option('maki_geo_options', array());
         $api_key = isset($options['api_key']) ? $options['api_key'] : '';
         
@@ -40,7 +45,8 @@ class mgeo_RequestLimiter {
         return get_option($this->request_limit_option, 1000);
     }
 
-    public function sync_with_api() {
+    public function sync_with_api()
+    {
         $options = get_option('maki_geo_options', array());
         $api_key = isset($options['api_key']) ? $options['api_key'] : '';
         
@@ -49,7 +55,7 @@ class mgeo_RequestLimiter {
         }
 
         $response = wp_remote_get(
-            'https://api.makiplugins.com/maki-geo/api/v1/verify-key', 
+            'https://api.makiplugins.com/maki-geo/api/v1/verifyKsey', 
             array(
                 'headers' => array(
                     'X-API-Key' => $api_key
