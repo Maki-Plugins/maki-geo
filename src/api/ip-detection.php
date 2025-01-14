@@ -31,28 +31,29 @@ class mgeo_IpDetection
 
     private function cloudflareCheckIP($ip)
     {
-        $cf_ips = array(
-        '199.27.128.0/21',
-        '173.245.48.0/20',
-        '103.21.244.0/22',
-        '103.22.200.0/22',
-        '103.31.4.0/22',
-        '141.101.64.0/18',
-        '108.162.192.0/18',
-        '190.93.240.0/20',
-        '188.114.96.0/20',
-        '197.234.240.0/22',
-        '198.41.128.0/17',
-        '162.158.0.0/15',
-        '104.16.0.0/12',
-        );
-        $is_cf_ip = false;
-        foreach ($cf_ips as $cf_ip) {
-            if ($this::ipInRange($ip, $cf_ip)) {
-                $is_cf_ip = true;
-                break;
+        $json_file = dirname(__FILE__) . '/../assets/cf-ip-ranges.json';
+        
+        if (!file_exists($json_file)) {
+            return false;
+        }
+
+        $ranges = json_decode(file_get_contents($json_file), true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return false;
+        }
+
+        // Determine if we're dealing with IPv4 or IPv6
+        $is_ipv6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+        $ranges_to_check = $is_ipv6 ? $ranges['v6'] : $ranges['v4'];
+
+        foreach ($ranges_to_check as $range) {
+            if ($this::ipInRange($ip, $range)) {
+                return true;
             }
-        } return $is_cf_ip;
+        }
+        
+        return false;
     }
 
     private function cloudflareRequestsCheck()
