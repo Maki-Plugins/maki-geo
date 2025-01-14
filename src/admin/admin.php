@@ -13,7 +13,7 @@ function mgeo_render_settings_page()
 {
     ?>
     <div class="wrap">
-        <h1><img width="auto" height="24px" src="<?php echo plugin_dir_url(__FILE__) . '../assets/maki-geo-logo.svg' ?>" /> 
+        <h1><img width="auto" height="24px" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../assets/maki-geo-logo.svg') ?>" /> 
         <?php echo esc_html(get_admin_page_title()); ?></h1>
         <?php 
         mgeo_render_tabs();
@@ -80,10 +80,10 @@ function mgeo_render_client_server_mode_field()
 function mgeo_add_admin_menu()
 {
     add_menu_page(
-        'Maki Geo Settings',
+        'Maki Geo',
         'Maki Geo',
         'manage_options',
-        'maki-geo-settings',
+        'maki-geo',
         'mgeo_render_settings_page',
         'dashicons-admin-site',
         71
@@ -92,7 +92,7 @@ function mgeo_add_admin_menu()
 
 function mgeo_enqueue_admin_scripts($hook)
 {
-    if ($hook !== 'toplevel_page_maki-geo-settings') {
+    if ($hook !== 'toplevel_page_maki-geo') {
         return;
     }
 

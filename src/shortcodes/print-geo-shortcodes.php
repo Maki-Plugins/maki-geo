@@ -18,47 +18,18 @@ function mgeo_get_location_data()
 function mgeo_shortcode_handler($atts, $content, $tag)
 {
     $defaults = array(
-        'default' => 'Unknown',
-        'lang' => 'en'
+        'default' => 'Unknown'
     );
     
     $atts = shortcode_atts($defaults, $atts);
     $location_data = mgeo_get_location_data();
     
-    if (!$location_data) {
+    $field = str_replace('mgeo_', '', $tag);
+    if (!$location_data || !isset($location_data[$field]) || $location_data[$field] == "Unknown") {
         return $atts['default'];
     }
 
-    $field = str_replace('mgeo_', '', $tag);
-    $value = isset($location_data[$field]) ? $location_data[$field] : $atts['default'];
-    
-    // Handle localization if needed
-    if ($atts['lang'] !== 'en') {
-        $value = mgeo_translate_location($value, $field, $atts['lang']);
-    }
-    
-    return $value;
-}
-
-function mgeo_translate_location($value, $field, $lang)
-{
-    // Add translations for common countries
-    $translations = [
-        'nl' => [
-            'Netherlands' => 'Nederland',
-            'Germany' => 'Duitsland',
-            'France' => 'Frankrijk',
-            'Belgium' => 'België',
-            // Add more as needed
-        ],
-        // Add more languages as needed
-    ];
-
-    if (isset($translations[$lang]) && isset($translations[$lang][$value])) {
-        return $translations[$lang][$value];
-    }
-
-    return $value;
+    return $location_data[$field];
 }
 
 function mgeo_country_flag_shortcode($atts)
@@ -70,7 +41,7 @@ function mgeo_country_flag_shortcode($atts)
     $atts = shortcode_atts($defaults, $atts);
     $location_data = mgeo_get_location_data();
     
-    if (!$location_data || empty($location_data['country_code'])) {
+    if (!$location_data || empty($location_data['country_code']) || $location_data['country_code'] == "Unknown") {
         return '';
     }
 

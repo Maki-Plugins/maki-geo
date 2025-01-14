@@ -32,7 +32,7 @@ function mgeo_content_shortcode($atts, $content = '')
 
         // Determine if this is a local or global rule
         $ruleType = empty($attributes['rule']) ? 'local' : 'global';
-        $ruleData = $ruleType === 'global' ? $attributes['rule'] : json_encode($rule);
+        $ruleData = $ruleType === 'global' ? $attributes['rule'] : wp_json_encode($rule);
 
         // If this is a popup, enqueue its assets
         if ($attributes['display'] === 'flex') {

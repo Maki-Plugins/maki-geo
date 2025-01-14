@@ -30,7 +30,7 @@ class TestLocation extends WP_UnitTestCase
             function ($preempt, $args, $url) use ($mock_response) {
                 return [
                     "response" => ["code" => 200],
-                    "body" => json_encode($mock_response),
+                    "body" => wp_json_encode($mock_response),
                 ];
             },
             10,

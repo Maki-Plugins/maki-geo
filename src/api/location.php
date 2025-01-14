@@ -3,8 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once 'api-utils.php';
-
 add_action(
     'rest_api_init', function () {
         register_rest_route(
@@ -17,27 +15,11 @@ add_action(
     }
 );
 
-function mgeo_get_debug_data()
-{
-    return array(
-        'continent' => 'Europe',
-        'country_code' => "FR",
-        'country' => 'France',
-        'region' => 'Île-de-France',
-        'city' => 'Paris'
-    );
-}
-
-function mgeo_get_debug_ip()
-{
-    return "86.94.131.20";
-}
-
-
 function mgeo_get_geolocation_data()
 {
     mgeo_verify_nonce();
-    $ip = mgeo_get_debug_ip(); //$_SERVER['REMOTE_ADDR'];
+    $ipDetection = new mgeo_IpDetection();
+    $ip = $ipDetection->getRequestIP();
     $cached_data = get_transient("mgeo_geo_location_{$ip}");
     if ($cached_data) {
         return $cached_data;

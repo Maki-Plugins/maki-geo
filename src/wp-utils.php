@@ -15,7 +15,7 @@ function mgeo_enqueue($handle, $relpath, $type='script', $deps=array())
     $plugin_root_path = plugin_dir_path(__FILE__) . '../';
     $version = filemtime($plugin_root_path . $relpath);
     if($type == 'script') { 
-        wp_enqueue_script($handle, $uri, $deps, $version);
+        wp_enqueue_script($handle, $uri, $deps, $version, true);
     } else if($type == 'style') {
         wp_enqueue_style($handle, $uri, $deps, $version);
     }      
