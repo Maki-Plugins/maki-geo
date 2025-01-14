@@ -38,5 +38,7 @@ jobs:
         run: npm run build
       - name: JS tests
         run: npm run js-test
+      - name: Start WP env
+        run: npm run env start
       - name: PHP tests
         run: npm run php-test
