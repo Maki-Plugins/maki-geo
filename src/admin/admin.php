@@ -49,6 +49,14 @@ function mgeo_register_settings()
         'maki_geo_general_section'
     );
 
+    add_settings_field(
+        'api_key',
+        'API Key',
+        'mgeo_render_api_key_field',
+        'maki_geo_settings',
+        'maki_geo_general_section'
+    );
+
     // Geo Rules Settings
     register_setting('maki_geo_rules', 'maki_geo_rules_options');
 
@@ -73,6 +81,28 @@ function mgeo_render_client_server_mode_field()
         Server-side: Processes geo location on the server when the page loads.<br>
         Client-side: Uses AJAX to evaluate geo location in the browser. This works better with caching plugins but is slightly slower and requires javascript.<br>
         <b>Our advise:</b> Use Server-side unless you're experiencing wrong location detection due to caching.
+    </p>
+    <?php
+}
+
+function mgeo_render_api_key_field()
+{
+    $options = get_option('maki_geo_options', array());
+    $api_key = isset($options['api_key']) ? $options['api_key'] : '';
+    ?>
+    <input type="text" 
+           name="maki_geo_options[api_key]" 
+           value="<?php echo esc_attr($api_key); ?>" 
+           class="regular-text"
+    />
+    <button type="button" id="verify-api-key" class="button button-secondary">
+        Verify Key
+    </button>
+    <p class="description">
+        Enter your API key to increase your monthly request limit. 
+        <a href="https://makiplugins.com/pricing" target="_blank">
+            Get an API key
+        </a>
     </p>
     <?php
 }

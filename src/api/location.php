@@ -18,6 +18,15 @@ add_action(
 function mgeo_get_geolocation_data()
 {
     mgeo_verify_nonce();
+    
+    $request_limiter = new mgeo_RequestLimiter();
+    if (!$request_limiter->can_make_request()) {
+        return new WP_Error(
+            'request_limit_exceeded',
+            'Monthly API request limit exceeded'
+        );
+    }
+
     $ipDetection = new mgeo_IpDetection();
     $ip = $ipDetection->getRequestIP();
     $cached_data = get_transient("mgeo_geo_location_{$ip}");
@@ -31,9 +40,12 @@ function mgeo_get_geolocation_data()
     }
 
     $responseObject = json_decode(wp_remote_retrieve_body($response), true);
-    // TODO: Check for errors here
-
     $data = $responseObject['data'];
-    set_transient("mgeo_geo_location_{$ip}", $data, HOUR_IN_SECONDS);
+    
+    if ($data) {
+        $request_limiter->increment_counter();
+        set_transient("mgeo_geo_location_{$ip}", $data, HOUR_IN_SECONDS);
+    }
+    
     return $data;
 }
