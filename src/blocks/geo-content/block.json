@@ -2,10 +2,11 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "maki-geo/geo-content",
-  "version": "0.0.1",
-  "title": "Geo Content Block",
+  "version": "1.0.0",
+  "title": "Geo Content",
   "category": "maki-geo-category",
-  "description": "Target content based on users geo location.",
+  "icon": "admin-site",
+  "description": "Show or hide content based on user geo location.",
   "example": {},
   "attributes": {
     "ruleType": {

@@ -1,6 +1,6 @@
-=== Maki Geo – Geo target and Convert ===
+=== Maki Geo – Geo targeting plugin ===
 Contributors: makiplugins
-Tags: geo, location, geo targeting, location targeting, geo location
+Tags: geo, location, geo target, location targeting, ip
 Requires at least: 6.6
 Tested up to: 6.7
 Stable tag: 1.0.0
@@ -8,7 +8,7 @@ Requires PHP: 7.3
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Easily personalize your website based on visitor location. Geo target users and maximize conversions. 
+Easily personalize your website based on visitor location. Increase engagement, conversions and revenue using geo targeting. 
 
 == Description ==
 **[Maki Geo](https://makiplugins.com/ "Maki Geo")** helps you create content that resonates with local audiences by geo targeting. 

@@ -13,7 +13,8 @@ function mgeo_render_settings_page()
 {
     ?>
     <div class="wrap">
-        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        <h1><img width="auto" height="24px" src="<?php echo plugin_dir_url(__FILE__) . '../assets/maki-geo-logo.svg' ?>" /> 
+        <?php echo esc_html(get_admin_page_title()); ?></h1>
         <?php 
         mgeo_render_tabs();
         ?>

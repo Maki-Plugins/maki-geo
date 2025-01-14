@@ -12,8 +12,10 @@ import {
 } from "../../types/types";
 import "./geo-content.css";
 import { GeoRulesPanel } from "../../components/geo-rules-panel";
+import updateCategoryIcon from "./update-category-icon"
 
 const { name, ...settings } = metadata;
+updateCategoryIcon();
 
 //@ts-ignore
 registerBlockType<BlockAttributes>(name, {
