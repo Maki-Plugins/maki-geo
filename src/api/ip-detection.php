@@ -4,7 +4,7 @@ class mgeo_IpDetection
 {
     public function getRequestIP()
     {
-        $remote_addr = rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["REMOTE_ADDR"])))
+        $remote_addr = rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["REMOTE_ADDR"])));
         if(!$remote_addr) {
             return false;
         }
@@ -78,7 +78,14 @@ class mgeo_IpDetection
             return false;
         }
 
-        $ranges = json_decode(file_get_contents($json_file), true);
+        $request = wp_remote_get($json_file);
+        if(is_wp_error($request) ) {
+            return false;
+        }
+
+        // Retrieve the data
+        $body = wp_remote_retrieve_body($request);
+        $ranges = json_decode($body, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return false;
