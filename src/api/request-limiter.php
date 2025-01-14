@@ -21,15 +21,15 @@ class mgeo_RequestLimiter
         return $current_count < $limit;
     }
 
-    private function check_monthly_reset()
+    public function check_monthly_reset($current_time = null)
     {
         $last_reset = get_option($this->last_reset_option, 0);
-        $current_month = date('Y-m');
+        $current_month = date('Y-m', $current_time ?? time());
         $last_reset_month = date('Y-m', $last_reset);
 
         if ($current_month !== $last_reset_month) {
             update_option($this->monthly_requests_option, 0);
-            update_option($this->last_reset_option, time());
+            update_option($this->last_reset_option, $current_time ?? time());
         }
     }
 
