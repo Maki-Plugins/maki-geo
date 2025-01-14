@@ -39,4 +39,4 @@ jobs:
       - name: JS tests
         run: npm run js-test
       - name: PHP tests
-        run: npm run js-test
+        run: npm run php-test
