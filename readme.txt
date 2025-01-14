@@ -1,4 +1,4 @@
-=== Maki Geo – Geo targeting plugin ===
+=== Maki Geo – Geo targeting ===
 Contributors: makiplugins
 Tags: geo, location, geo target, location targeting, ip
 Requires at least: 6.6

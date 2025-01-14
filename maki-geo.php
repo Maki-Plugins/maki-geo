@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name:       Maki Geo
- * Description:       Geo targeting
+ * Plugin Name:       Maki Geo – Geo targeting
+ * Description:       Easily personalize your website based on visitor location. Increase engagement, conversions and revenue using geo targeting. 
  * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      7.3
