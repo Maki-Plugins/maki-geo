@@ -55,7 +55,7 @@ class mgeo_RequestLimiter
         }
 
         $response = wp_remote_get(
-            'https://api.makiplugins.com/maki-geo/api/v1/verify-key', 
+            'https://api.makiplugins.com/maki-geo/api/v1/verifyKey', 
             array(
                 'headers' => array(
                     'X-API-Key' => $api_key
@@ -74,9 +74,7 @@ class mgeo_RequestLimiter
             
             // Sync the request count from the API
             if (isset($data['requests_this_month'])) {
-                $local_requests = get_option($this->monthly_requests_option, 0);
-                // Use the higher count between local and API to avoid undercounting
-                $synced_requests = max($local_requests, $data['requests_this_month']);
+                $synced_requests = $data['requests_this_month'];
                 update_option($this->monthly_requests_option, $synced_requests);
             }
             
