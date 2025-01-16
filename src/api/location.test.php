@@ -12,7 +12,7 @@ class TestLocation extends WP_UnitTestCase
         // );
 
         // Mock the nonce verification
-        // add_filter('mgeo_verify_nonce', '__return_true');
+        add_filter('mgeo_verify_nonce', '__return_true');
          
         // // Mock the request limiter
         // $mock_limiter = $this->getMockBuilder('mgeo_RequestLimiter')
@@ -42,17 +42,20 @@ class TestLocation extends WP_UnitTestCase
         ];
 
         // Add filter to mock wp_remote_get response
-        // add_filter(
-        //     "pre_http_request",
-        //     function ($preempt, $args, $url) use ($mock_data) {
-        //         return [
-        //             "response" => ["code" => 200],
-        //             "body" => json_encode(["data" => $mock_data])
-        //         ];
-        //     },
-        //     10,
-        //     3
-        // );
+        add_filter(
+            "pre_http_request",
+            function ($preempt, $args, $url) use ($mock_data) {
+                if (strpos($url, 'makiplugins.com') !== false) {
+                    return [
+                        "response" => ["code" => 200],
+                        "body" => json_encode(["data" => $mock_data])
+                    ];
+                }
+                return $preempt;
+            },
+            10,
+            3
+        );
         
         $result = mgeo_get_geolocation_data();
         
