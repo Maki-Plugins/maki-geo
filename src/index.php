@@ -3,10 +3,23 @@ if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
-register_uninstall_hook(__FILE__, 'mgeo_uninstall');
 
-function mgeo_uninstall() {
-    require_once plugin_dir_path(__FILE__) . '../uninstall.php';
+// Activate, deactivate, install, uninstall
+function mgeo_activate()
+{
+    // Register uninstall when activated
+    register_uninstall_hook(__FILE__, 'mgeo_uninstall');
+}
+register_activation_hook(__FILE__, 'mgeo_activate');
+
+function mgeo_uninstall()
+{
+    // Delete all plugin options
+    $settings_registry = mgeo_SettingsRegistry::get_instance();
+    $settings = $settings_registry->get_all_settings();
+    foreach ($settings as $option_name) {
+        delete_option($option_name);
+    }
 }
 
 
@@ -60,13 +73,14 @@ add_action('init', 'mgeo_create_geo_content_blocks');
 
 
 require_once "admin/admin.php";
-require_once "blocks/setup.php";
 require_once "api/api-utils.php";
 require_once "api/geo-rules.php";
 require_once "api/ip-detection.php";
 require_once "api/location.php";
 require_once "api/request-limiter.php";
+require_once "blocks/setup.php";
+require_once "geo-rules/evaluate-rule-backend.php";
 require_once "shortcodes/geo-content-shortcode.php";
 require_once "shortcodes/print-geo-shortcodes.php";
-require_once "geo-rules/evaluate-rule-backend.php";
+require_once 'settings-registry.php';
 require_once "wp-utils.php";
