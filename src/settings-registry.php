@@ -14,9 +14,7 @@ class mgeo_SettingsRegistry {
         return self::$instance;
     }
 
-    private function __construct() {
-        add_action('admin_init', [$this, 'register_wordpress_settings']);
-    }
+    private function __construct() {}
 
     public function register_setting($option_name, $args = []) {
         if (!in_array($option_name, $this->settings)) {
@@ -39,18 +37,6 @@ class mgeo_SettingsRegistry {
         }
     }
 
-    public function register_wordpress_settings() {
-        // General Settings
-        $this->register_setting('maki_geo_options');
-        
-        // Rules Settings
-        $this->register_setting('maki_geo_rules');
-        $this->register_setting('maki_geo_rules_options');
-        
-        // API Limits
-        $this->register_setting('mgeo_monthly_requests');
-        $this->register_setting('mgeo_request_limit');
-    }
 
     public function get_all_settings() {
         return $this->settings;
