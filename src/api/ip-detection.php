@@ -9,7 +9,7 @@ class mgeo_IpDetection
             return false;
         }
 
-        $cloudflare = $this::isCloudflare();
+        $cloudflare = $this->isCloudflare();
 
         if ($cloudflare) {
             return rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"])));
@@ -97,7 +97,7 @@ class mgeo_IpDetection
         $ranges_to_check = $is_ipv6 ? $ranges["v6"] : $ranges["v4"];
 
         foreach ($ranges_to_check as $range) {
-            if ($this::ipInRange($ip, $range)) {
+            if ($this->ipInRange($ip, $range)) {
                 return true;
             }
         }
@@ -115,8 +115,8 @@ class mgeo_IpDetection
 
     private function isCloudflare()
     {
-        $ipCheck = $this::cloudflareCheckIP($_SERVER["REMOTE_ADDR"]);
-        $requestCheck = $this::cloudflareRequestsCheck();
+        $ipCheck = $this->cloudflareCheckIP($_SERVER["REMOTE_ADDR"]);
+        $requestCheck = $this->cloudflareRequestsCheck();
         return $ipCheck && $requestCheck;
     }
 }

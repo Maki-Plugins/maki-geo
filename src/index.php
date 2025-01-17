@@ -59,6 +59,7 @@ require_once "api/api-utils.php";
 require_once "api/geo-rules.php";
 require_once "api/ip-detection.php";
 require_once "api/location.php";
+require_once "api/request-limiter.php";
 require_once "shortcodes/geo-content-shortcode.php";
 require_once "shortcodes/print-geo-shortcodes.php";
 require_once "geo-rules/evaluate-rule-backend.php";
