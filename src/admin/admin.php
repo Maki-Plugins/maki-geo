@@ -32,6 +32,15 @@ function mgeo_render_settings_page()
 function mgeo_register_settings() {
     $registry = mgeo_SettingsRegistry::get_instance();
     
+    // Register settings with the registry
+    $registry->register_setting('maki_geo_settings', [
+        'type' => 'object',
+        'default' => [
+            'client_server_mode' => 'server',
+            'api_key' => ''
+        ]
+    ]);
+    
     // Register settings sections
     add_settings_section(
         'maki_geo_general_section',
@@ -64,6 +73,12 @@ function mgeo_register_settings() {
         null,
         'maki_geo_rules'
     );
+
+    // Register rules settings with the registry
+    $registry->register_setting('maki_geo_rules', [
+        'type' => 'array',
+        'default' => []
+    ]);
 }
 
 function mgeo_render_client_server_mode_field()
