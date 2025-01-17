@@ -64,16 +64,20 @@ class TestRequestLimiter extends WP_UnitTestCase
         update_option('maki_geo_options', array('api_key' => 'test_key'));
 
         // Mock API response
-        add_filter('pre_http_request', function($preempt, $args, $url) {
-            return array(
+        add_filter(
+            'pre_http_request', function ($preempt, $args, $url) {
+                return array(
                 'response' => array('code' => 200),
-                'body' => json_encode(array(
+                'body' => wp_json_encode(
+                    array(
                     'valid' => true,
                     'monthly_limit' => 5000,
                     'requests_this_month' => 250
-                ))
-            );
-        }, 10, 3);
+                    )
+                )
+                );
+            }, 10, 3
+        );
 
         $result = $this->request_limiter->sync_with_api();
 
@@ -88,14 +92,18 @@ class TestRequestLimiter extends WP_UnitTestCase
         update_option('maki_geo_options', array('api_key' => 'invalid_key'));
 
         // Mock API response for invalid key
-        add_filter('pre_http_request', function($preempt, $args, $url) {
-            return array(
+        add_filter(
+            'pre_http_request', function ($preempt, $args, $url) {
+                return array(
                 'response' => array('code' => 200),
-                'body' => json_encode(array(
+                'body' => wp_json_encode(
+                    array(
                     'valid' => false
-                ))
-            );
-        }, 10, 3);
+                    )
+                )
+                );
+            }, 10, 3
+        );
 
         $result = $this->request_limiter->sync_with_api();
 
@@ -110,9 +118,11 @@ class TestRequestLimiter extends WP_UnitTestCase
         update_option('maki_geo_options', array('api_key' => 'test_key'));
 
         // Mock API error response
-        add_filter('pre_http_request', function($preempt, $args, $url) {
-            return new WP_Error('http_request_failed', 'API request failed');
-        }, 10, 3);
+        add_filter(
+            'pre_http_request', function ($preempt, $args, $url) {
+                return new WP_Error('http_request_failed', 'API request failed');
+            }, 10, 3
+        );
 
         $result = $this->request_limiter->sync_with_api();
 

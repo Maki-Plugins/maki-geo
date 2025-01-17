@@ -16,10 +16,10 @@ function mgeo_render_dashboard_tab()
             <h2>Statistics Overview</h2>
             <div class="mgeo-stats-grid">
                 <div class="mgeo-stat-box">
-                    <h3>API Requests This Month</h3>
+                    <h3>Location API Requests this month</h3>
                     <p class="mgeo-stat-number"><?php echo esc_html($monthly_requests); ?></p>
                     <p class="mgeo-stat-subtext">
-                        <?php echo esc_html($requests_remaining); ?> requests remaining
+                        Limit: <?php echo esc_html($request_limit); ?> (<?php echo esc_html($requests_remaining); ?> remaining)
                     </p>
                 </div>
                 <div class="mgeo-stat-box">

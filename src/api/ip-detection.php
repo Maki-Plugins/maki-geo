@@ -5,17 +5,15 @@ class mgeo_IpDetection
     public function getRequestIP()
     {
         $remote_addr = rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["REMOTE_ADDR"])));
+        
         if(!$remote_addr) {
             return false;
         }
 
-        $cloudflare = $this->isCloudflare();
-
-        if ($cloudflare) {
+        if(isset($_SERVER["HTTP_CF_CONNECTING_IP"]) && $this->isCloudflare($remote_addr)) {
             return rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"])));
         }
         return $remote_addr;
-        
     }
 
     private function ipInRange($ip, $range)
@@ -77,8 +75,8 @@ class mgeo_IpDetection
         if (!file_exists($json_file)) {
             return false;
         }
-
-        $request = wp_remote_get($json_file);
+        // TODO: inline the json? This may be too slow
+        $request = wp_remote_get(plugins_url('../assets/cf-ip-ranges.json', __FILE__));
         if(is_wp_error($request) ) {
             return false;
         }
@@ -113,9 +111,9 @@ class mgeo_IpDetection
         return true;
     }
 
-    private function isCloudflare()
+    private function isCloudflare($remote_addr)
     {
-        $ipCheck = $this->cloudflareCheckIP($_SERVER["REMOTE_ADDR"]);
+        $ipCheck = $this->cloudflareCheckIP($remote_addr);
         $requestCheck = $this->cloudflareRequestsCheck();
         return $ipCheck && $requestCheck;
     }

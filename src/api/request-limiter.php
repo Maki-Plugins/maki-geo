@@ -24,8 +24,8 @@ class mgeo_RequestLimiter
     public function check_monthly_reset($current_time = null)
     {
         $last_reset = get_option($this->last_reset_option, 0);
-        $current_month = date('Y-m', $current_time ?? time());
-        $last_reset_month = date('Y-m', $last_reset);
+        $current_month = gmdate('Y-m', $current_time ?? time());
+        $last_reset_month = gmdate('Y-m', $last_reset);
 
         if ($current_month !== $last_reset_month) {
             update_option($this->monthly_requests_option, 0);

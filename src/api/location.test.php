@@ -32,7 +32,7 @@ class TestLocation extends WP_UnitTestCase
                 if (strpos($url, 'makiplugins.com') !== false) {
                     return [
                         "response" => ["code" => 200],
-                        "body" => json_encode(["data" => $mock_data])
+                        "body" => wp_json_encode(["data" => $mock_data])
                     ];
                 }
                 return $preempt;
