@@ -3,6 +3,12 @@ if (! defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
+register_uninstall_hook(__FILE__, 'mgeo_uninstall');
+
+function mgeo_uninstall() {
+    require_once plugin_dir_path(__FILE__) . '../uninstall.php';
+}
+
 
 function mgeo_register_geo_target_assets()
 {
