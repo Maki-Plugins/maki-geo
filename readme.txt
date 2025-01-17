@@ -1,7 +1,7 @@
 === Maki Geo – Geo targeting ===
 Contributors: makiplugins
 Tags: geo, location, geo target, location targeting, ip
-Requires at least: 6.6
+Requires at least: 6.7
 Tested up to: 6.7
 Stable tag: 1.0.0
 Requires PHP: 7.3

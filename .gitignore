@@ -4,3 +4,4 @@ build
 .env
 vendor
 .phpunit*
+maki-geo.zip
