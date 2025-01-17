@@ -29,11 +29,10 @@ function mgeo_render_settings_page()
     <?php
 }
 
-function mgeo_register_settings()
-{
-    // General Settings
-    register_setting('maki_geo_settings', 'maki_geo_options');
-
+function mgeo_register_settings() {
+    $registry = mgeo_SettingsRegistry::get_instance();
+    
+    // Register settings sections
     add_settings_section(
         'maki_geo_general_section',
         'General Settings',
@@ -41,6 +40,7 @@ function mgeo_register_settings()
         'maki_geo_settings'
     );
 
+    // Register fields
     add_settings_field(
         'client_server_mode',
         'Geo Targeting Method',
@@ -57,9 +57,7 @@ function mgeo_register_settings()
         'maki_geo_general_section'
     );
 
-    // Geo Rules Settings
-    register_setting('maki_geo_rules', 'maki_geo_rules_options');
-
+    // Register settings sections for rules
     add_settings_section(
         'maki_geo_rules_section',
         'Default Geo Rules',
