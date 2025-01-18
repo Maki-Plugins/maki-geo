@@ -68,31 +68,39 @@ class mgeo_IpDetection
         return $bits;
     }
 
+    private $cf_ipv4_ranges = [
+        "103.21.244.0/22",
+        "103.22.200.0/22",
+        "103.31.4.0/22",
+        "104.16.0.0/13",
+        "104.24.0.0/14",
+        "108.162.192.0/18",
+        "131.0.72.0/22",
+        "141.101.64.0/18",
+        "162.158.0.0/15",
+        "172.64.0.0/13",
+        "173.245.48.0/20",
+        "188.114.96.0/20",
+        "190.93.240.0/20",
+        "197.234.240.0/22",
+        "198.41.128.0/17"
+    ];
+
+    private $cf_ipv6_ranges = [
+        "2400:cb00::/32",
+        "2405:8100::/32",
+        "2405:b500::/32",
+        "2606:4700::/32",
+        "2803:f800::/32",
+        "2a06:98c0::/29",
+        "2c0f:f248::/32"
+    ];
+
     private function cloudflareCheckIP($ip)
     {
-        $json_file = dirname(__FILE__) . "/../assets/cf-ip-ranges.json";
-
-        if (!file_exists($json_file)) {
-            return false;
-        }
-        // TODO: inline the json? This may be too slow
-        $request = wp_remote_get(plugins_url('../assets/cf-ip-ranges.json', __FILE__));
-        if(is_wp_error($request) ) {
-            return false;
-        }
-
-        // Retrieve the data
-        $body = wp_remote_retrieve_body($request);
-        $ranges = json_decode($body, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return false;
-        }
-
         // Determine if we're dealing with IPv4 or IPv6
-        $is_ipv6 =
-            filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
-        $ranges_to_check = $is_ipv6 ? $ranges["v6"] : $ranges["v4"];
+        $is_ipv6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+        $ranges_to_check = $is_ipv6 ? $this->cf_ipv6_ranges : $this->cf_ipv4_ranges;
 
         foreach ($ranges_to_check as $range) {
             if ($this->ipInRange($ip, $range)) {
