@@ -54,32 +54,22 @@ class mgeo_RequestLimiter
             return false;
         }
 
-        $response = wp_remote_get(
-            MGEO_MAKI_PLUGINS_API . '/verifyKey', 
-            array(
-                'headers' => array(
-                    'X-API-Key' => $api_key
-                )
-            )
-        );
-
-        if (is_wp_error($response)) {
+        $api = new mgeo_MakiPluginsAPI($api_key);
+        $data = $api->verify_key();
+        
+        if (!$data || !isset($data['valid']) || !$data['valid']) {
             return false;
         }
 
-        $data = json_decode(wp_remote_retrieve_body($response), true);
+        update_option($this->request_limit_option, $data['monthly_limit']);
         
-        if (isset($data['valid']) && $data['valid']) {
-            update_option($this->request_limit_option, $data['monthly_limit']);
-            
-            // Sync the request count from the API
-            if (isset($data['requests_this_month'])) {
-                $synced_requests = $data['requests_this_month'];
-                update_option($this->monthly_requests_option, $synced_requests);
-            }
-            
-            return true;
+        // Sync the request count from the API
+        if (isset($data['requests_this_month'])) {
+            $synced_requests = $data['requests_this_month'];
+            update_option($this->monthly_requests_option, $synced_requests);
         }
+        
+        return true;
 
         return false;
     }

@@ -34,15 +34,8 @@ function mgeo_get_geolocation_data()
         return $cached_data;
     }
 
-    $response = wp_remote_get(
-        MGEO_MAKI_PLUGINS_API . "/getLocation?ip={$ip}"
-    );
-    if (is_wp_error($response)) {
-        return false;
-    }
-
-    $responseObject = json_decode(wp_remote_retrieve_body($response), true);
-    $data = $responseObject["data"];
+    $api = new mgeo_MakiPluginsAPI();
+    $data = $api->get_location($ip);
 
     if ($data) {
         $request_limiter->increment_counter();
