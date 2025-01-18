@@ -114,7 +114,7 @@ function mgeo_render_api_key_field()
     </button>
     <p class="description">
         Enter your API key to increase your monthly request limit. 
-        <a href="https://makiplugins.com/pricing" target="_blank">
+        <a href="<?php echo MGEO_MAKI_PLUGINS_URL . '#pricing'?>" target="_blank">
             Get an API key
         </a>
     </p>

@@ -35,7 +35,7 @@ function mgeo_get_geolocation_data()
     }
 
     $response = wp_remote_get(
-        "https://api.makiplugins.com/maki-geo/api/v1/getLocation?ip={$ip}"
+        MGEO_MAKI_PLUGINS_API . "/getLocation?ip={$ip}"
     );
     if (is_wp_error($response)) {
         return false;

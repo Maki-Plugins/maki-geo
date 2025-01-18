@@ -55,7 +55,7 @@ class mgeo_RequestLimiter
         }
 
         $response = wp_remote_get(
-            'https://api.makiplugins.com/maki-geo/api/v1/verifyKey', 
+            MGEO_MAKI_PLUGINS_API . '/verifyKey', 
             array(
                 'headers' => array(
                     'X-API-Key' => $api_key
