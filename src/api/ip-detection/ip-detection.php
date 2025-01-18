@@ -68,6 +68,10 @@ class mgeo_IpDetection
         return $bits;
     }
 
+    /**
+     * Cloudflare IP ranges
+     * Source: https://www.cloudflare.com/ips/
+     */
     private $cf_ipv4_ranges = [
         "103.21.244.0/22",
         "103.22.200.0/22",
