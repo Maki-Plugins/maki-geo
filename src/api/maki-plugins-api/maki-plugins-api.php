@@ -3,14 +3,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class mgeo_MakiPluginsAPI {
+class mgeo_MakiPluginsAPI
+{
     private $api_key;
 
-    public function __construct($api_key = null) {
+    public function __construct($api_key = null)
+    {
         $this->api_key = $api_key;
     }
 
-    public function get_location($ip) {
+    public function get_location($ip)
+    {
         $response = wp_remote_get(
             MGEO_MAKI_PLUGINS_API . "/getLocation?ip=" . urlencode($ip)
         );
@@ -29,12 +32,13 @@ class mgeo_MakiPluginsAPI {
         return $data['data'];
     }
 
-    public function verify_key() {
+    public function verify_key()
+    {
         if (!$this->api_key) {
             return false;
         }
 
-        $response = wp_remote_get(
+        $response = wp_remote_post(
             MGEO_MAKI_PLUGINS_API . '/verifyKey',
             array(
                 'headers' => array(
@@ -48,7 +52,8 @@ class mgeo_MakiPluginsAPI {
         }
 
         $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
+        $decoded_body = json_decode($body, true);
+        $data = $decoded_body['data'];
 
         return $data;
     }

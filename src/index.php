@@ -4,7 +4,9 @@ if (! defined('ABSPATH')) {
 }
 
 
+// =========================
 // Activate, deactivate, install, uninstall
+// =========================
 function mgeo_activate()
 {
     // Register uninstall when activated
@@ -73,11 +75,13 @@ add_action('init', 'mgeo_create_geo_content_blocks');
 
 
 require_once "admin/admin.php";
+require_once "api/ip-detection/ip-detection.php";
+require_once "api/maki-plugins-api/maki-plugins-api.php";
+require_once "api/request-limiter/request-limiter.php";
 require_once "api/api-utils.php";
 require_once "api/geo-rules.php";
-require_once "api/ip-detection.php";
 require_once "api/location.php";
-require_once "api/request-limiter.php";
+require_once "api/verify-key.php";
 require_once "blocks/setup.php";
 require_once "geo-rules/evaluate-rule-backend.php";
 require_once "shortcodes/geo-content-shortcode.php";

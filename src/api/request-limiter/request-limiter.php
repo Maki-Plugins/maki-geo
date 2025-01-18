@@ -70,7 +70,5 @@ class mgeo_RequestLimiter
         }
         
         return true;
-
-        return false;
     }
 }

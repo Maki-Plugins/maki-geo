@@ -3,15 +3,20 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_action('rest_api_init', function () {
-    register_rest_route('maki-geo/v1', '/verify-key', array(
-        'methods' => 'POST',
-        'callback' => 'mgeo_verify_api_key',
-        'permission_callback' => 'mgeo_can_manage_rules',
-    ));
-});
+add_action(
+    'rest_api_init', function () {
+        register_rest_route(
+            'maki-geo/v1', '/verify-key', array(
+            'methods' => 'POST',
+            'callback' => 'mgeo_verify_api_key',
+            'permission_callback' => 'mgeo_can_manage_rules',
+            )
+        );
+    }
+);
 
-function mgeo_verify_api_key($request) {
+function mgeo_verify_api_key($request)
+{
     mgeo_verify_nonce();
     
     $params = $request->get_json_params();
