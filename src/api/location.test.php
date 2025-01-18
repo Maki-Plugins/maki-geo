@@ -48,8 +48,8 @@ class TestLocation extends WP_UnitTestCase
         $this->assertEquals($mock_data, $result);
 
         // Verify the data was cached
-        $cached_data = get_transient("mgeo_geo_location_86.94.131.20");
-        $this->assertEquals($mock_response["data"], $cached_data);
+        $cached_data = get_transient("mgeo_geo_location_127.0.0.1");
+        $this->assertEquals($mock_data, $cached_data);
     }
 
     public function test_geolocation_data_from_cache()
