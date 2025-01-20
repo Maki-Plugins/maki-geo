@@ -1,4 +1,4 @@
-=== Maki Geo – Geo targeting ===
+=== Maki Geo ===
 Contributors: makiplugins
 Tags: geo, location, geo target, location targeting, ip
 Requires at least: 6.7
@@ -37,8 +37,6 @@ Maki Geo works by requesting the user location from our location services API. Y
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Screenshots are stored in the /assets directory.
-2. This is the second screen shot
 
 == Frequently Asked Questions ==
 

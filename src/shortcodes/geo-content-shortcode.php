@@ -15,7 +15,6 @@ function mgeo_content_shortcode($atts, $content = '')
             'ip' => '',
             'match' => 'all',    // 'all' or 'any'
             'action' => 'show',  // 'show' or 'hide'
-            'display' => 'block' // 'block' or 'flex'
         ), 
         $atts
     );
@@ -34,17 +33,11 @@ function mgeo_content_shortcode($atts, $content = '')
         $ruleType = empty($attributes['rule']) ? 'local' : 'global';
         $ruleData = $ruleType === 'global' ? $attributes['rule'] : wp_json_encode($rule);
 
-        // If this is a popup, enqueue its assets
-        if ($attributes['display'] === 'flex') {
-            wp_enqueue_style('maki-geo-popup-style');
-            wp_enqueue_script('maki-geo-popup-handler');
-        }
 
         return sprintf(
-            '<div class="mgeo-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s" data-display="%s">%s</div>',
+            '<div class="mgeo-geo-target-block" style="display: none" data-ruletype="%s" data-rule="%s">%s</div>',
             esc_attr($ruleType),
             esc_attr($ruleData),
-            esc_attr($attributes['display']),
             do_shortcode($content)
         );
     }
