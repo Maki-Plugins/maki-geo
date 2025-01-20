@@ -42,7 +42,4 @@ mgeo_create_mgeo_constant('PREFIX', 'mgeo');
 mgeo_create_mgeo_constant('MAKI_PLUGINS_URL', 'https://makiplugins.com');
 mgeo_create_mgeo_constant('MAKI_PLUGINS_API', 'https://api.makiplugins.com/maki-geo/api/v1');
 
-
-require_once 'vendor/autoload.php';
-
 require_once "src/index.php";
