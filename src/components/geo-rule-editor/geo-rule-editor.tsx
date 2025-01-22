@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   Dashicon,
 } from "@wordpress/components";
+import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
 import {
   DragDropContext,
   Droppable,
@@ -115,6 +116,19 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
             placeholder="e.g. 192.168.1.0/24"
             value={condition.value}
             onChange={(value) => updateCondition(conditionIndex, { value })}
+          />
+        );
+      case "country":
+        return (
+          <SearchableDropdown
+            value={condition.value}
+            onChange={(value) => updateCondition(conditionIndex, { value })}
+            options={[
+              { label: "United States", value: "US" },
+              { label: "Canada", value: "CA" },
+              // You can add more countries here later
+            ]}
+            placeholder="Search country..."
           />
         );
       default:
