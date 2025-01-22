@@ -146,17 +146,29 @@
 }
 
 .mgeo-admin-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
+    flex-direction: row-reverse;
     gap: 20px;
 }
 
 .mgeo-main-content {
-    grid-column: 1;
+    flex: 2;
+    min-width: 0; /* Prevents flex item from overflowing */
 }
 
 .mgeo-sidebar {
-    grid-column: 2;
+    flex: 1;
+    min-width: 250px;
+}
+
+@media screen and (max-width: 782px) {
+    .mgeo-admin-container {
+        flex-direction: column;
+    }
+    
+    .mgeo-sidebar {
+        width: 100%;
+    }
 }
 
 .mgeo-admin-card {
