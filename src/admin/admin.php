@@ -45,7 +45,7 @@ function mgeo_register_settings()
     // Register settings sections
     add_settings_section(
         'maki_geo_general_section',
-        'General Settings',
+        'General',
         null,
         'maki_geo_settings'
     );

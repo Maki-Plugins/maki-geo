@@ -7,7 +7,7 @@ function mgeo_render_tabs()
 {
     ?>
     <nav class="nav-tab-wrapper">
-        <a href="#settings" class="nav-tab nav-tab-active">Settings</a>
+        <a href="#settings" class="nav-tab nav-tab-active">General</a>
         <a href="#geo-rules" class="nav-tab">Global Geo Rules</a>
     </nav>
 
