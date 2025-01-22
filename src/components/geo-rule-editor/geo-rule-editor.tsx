@@ -128,12 +128,10 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
           />
         );
       case "region":
-        const countryCondition = rule.conditions.find(c => c.type === "country");
         return (
           <RegionDropdown
             value={condition.value}
             onChange={(value) => updateCondition(conditionIndex, { value })}
-            country={countryCondition?.value}
           />
         );
       case "city":
