@@ -10,7 +10,7 @@ import {
   Dashicon,
 } from "@wordpress/components";
 import { CountryDropdown } from "../location-dropdowns/country-dropdown";
-import { StateDropdown } from "../location-dropdowns/state-dropdown";
+import { RegionDropdown } from "../location-dropdowns/region-dropdown";
 import { CityDropdown } from "../location-dropdowns/city-dropdown";
 import {
   DragDropContext,
@@ -130,7 +130,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
       case "region":
         const countryCondition = rule.conditions.find(c => c.type === "country");
         return (
-          <StateDropdown
+          <RegionDropdown
             value={condition.value}
             onChange={(value) => updateCondition(conditionIndex, { value })}
             country={countryCondition?.value}
