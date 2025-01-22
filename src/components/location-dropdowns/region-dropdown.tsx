@@ -1,6 +1,6 @@
 import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
+import regionsData from "../../assets/regions.json";
 
-// Region = State or Province
 interface RegionDropdownProps {
   value: string;
   onChange: (value: string) => void;
@@ -8,29 +8,35 @@ interface RegionDropdownProps {
   placeholder?: string;
 }
 
-// Example US states - you'll want to expand this and add other countries
-const states = {
-  US: [
-    { label: "Alabama", value: "AL" },
-    { label: "Alaska", value: "AK" },
-    { label: "Arizona", value: "AZ" },
-    // TODO: Add complete US states list
-  ],
-  CA: [
-    { label: "Alberta", value: "AB" },
-    { label: "British Columbia", value: "BC" },
-    { label: "Ontario", value: "ON" },
-    // TODO: Add complete Canadian provinces list
-  ],
-};
+interface Region {
+  id: number;
+  states: {
+    id: number;
+    name: string;
+    state_code: string;
+  }[];
+}
+
+// Transform the regions data into a more usable format
+const regions: { [key: string]: { label: string; value: string }[] } = {};
+
+(regionsData as Region[]).forEach((countryRegions, index) => {
+  // Use the index + 1 as the country ID since that's how the data is structured
+  const countryId = index + 1;
+  regions[countryId] = countryRegions.states.map(state => ({
+    label: state.name,
+    value: state.name // Using name as value since state_code isn't standardized
+  }));
+});
 
 export const RegionDropdown: React.FC<RegionDropdownProps> = ({
   value,
   onChange,
-  country = "US",
+  country,
   placeholder = "Choose state/province",
 }) => {
-  const options = states[country as keyof typeof states] || [];
+  // If no country is selected or country isn't found in regions, show empty list
+  const options = country ? (regions[country] || []) : [];
 
   return (
     <SearchableDropdown
