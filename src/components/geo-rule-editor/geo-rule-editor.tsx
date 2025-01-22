@@ -128,7 +128,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
               { label: "Canada", value: "CA" },
               // You can add more countries here later
             ]}
-            placeholder="Search country..."
+            placeholder="Choose country"
           />
         );
       default:
