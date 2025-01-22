@@ -154,6 +154,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
   },
 
   save: ({ attributes }: SaveProps) => {
+    const blockProps = useBlockProps.save();
     const {
       localRule,
       globalRuleId,
@@ -165,7 +166,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
 
     if (ruleType === "global" && globalRuleId) {
       return (
-        <>
+        <div {...blockProps}>
           {`[mgeo_content rule="${globalRuleId}"]`}
           <div className="geo-popup-overlay">
             <div
@@ -179,7 +180,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
             </div>
           </div>
           {`[/mgeo_content]`}
-        </>
+        </div>
       );
     }
 
@@ -198,7 +199,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
     }
 
     return (
-      <>
+      <div {...blockProps}>
         {`[mgeo_content ${parts.join(" ")}]`}
         <div className="geo-popup-overlay">
           <div
@@ -212,7 +213,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
           </div>
         </div>
         {`[/mgeo_content]`}
-      </>
+      </div>
     );
   },
 });

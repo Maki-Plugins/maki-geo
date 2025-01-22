@@ -44,7 +44,6 @@
   },
   "editorScript": "file:./geo-popup.tsx",
   "editorStyle": "file:./geo-popup.css",
-  "viewStyle": "file:./style.css",
-  "script": "file:./popup-handler.js",
-  "render": "file:./render.php"
+  "viewStyle": "file:./style-geo-popup.css",
+  "script": "file:./popup-handler.js"
 }
