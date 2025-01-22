@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once plugin_dir_path(__FILE__) . 'tabs/dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'tabs/geo-rules.php';
 require_once plugin_dir_path(__FILE__) . 'tabs/settings.php';
 require_once plugin_dir_path(__FILE__) . 'tabs/tabs-manager.php';
@@ -18,7 +17,7 @@ function mgeo_render_settings_page()
         <?php 
         mgeo_render_tabs();
         ?>
-        <div class="mgeo-admin-container">
+        <div style="margin-top: 20px">
             <?php
             mgeo_render_settings_tab();
             mgeo_render_geo_rules_tab();

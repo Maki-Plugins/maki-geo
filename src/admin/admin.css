@@ -147,7 +147,7 @@
 
 .mgeo-admin-container {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     gap: 20px;
 }
 
@@ -163,7 +163,7 @@
 
 @media screen and (max-width: 782px) {
     .mgeo-admin-container {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
     
     .mgeo-sidebar {

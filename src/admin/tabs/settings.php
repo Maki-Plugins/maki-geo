@@ -11,7 +11,8 @@ function mgeo_render_settings_tab()
     $requests_remaining = max(0, $request_limit - $monthly_requests);
     
     ?>
-    <div id="settings" class="mgeo-admin-tab">
+    <div id="settings" class="mgeo-admin-tab active">
+        <div class="mgeo-admin-container">
         <div class="mgeo-main-content">
             <div class="mgeo-admin-card">
                 <form method="post" action="options.php">
@@ -93,6 +94,7 @@ function mgeo_render_settings_tab()
                 </div>
             </div>
         </div>
+                </div>
     </div>
     <?php
 }
