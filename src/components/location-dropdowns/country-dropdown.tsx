@@ -1,4 +1,5 @@
 import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
+import countryCodesData from "../../assets/country_codes.json";
 
 interface CountryDropdownProps {
   value: string;
@@ -6,12 +7,16 @@ interface CountryDropdownProps {
   placeholder?: string;
 }
 
-const countries = [
-  { label: "United States", value: "US" },
-  { label: "Canada", value: "CA" },
-  { label: "United Kingdom", value: "GB" },
-  // TODO: Add complete country list
-];
+interface CountryCode {
+  name: string;
+  "alpha-2": string;
+  "country-code": string;
+}
+
+const countries = (countryCodesData as CountryCode[]).map(country => ({
+  label: country.name,
+  value: country["alpha-2"]
+}));
 
 export const CountryDropdown: React.FC<CountryDropdownProps> = ({
   value,
