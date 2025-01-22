@@ -9,7 +9,9 @@ import {
   ButtonGroup,
   Dashicon,
 } from "@wordpress/components";
-import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
+import { CountryDropdown } from "../location-dropdowns/country-dropdown";
+import { StateDropdown } from "../location-dropdowns/state-dropdown";
+import { CityDropdown } from "../location-dropdowns/city-dropdown";
 import {
   DragDropContext,
   Droppable,
@@ -120,15 +122,29 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
         );
       case "country":
         return (
-          <SearchableDropdown
+          <CountryDropdown
             value={condition.value}
             onChange={(value) => updateCondition(conditionIndex, { value })}
-            options={[
-              { label: "United States", value: "US" },
-              { label: "Canada", value: "CA" },
-              // You can add more countries here later
-            ]}
-            placeholder="Choose country"
+          />
+        );
+      case "region":
+        const countryCondition = rule.conditions.find(c => c.type === "country");
+        return (
+          <StateDropdown
+            value={condition.value}
+            onChange={(value) => updateCondition(conditionIndex, { value })}
+            country={countryCondition?.value}
+          />
+        );
+      case "city":
+        const cityCountryCondition = rule.conditions.find(c => c.type === "country");
+        const stateCondition = rule.conditions.find(c => c.type === "region");
+        return (
+          <CityDropdown
+            value={condition.value}
+            onChange={(value) => updateCondition(conditionIndex, { value })}
+            country={cityCountryCondition?.value}
+            state={stateCondition?.value}
           />
         );
       default:
