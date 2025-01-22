@@ -11,7 +11,7 @@ import {
   RangeControl,
   ColorPicker,
 } from "@wordpress/components";
-import { GeoRulesPanel } from "../../components/geo-rules-panel";
+import { GeoRulesPanel } from "../../components/geo-rules-panel/geo-rules-panel";
 import metadata from "./block.json";
 import "./geo-popup.css";
 import "./style.css";

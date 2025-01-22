@@ -11,7 +11,7 @@ import {
   LocalGeoRule,
 } from "../../types/types";
 import "./geo-content.css";
-import { GeoRulesPanel } from "../../components/geo-rules-panel";
+import { GeoRulesPanel } from "../../components/geo-rules-panel/geo-rules-panel";
 import updateCategoryIcon from "./update-category-icon"
 
 const { name, ...settings } = metadata;

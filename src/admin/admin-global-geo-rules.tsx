@@ -1,7 +1,7 @@
 import { render } from "@wordpress/element";
 import { Button } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
-import { GeoRulesManager } from "../components/geo-rules-manager";
+import { GeoRulesManager } from "../components/geo-rules-manager/geo-rules-manager";
 import { useState, useEffect } from "react";
 import { GlobalGeoRule } from "../types/types";
 

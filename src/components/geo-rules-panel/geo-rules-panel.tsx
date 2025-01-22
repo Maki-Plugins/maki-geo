@@ -1,5 +1,5 @@
 import { PanelBody, RadioControl } from "@wordpress/components";
-import { GeoRuleEditor } from "../geo-rule-editor";
+import { GeoRuleEditor } from "../geo-rule-editor/geo-rule-editor";
 import { GeoRule, GlobalGeoRule, LocalGeoRule } from "../../types/types";
 import React from "react";
 
