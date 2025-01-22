@@ -147,6 +147,17 @@
 
 .mgeo-admin-container {
     margin-top: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.mgeo-main-content {
+    grid-column: 1;
+}
+
+.mgeo-sidebar {
+    grid-column: 2;
 }
 
 .mgeo-admin-card {

@@ -20,9 +20,8 @@ function mgeo_render_settings_page()
         ?>
         <div class="mgeo-admin-container">
             <?php
-            mgeo_render_dashboard_tab();
-            mgeo_render_geo_rules_tab();
             mgeo_render_settings_tab();
+            mgeo_render_geo_rules_tab();
             ?>
         </div>
     </div>
