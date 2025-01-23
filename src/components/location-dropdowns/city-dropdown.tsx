@@ -31,6 +31,8 @@ export const CityDropdown: React.FC<CityDropdownProps> = ({
       }
 
       const data = await response.json();
+      console.log(`Raw API response:${JSON.stringify(data)}`);
+
       return data.cities.map((city: string) => ({
         label: city,
         value: city
