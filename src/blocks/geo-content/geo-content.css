@@ -46,7 +46,6 @@
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
-    cursor: grab;
     gap: 8px;
 }
 
@@ -65,8 +64,16 @@
     margin-top: 4px;
 }
 
-.geo-condition:active {
-    cursor: grabbing;
+.geo-condition .mgeo-geo-rule-select{
+    color: black;
+}
+
+.geo-condition .mgeo-geo-rule-select .components-input-control__container, .geo-condition .mgeo-geo-rule-select .components-text-control__input{
+    background:none;
+}
+
+.geo-condition .mgeo-geo-rule-select .components-input-control__container .components-input-control__backdrop{
+    border-width: 0px;
 }
 
 .geo-rule-card .components-card__header {
@@ -93,7 +100,7 @@
     flex: 1;
 }
 
-.geo-condition > div:first-child {
+.mgeo-geo-condition-grabber {
     cursor: grab;
     color: #757575;
     padding: 0 8px;

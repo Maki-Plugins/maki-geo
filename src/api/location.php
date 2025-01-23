@@ -34,7 +34,7 @@ function mgeo_get_geolocation_data()
         return $cached_data;
     }
 
-    $api = new mgeo_MakiPluginsAPI();
+    $api = new mgeo_MakiPluginsApi();
     $data = $api->get_location($ip);
 
     if ($data) {

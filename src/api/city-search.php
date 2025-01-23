@@ -3,22 +3,27 @@ if (!defined("ABSPATH")) {
     exit();
 }
 
-add_action('rest_api_init', function() {
-    register_rest_route('maki-geo/v1', '/city-search', [
-        'methods' => 'GET',
-        'callback' => 'mgeo_search_cities',
-        'permission_callback' => '__return_true',
-        'args' => [
+add_action(
+    'rest_api_init', function () {
+        register_rest_route(
+            'maki-geo/v1', '/city-search', [
+            'methods' => 'GET',
+            'callback' => 'mgeo_search_cities',
+            'permission_callback' => '__return_true',
+            'args' => [
             'search' => [
                 'required' => true,
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field'
             ]
-        ]
-    ]);
-});
+            ]
+            ]
+        );
+    }
+);
 
-function mgeo_search_cities($request) {
+function mgeo_search_cities($request)
+{
     mgeo_verify_nonce();
 
     $search_term = $request->get_param('search');
@@ -31,7 +36,7 @@ function mgeo_search_cities($request) {
         return ['cities' => $cached_results];
     }
 
-    $api = new mgeo_GeoNamesAPI();
+    $api = new mgeo_GeoNamesApi();
     $results = $api->search_cities($search_term);
 
     if ($results === false) {

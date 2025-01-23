@@ -26,7 +26,7 @@ function mgeo_verify_api_key($request)
         return new WP_Error('invalid_key', 'API key is required', array('status' => 400));
     }
 
-    $api = new mgeo_MakiPluginsAPI($api_key);
+    $api = new mgeo_MakiPluginsApi($api_key);
     $result = $api->verify_key();
 
     if (!$result || !isset($result['valid']) || !$result['valid']) {

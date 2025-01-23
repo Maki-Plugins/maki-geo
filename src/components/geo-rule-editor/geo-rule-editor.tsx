@@ -105,6 +105,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
       case "continent":
         return (
           <SelectControl
+            className="mgeo-geo-rule-select"
             __nextHasNoMarginBottom={true}
             value={condition.value}
             options={continents}
@@ -114,6 +115,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
       case "ip":
         return (
           <TextControl
+            className="mgeo-geo-rule-select"
             __nextHasNoMarginBottom={true}
             placeholder="e.g. 192.168.1.0/24"
             value={condition.value}
@@ -135,19 +137,16 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
           />
         );
       case "city":
-        const cityCountryCondition = rule.conditions.find(c => c.type === "country");
-        const stateCondition = rule.conditions.find(c => c.type === "region");
         return (
           <CityDropdown
             value={condition.value}
             onChange={(value) => updateCondition(conditionIndex, { value })}
-            country={cityCountryCondition?.value}
-            state={stateCondition?.value}
           />
         );
       default:
         return (
           <TextControl
+            className="mgeo-geo-rule-select"
             __nextHasNoMarginBottom={true}
             placeholder={`Enter ${locationTypes[condition.type]}`}
             value={condition.value}
@@ -254,15 +253,17 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                           {...provided.draggableProps}
                         >
                           <Flex
-                            {...provided.dragHandleProps}
                             justify="inherit"
                             gap={2}
                           >
-                            <div>⋮⋮</div>
-                            <span>When</span>
+                            <div className="mgeo-geo-condition-grabber"
+                              {...provided.dragHandleProps}>⋮⋮</div>
+                            <span>When{" "}</span>
                             <SelectControl
+                              className="mgeo-geo-rule-select"
                               __nextHasNoMarginBottom={true}
                               value={condition.type}
+                              style={{ width: "160px" }}
                               options={Object.entries(locationTypes).map(
                                 ([value, label]) => ({
                                   value,
@@ -277,8 +278,10 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                               }
                             />
                             <SelectControl
+                              className="mgeo-geo-rule-select"
                               __nextHasNoMarginBottom={true}
                               value={condition.operator || "is"}
+                              style={{ width: "90px" }}
                               options={[
                                 { value: "is", label: "is" },
                                 { value: "is not", label: "is not" },

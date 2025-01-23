@@ -1,0 +1,5 @@
+country_codes.json:
+https://github.com/venkatmcajj/react-country-state-city/blob/master/data/countriesminified.json
+
+regions.json:
+https://github.com/venkatmcajj/react-country-state-city/blob/master/data/statesminified.json

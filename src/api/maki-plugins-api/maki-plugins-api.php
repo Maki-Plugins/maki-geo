@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class mgeo_MakiPluginsAPI
+class mgeo_MakiPluginsApi
 {
     private $api_key;
 

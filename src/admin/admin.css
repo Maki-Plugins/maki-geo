@@ -13,10 +13,6 @@
     flex-direction: column-reverse;
 }
 
-.geo-rule-wrapper{
-    max-width: 600px;
-}
-
 .geo-rule-card {
     margin-bottom: 8px;
     border: 1px solid #dcdcde;
@@ -29,6 +25,18 @@
 .rule-actions {
     padding: 0 20px 20px;
     text-align: right;
+}
+
+.geo-condition .mgeo-geo-rule-select{
+    color: black;
+}
+
+.geo-condition .mgeo-geo-rule-select .components-input-control__container, .geo-condition .mgeo-geo-rule-select .components-text-control__input{
+    background:none;
+}
+
+.geo-condition .mgeo-geo-rule-select .components-input-control__container .components-input-control__backdrop{
+    border-width: 0px;
 }
 
 .remove-rule-button.components-button.is-destructive {
@@ -63,17 +71,6 @@
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
-    cursor: grab;
-}
-
-.geo-condition:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.geo-condition:active {
-    cursor: grabbing;
-    transform: translateY(0);
 }
 
 .geo-condition .components-select-control {
@@ -113,7 +110,7 @@
     flex: 1;
 }
 
-.geo-condition > div:first-child {
+.mgeo-geo-condition-grabber {
     cursor: grab;
     color: #757575;
     padding: 0 10px;
@@ -222,3 +219,34 @@
     margin-top: 20px;
     padding: 10px;
 }
+
+/* Searchable dropdown css */
+
+.searchable-dropdown {
+    position: relative;
+    width: 100%;
+  }
+  
+  .searchable-dropdown__options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .searchable-dropdown__option {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  .searchable-dropdown__option:hover {
+    background-color: #f0f0f0;
+  }
+  

@@ -21,13 +21,14 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   value,
   onChange,
   onSearch,
+  options: staticOptions,
   placeholder = "Search...",
   minSearchLength = 2,
   debounceMs = 300,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [options, setOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<Option[]>(staticOptions ?? []);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
@@ -50,8 +51,8 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   }, []);
 
   const filterStaticOptions = (term: string) => {
-    if (!options) return [];
-    return options.filter((option) =>
+    if (!staticOptions) return [];
+    return staticOptions.filter((option) =>
       option.label.toLowerCase().includes(term.toLowerCase())
     );
   };
@@ -69,6 +70,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
 
     setIsLoading(true);
     try {
+      console.log('Trying to search.');
       const results = await onSearch(term);
       setOptions(results);
     } catch (error) {
@@ -90,20 +92,23 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     }
 
     searchTimeoutRef.current = setTimeout(() => {
+      console.log('Debounced search now.');
       handleSearch(term);
     }, debounceMs);
   };
 
   // Initialize options with static options if provided
   useEffect(() => {
-    if (options) {
-      setOptions(options);
+    if (staticOptions) {
+      setOptions(staticOptions);
     }
-  }, [options]);
+  }, [staticOptions]);
 
   return (
     <div className="searchable-dropdown" ref={dropdownRef}>
       <TextControl
+        className="mgeo-geo-rule-select"
+        __nextHasNoMarginBottom={true}
         value={isOpen ? searchTerm : currentLabel}
         onChange={(newValue) => {
           setSearchTerm(newValue);
@@ -111,7 +116,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
           onChange(newValue);
           debouncedSearch(newValue);
         }}
-        placeholder={isLoading ? "Loading..." : placeholder}
+        placeholder={placeholder}
         onFocus={() => {
           setIsOpen(true);
           setSearchTerm(currentLabel);
@@ -122,7 +127,12 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
       />
       {isOpen && options.length > 0 && (
         <div className="searchable-dropdown__options">
-          {options.map((option) => (
+          {isLoading && (<div
+            className="searchable-dropdown__option"
+          >
+            Loading...
+          </div>)}
+          {!isLoading && options.map((option) => (
             <div
               key={option.value}
               className="searchable-dropdown__option"

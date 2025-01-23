@@ -75,10 +75,12 @@ add_action('init', 'mgeo_create_geo_content_blocks');
 
 
 require_once "admin/admin.php";
+require_once "api/geonames-api/geonames-api.php";
 require_once "api/ip-detection/ip-detection.php";
 require_once "api/maki-plugins-api/maki-plugins-api.php";
 require_once "api/request-limiter/request-limiter.php";
 require_once "api/api-utils.php";
+require_once "api/city-search.php";
 require_once "api/geo-rules.php";
 require_once "api/location.php";
 require_once "api/verify-key.php";

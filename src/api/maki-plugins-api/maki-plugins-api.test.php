@@ -7,7 +7,7 @@ class TestMakiPluginsAPI extends WP_UnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->api = new mgeo_MakiPluginsAPI("test_key");
+        $this->api = new mgeo_MakiPluginsApi("test_key");
     }
 
     public function test_get_location()
@@ -95,7 +95,7 @@ class TestMakiPluginsAPI extends WP_UnitTestCase
 
     public function test_verify_key_no_key()
     {
-        $api = new mgeo_MakiPluginsAPI();
+        $api = new mgeo_MakiPluginsApi();
         $result = $api->verify_key();
         $this->assertFalse($result);
     }

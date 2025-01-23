@@ -54,7 +54,7 @@ class mgeo_RequestLimiter
             return false;
         }
 
-        $api = new mgeo_MakiPluginsAPI($api_key);
+        $api = new mgeo_MakiPluginsApi($api_key);
         $data = $api->verify_key();
         
         if (!$data || !isset($data['valid']) || !$data['valid']) {
