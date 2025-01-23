@@ -10,25 +10,31 @@ interface Option {
 interface SearchableDropdownProps {
   value: string;
   onChange: (value: string) => void;
-  options: Option[];
+  onSearch: (term: string) => Promise<Option[]>;
   placeholder?: string;
+  minSearchLength?: number;
+  debounceMs?: number;
 }
 
 export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   value,
   onChange,
-  options,
+  onSearch,
   placeholder = "Search...",
+  minSearchLength = 2,
+  debounceMs = 300,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [options, setOptions] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Find the label for the current value, or use the value itself if not found
   const currentLabel = options.find((opt) => opt.value === value)?.label || value;
 
   useEffect(() => {
-    // Close dropdown when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -42,9 +48,33 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearch = async (term: string) => {
+    if (term.length < minSearchLength) {
+      setOptions([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const results = await onSearch(term);
+      setOptions(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setOptions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const debouncedSearch = (term: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      handleSearch(term);
+    }, debounceMs);
+  };
 
   return (
     <div className="searchable-dropdown" ref={dropdownRef}>
@@ -53,17 +83,21 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         onChange={(newValue) => {
           setSearchTerm(newValue);
           setIsOpen(true);
-          onChange(newValue); // Also update the actual value as the user types
+          onChange(newValue);
+          debouncedSearch(newValue);
         }}
-        placeholder={placeholder}
+        placeholder={isLoading ? "Loading..." : placeholder}
         onFocus={() => {
           setIsOpen(true);
           setSearchTerm(currentLabel);
+          if (currentLabel) {
+            debouncedSearch(currentLabel);
+          }
         }}
       />
-      {isOpen && (
+      {isOpen && options.length > 0 && (
         <div className="searchable-dropdown__options">
-          {filteredOptions.map((option) => (
+          {options.map((option) => (
             <div
               key={option.value}
               className="searchable-dropdown__option"

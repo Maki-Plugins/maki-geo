@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
 
 interface CityDropdownProps {
@@ -21,42 +20,41 @@ export const CityDropdown: React.FC<CityDropdownProps> = ({
   state,
   placeholder = "Choose city",
 }) => {
-  const [cities, setCities] = useState<CityOption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const searchCities = async (searchTerm: string): Promise<CityOption[]> => {
+    if (!country || !state) {
+      return [];
+    }
 
-  useEffect(() => {
-    const loadCities = async () => {
-      if (!country || !state) {
-        setCities([]);
-        return;
+    try {
+      const response = await fetch(
+        `/wp-json/maki-geo/v1/cities/search?` +
+        new URLSearchParams({
+          country,
+          state,
+          search: searchTerm
+        })
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch cities');
       }
 
-      setIsLoading(true);
-      try {
-        // TODO: Replace with actual API call to get cities
-        // This is just an example structure
-        const response = await fetch(
-          `/wp-json/maki-geo/v1/cities?country=${country}&state=${state}`
-        );
-        const data = await response.json();
-        setCities(data.cities);
-      } catch (error) {
-        console.error("Failed to load cities:", error);
-        setCities([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCities();
-  }, [country, state]);
+      const data = await response.json();
+      return data.cities;
+    } catch (error) {
+      console.error("Failed to search cities:", error);
+      return [];
+    }
+  };
 
   return (
     <SearchableDropdown
       value={value}
       onChange={onChange}
-      options={cities}
-      placeholder={isLoading ? "Loading cities..." : placeholder}
+      onSearch={searchCities}
+      placeholder={placeholder}
+      minSearchLength={2}
+      debounceMs={300}
     />
   );
 };
