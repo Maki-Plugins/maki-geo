@@ -15,12 +15,7 @@ class TestCitySearch extends WP_UnitTestCase
 
     public function test_city_search()
     {
-        $mock_cities = [
-            [
-                'label' => 'Paris',
-                'value' => 'Paris'
-            ]
-        ];
+        $mock_cities = ['Paris'];
 
         // Mock the GeoNames API response
         add_filter(
@@ -66,12 +61,7 @@ class TestCitySearch extends WP_UnitTestCase
 
     public function test_city_search_from_cache()
     {
-        $cached_cities = [
-            [
-                'label' => 'Paris',
-                'value' => 'Paris'
-            ]
-        ];
+        $cached_cities = ['Paris'];
 
         $cache_key = 'mgeo_city_search_' . md5('Paris');
         set_transient($cache_key, $cached_cities, HOUR_IN_SECONDS);

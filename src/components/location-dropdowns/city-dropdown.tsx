@@ -31,7 +31,10 @@ export const CityDropdown: React.FC<CityDropdownProps> = ({
       }
 
       const data = await response.json();
-      return data.cities;
+      return data.cities.map((city: string) => ({
+        label: city,
+        value: city
+      }));
     } catch (error) {
       console.error("Failed to search cities:", error);
       return [];
