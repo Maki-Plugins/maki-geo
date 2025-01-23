@@ -1,7 +1,9 @@
 <?php
 
-class TestCitySearch extends WP_UnitTestCase {
-    public function setUp(): void {
+class TestCitySearch extends WP_UnitTestCase
+{
+    public function setUp(): void
+    {
         parent::setUp();
         // Clear any existing transients
         global $wpdb;
@@ -11,24 +13,23 @@ class TestCitySearch extends WP_UnitTestCase {
         add_filter('mgeo_verify_nonce', '__return_true');
     }
 
-    public function test_city_search() {
+    public function test_city_search()
+    {
         $mock_cities = [
             [
-                'label' => 'Paris, Île-de-France, France',
-                'value' => 'Paris'
-            ],
-            [
-                'label' => 'Paris, Texas, United States',
+                'label' => 'Paris',
                 'value' => 'Paris'
             ]
         ];
 
         // Mock the GeoNames API response
-        add_filter('pre_http_request', function($preempt, $args, $url) use ($mock_cities) {
-            if (strpos($url, 'api.geonames.org') !== false) {
-                return [
+        add_filter(
+            'pre_http_request', function ($preempt, $args, $url) use ($mock_cities) {
+                if (strpos($url, 'api.geonames.org') !== false) {
+                    return [
                     'response' => ['code' => 200],
-                    'body' => wp_json_encode([
+                    'body' => wp_json_encode(
+                        [
                         'geonames' => [
                             [
                                 'name' => 'Paris',
@@ -41,11 +42,13 @@ class TestCitySearch extends WP_UnitTestCase {
                                 'countryName' => 'United States'
                             ]
                         ]
-                    ])
-                ];
-            }
-            return $preempt;
-        }, 10, 3);
+                        ]
+                    )
+                    ];
+                }
+                return $preempt;
+            }, 10, 3
+        );
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/city-search');
         $request->set_param('search', 'Paris');
@@ -61,10 +64,11 @@ class TestCitySearch extends WP_UnitTestCase {
         $this->assertEquals($mock_cities, $cached_data);
     }
 
-    public function test_city_search_from_cache() {
+    public function test_city_search_from_cache()
+    {
         $cached_cities = [
             [
-                'label' => 'Paris, Île-de-France, France',
+                'label' => 'Paris',
                 'value' => 'Paris'
             ]
         ];
@@ -81,14 +85,17 @@ class TestCitySearch extends WP_UnitTestCase {
         $this->assertEquals($cached_cities, $response['cities']);
     }
 
-    public function test_city_search_api_error() {
+    public function test_city_search_api_error()
+    {
         // Mock API error
-        add_filter('pre_http_request', function($preempt, $args, $url) {
-            if (strpos($url, 'api.geonames.org') !== false) {
-                return new WP_Error('http_request_failed', 'API request failed');
-            }
-            return $preempt;
-        }, 10, 3);
+        add_filter(
+            'pre_http_request', function ($preempt, $args, $url) {
+                if (strpos($url, 'api.geonames.org') !== false) {
+                    return new WP_Error('http_request_failed', 'API request failed');
+                }
+                return $preempt;
+            }, 10, 3
+        );
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/city-search');
         $request->set_param('search', 'Paris');

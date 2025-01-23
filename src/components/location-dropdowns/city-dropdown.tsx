@@ -3,8 +3,6 @@ import { SearchableDropdown } from "../searchable-dropdown/searchable-dropdown";
 interface CityDropdownProps {
   value: string;
   onChange: (value: string) => void;
-  country?: string;
-  state?: string;
   placeholder?: string;
 }
 
@@ -16,25 +14,18 @@ interface CityOption {
 export const CityDropdown: React.FC<CityDropdownProps> = ({
   value,
   onChange,
-  country,
-  state,
   placeholder = "Choose city",
 }) => {
   const searchCities = async (searchTerm: string): Promise<CityOption[]> => {
-    if (!country || !state) {
-      return [];
-    }
 
     try {
       const response = await fetch(
-        `/wp-json/maki-geo/v1/cities/search?` +
+        `/wp-json/maki-geo/v1/city-search?` +
         new URLSearchParams({
-          country,
-          state,
           search: searchTerm
         })
       );
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch cities');
       }
