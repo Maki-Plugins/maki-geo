@@ -7,21 +7,9 @@ interface RegionDropdownProps {
   placeholder?: string;
 }
 
-interface Region {
-  id: number;
-  states: {
-    id: number;
-    name: string;
-    state_code: string;
-  }[];
-}
-
 // Transform the regions data into a flat list of unique regions
 const regions = Array.from(
-  new Set(
-    (regionsData as Region[]).flatMap(country => 
-      country.states.map(state => state.name)
-    )
+  new Set((regionsData as string[])
   )
 ).sort().map(name => ({
   label: name,
@@ -38,7 +26,7 @@ export const RegionDropdown: React.FC<RegionDropdownProps> = ({
     <SearchableDropdown
       value={value}
       onChange={onChange}
-      options={options}
+      options={regions}
       placeholder={placeholder}
     />
   );

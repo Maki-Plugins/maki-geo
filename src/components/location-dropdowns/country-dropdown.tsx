@@ -21,7 +21,7 @@ const countries = (countryCodesData as CountryCode[]).map(country => ({
 export const CountryDropdown: React.FC<CountryDropdownProps> = ({
   value,
   onChange,
-  placeholder = "Choose country",
+  placeholder = "Country or country code",
 }) => {
   return (
     <SearchableDropdown
