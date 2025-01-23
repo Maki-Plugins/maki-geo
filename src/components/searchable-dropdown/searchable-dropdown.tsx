@@ -24,8 +24,8 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Find the label for the current value
-  const currentLabel = options.find((opt) => opt.value === value)?.label || "";
+  // Find the label for the current value, or use the value itself if not found
+  const currentLabel = options.find((opt) => opt.value === value)?.label || value;
 
   useEffect(() => {
     // Close dropdown when clicking outside
@@ -53,6 +53,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         onChange={(newValue) => {
           setSearchTerm(newValue);
           setIsOpen(true);
+          onChange(newValue); // Also update the actual value as the user types
         }}
         placeholder={placeholder}
         onFocus={() => {
