@@ -33,7 +33,12 @@ export const CityDropdown: React.FC<CityDropdownProps> = ({
       const data = await response.json();
       console.log(`Raw API response:${JSON.stringify(data)}`);
 
-      return data.cities.map((city: string) => ({
+      // Convert to array if it's an object with numeric keys
+      const citiesArray = Array.isArray(data.cities) 
+        ? data.cities 
+        : Object.values(data.cities);
+    
+      return citiesArray.map((city: string) => ({
         label: city,
         value: city
       }));

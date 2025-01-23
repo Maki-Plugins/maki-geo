@@ -50,12 +50,12 @@ class mgeo_GeoNamesApi
         }
 
         // Transform the response to match our expected format
-        return array_unique(
+        return array_values(array_unique(
             array_map(
                 function ($city) {
                     return $city["name"];
                 }, $data["geonames"]
             )
-        );
+        ));
     }
 }
