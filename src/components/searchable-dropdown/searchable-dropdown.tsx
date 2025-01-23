@@ -10,7 +10,8 @@ interface Option {
 interface SearchableDropdownProps {
   value: string;
   onChange: (value: string) => void;
-  onSearch: (term: string) => Promise<Option[]>;
+  onSearch?: (term: string) => Promise<Option[]>;
+  options?: Option[];
   placeholder?: string;
   minSearchLength?: number;
   debounceMs?: number;
@@ -48,7 +49,19 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const filterStaticOptions = (term: string) => {
+    if (!options) return [];
+    return options.filter((option) =>
+      option.label.toLowerCase().includes(term.toLowerCase())
+    );
+  };
+
   const handleSearch = async (term: string) => {
+    if (!onSearch) {
+      setOptions(filterStaticOptions(term));
+      return;
+    }
+
     if (term.length < minSearchLength) {
       setOptions([]);
       return;
@@ -67,6 +80,11 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   };
 
   const debouncedSearch = (term: string) => {
+    if (!onSearch) {
+      handleSearch(term);
+      return;
+    }
+
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
@@ -75,6 +93,13 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
       handleSearch(term);
     }, debounceMs);
   };
+
+  // Initialize options with static options if provided
+  useEffect(() => {
+    if (options) {
+      setOptions(options);
+    }
+  }, [options]);
 
   return (
     <div className="searchable-dropdown" ref={dropdownRef}>

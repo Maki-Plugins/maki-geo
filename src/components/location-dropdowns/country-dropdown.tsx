@@ -29,6 +29,7 @@ export const CountryDropdown: React.FC<CountryDropdownProps> = ({
       onChange={onChange}
       options={countries}
       placeholder={placeholder}
+      minSearchLength={1}
     />
   );
 };

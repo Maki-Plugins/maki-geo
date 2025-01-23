@@ -28,6 +28,7 @@ export const RegionDropdown: React.FC<RegionDropdownProps> = ({
       onChange={onChange}
       options={regions}
       placeholder={placeholder}
+      minSearchLength={1}
     />
   );
 };
