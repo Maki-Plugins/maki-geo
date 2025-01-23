@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { TextControl } from "@wordpress/components";
+import "./searchable-dropdown.css";
 
 interface Option {
   label: string;
@@ -56,7 +57,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         placeholder={placeholder}
         onFocus={() => {
           setIsOpen(true);
-          setSearchTerm("");
+          setSearchTerm(currentLabel);
         }}
       />
       {isOpen && (
