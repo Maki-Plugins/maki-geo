@@ -13,11 +13,21 @@ function mgeo_evaluate_rule($rule, $location_data)
     // Evaluate conditions
     $results = array_map(
         function ($condition) use ($location_data) {
-            $location_value = strtolower($location_data[$condition['type']]);
-            $condition_value = strtolower($condition['value']);
+            $location_value = trim(strtolower($location_data[$condition['type']]));
+            $condition_value = trim(strtolower($condition['value']));
         
             if ($condition['operator'] === 'is') {
+                // When checking for country, also check for country_code. Ie, you can write country='US' and it should still work
+                if($condition['type'] === 'country') {
+                    $location_country_code = trim(strtolower($location_data['country_code']));
+                    return $location_value === $condition_value || $location_country_code === $condition_value;
+                }
                 return $location_value === $condition_value;
+            }
+            // Again, when checking for country, also check for country_code. Ie, you can write country='US' and it should still work
+            if($condition['type'] === 'country') {
+                $location_country_code = trim(strtolower($location_data['country_code']));
+                return $location_value !== $condition_value && $location_country_code !== $condition_value;
             }
             return $location_value !== $condition_value;
         }, $rule['conditions']
