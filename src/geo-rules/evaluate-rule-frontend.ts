@@ -75,9 +75,17 @@ export function evaluateGeoRule(
     const conditionValue = condition.value.toLowerCase();
 
     if (condition.operator === "is") {
+      if (condition.type === "country") {
+        const locationCountryCode = locationData.country_code.toLowerCase();
+        return locationValue === conditionValue || locationCountryCode === conditionValue;
+      }
       return locationValue === conditionValue;
     } else {
       // "is not"
+      if (condition.type === "country") {
+        const locationCountryCode = locationData.country_code.toLowerCase();
+        return locationValue !== conditionValue && locationCountryCode !== conditionValue;
+      }
       return locationValue !== conditionValue;
     }
   });

@@ -5,6 +5,7 @@ describe("evaluateGeoRules", () => {
   const mockLocationData: LocationData = {
     continent: "North America",
     country: "United States",
+    country_code: "US",
     region: "California",
     city: "San Francisco",
     ip: "192.168.1.1",
@@ -126,6 +127,37 @@ describe("evaluateGeoRules", () => {
       action: "show",
     };
     expect(evaluateGeoRule(rule2, mockLocationData)).toBe(true);
+  });
+
+  it("should handle country code matches", () => {
+    const locationDataWithCode = {
+      ...mockLocationData,
+      country_code: "US"
+    };
+
+    // Test with full country name
+    const rule: GeoRuleBase = {
+      conditions: [{ type: "country", operator: "is", value: "United States" }],
+      operator: "AND",
+      action: "show",
+    };
+    expect(evaluateGeoRule(rule, locationDataWithCode)).toBe(true);
+
+    // Test with country code
+    const rule2: GeoRuleBase = {
+      conditions: [{ type: "country", operator: "is", value: "us" }],
+      operator: "AND",
+      action: "show",
+    };
+    expect(evaluateGeoRule(rule2, locationDataWithCode)).toBe(true);
+
+    // Test with "is not" operator
+    const rule3: GeoRuleBase = {
+      conditions: [{ type: "country", operator: "is not", value: "CA" }],
+      operator: "AND",
+      action: "show",
+    };
+    expect(evaluateGeoRule(rule3, locationDataWithCode)).toBe(true);
   });
 
   it("should handle opposite actions when conditions are not met", () => {

@@ -15,6 +15,7 @@ class TestEvaluateRuleBackend extends WP_UnitTestCase
         $this->mockLocationData = array(
             'continent' => 'North America',
             'country' => 'United States',
+            'country_code' => 'US',
             'region' => 'California',
             'city' => 'San Francisco',
             'ip' => '192.168.1.1'
@@ -157,6 +158,39 @@ class TestEvaluateRuleBackend extends WP_UnitTestCase
             'action' => 'show'
         );
         $this->assertTrue(mgeo_evaluate_rule($rule2, $this->mockLocationData));
+    }
+
+    public function test_should_handle_country_code_matches()
+    {
+        // Test with full country name
+        $rule = array(
+            'conditions' => array(
+                array('type' => 'country', 'operator' => 'is', 'value' => 'United States')
+            ),
+            'operator' => 'AND',
+            'action' => 'show'
+        );
+        $this->assertTrue(mgeo_evaluate_rule($rule, $this->mockLocationData));
+
+        // Test with country code
+        $rule2 = array(
+            'conditions' => array(
+                array('type' => 'country', 'operator' => 'is', 'value' => 'us')
+            ),
+            'operator' => 'AND',
+            'action' => 'show'
+        );
+        $this->assertTrue(mgeo_evaluate_rule($rule2, $this->mockLocationData));
+
+        // Test with "is not" operator
+        $rule3 = array(
+            'conditions' => array(
+                array('type' => 'country', 'operator' => 'is not', 'value' => 'CA')
+            ),
+            'operator' => 'AND',
+            'action' => 'show'
+        );
+        $this->assertTrue(mgeo_evaluate_rule($rule3, $this->mockLocationData));
     }
 
     public function test_should_handle_opposite_actions_when_conditions_not_met()
