@@ -91,8 +91,6 @@ class TestCitySearch extends WP_UnitTestCase
         $request->set_param('search', 'Paris');
 
         $response = mgeo_search_cities($request);
-
-        $this->assertInstanceOf('WP_Error', $response);
-        $this->assertEquals('city_search_failed', $response->get_error_code());
+        $this->assertEquals(['cities' => []], $response);
     }
 }

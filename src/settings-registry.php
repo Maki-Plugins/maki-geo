@@ -3,20 +3,25 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class mgeo_SettingsRegistry {
+class mgeo_SettingsRegistry
+{
     private static $instance = null;
     private $settings = [];
     
-    public static function get_instance() {
+    public static function get_instance()
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
-    public function register_setting($option_name, $args = []) {
+    public function register_setting($option_name, $args = [])
+    {
         if (!in_array($option_name, $this->settings)) {
             $this->settings[] = $option_name;
             
@@ -32,13 +37,14 @@ class mgeo_SettingsRegistry {
             
             // Register with WordPress if admin is initialized
             if (did_action('admin_init')) {
-                register_setting('maki_geo_settings', $option_name, $merged_args);
+                register_setting('maki_geo_options', $option_name, $merged_args);
             }
         }
     }
 
 
-    public function get_all_settings() {
+    public function get_all_settings()
+    {
         return $this->settings;
     }
 }

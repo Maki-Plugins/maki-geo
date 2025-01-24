@@ -17,8 +17,8 @@ function mgeo_render_settings_tab()
             <div class="mgeo-admin-card">
                 <form method="post" action="options.php">
                 <?php
-                settings_fields('maki_geo_settings');
-                do_settings_sections('maki_geo_settings');
+                settings_fields('maki_geo_options');
+                do_settings_sections('maki_geo_options');
                 submit_button();
                 ?>
                 <hr />

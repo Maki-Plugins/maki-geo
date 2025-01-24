@@ -39,12 +39,9 @@ function mgeo_search_cities($request)
     $api = new mgeo_GeoNamesApi();
     $results = $api->search_cities($search_term);
 
-    if ($results === false) {
-        return new WP_Error(
-            'city_search_failed',
-            'Failed to search cities',
-            ['status' => 500]
-        );
+    if (is_wp_error($results)) {
+        error_log('Geonames API Error: ' . $results->get_error_message());
+        return ['cities' => []];
     }
 
     // Cache results for 1 hour

@@ -33,7 +33,7 @@ function mgeo_register_settings()
     
     // Register settings with the registry
     $registry->register_setting(
-        'maki_geo_settings', [
+        'maki_geo_options', [
         'type' => 'object',
         'default' => [
             'client_server_mode' => 'server',
@@ -47,7 +47,7 @@ function mgeo_register_settings()
         'maki_geo_general_section',
         'General',
         null,
-        'maki_geo_settings'
+        'maki_geo_options'
     );
 
     // Register fields
@@ -55,7 +55,7 @@ function mgeo_register_settings()
         'client_server_mode',
         'Geo Targeting Method',
         'mgeo_render_client_server_mode_field',
-        'maki_geo_settings',
+        'maki_geo_options',
         'maki_geo_general_section'
     );
 
@@ -63,7 +63,7 @@ function mgeo_register_settings()
         'api_key',
         'API Key',
         'mgeo_render_api_key_field',
-        'maki_geo_settings',
+        'maki_geo_options',
         'maki_geo_general_section'
     );
 

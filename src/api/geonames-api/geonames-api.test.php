@@ -59,6 +59,6 @@ class TestGeoNamesApi extends WP_UnitTestCase
         );
 
         $result = $this->api->search_cities('Paris');
-        $this->assertFalse($result);
+        $this->assertTrue(is_wp_error($result));
     }
 }

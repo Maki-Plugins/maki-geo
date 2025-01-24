@@ -5,20 +5,15 @@ if (!defined("ABSPATH")) {
 
 class mgeo_GeoNamesApi
 {
-    private $username;
+    private $username = "mancato";
     private $base_url = "http://api.geonames.org"; // Note: free geonames API has a limit of 20k requests per month
 
     public function __construct()
     {
-        $this->username = "mancato";
     }
 
     public function search_cities($search_term, $max_rows = 10)
     {
-        if (!$this->username) {
-            return false;
-        }
-
         // Docs: https://www.geonames.org/export/geonames-search.html
         $url =
             $this->base_url .
@@ -39,23 +34,30 @@ class mgeo_GeoNamesApi
         $response = wp_remote_get($url);
 
         if (is_wp_error($response)) {
-            return [];
+            error_log('Geonames API error: ' . $response->get_error_message());
+            return new \WP_Error('api_error', 'Failed to fetch city data', $response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
+
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log('JSON decode error: ' . json_last_error_msg());
+            return new \WP_Error('json_error', 'Invalid API response format');
+        }
 
         if (!isset($data["geonames"])) {
             return [];
         }
 
         // Transform the response to match our expected format
-        return array_values(array_unique(
-            array_map(
-                function ($city) {
-                    return $city["name"];
-                }, $data["geonames"]
+        return array_values(
+            array_unique(
+                array_map(
+                    fn($city) => $city["name"], $data["geonames"]
+                )
             )
-        ));
+        );
     }
 }
