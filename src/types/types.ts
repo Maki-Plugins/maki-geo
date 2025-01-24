@@ -31,6 +31,7 @@ export interface BlockAttributes {
 export interface LocationData {
   continent: string;
   country: string;
+  country_code: string;
   region: string;
   city: string;
   ip: string;
