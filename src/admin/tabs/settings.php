@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 function mgeo_render_settings_tab()
 {
     $monthly_requests = get_option('mgeo_monthly_requests', 0);
-    $api_key = get_option('maki_geo_options')['api_key'] ?? '';
+    $api_key = get_option('mgeo_general_options')['api_key'] ?? '';
     $request_limit = $api_key ? get_option('mgeo_request_limit', 1000) : 1000;
     $requests_remaining = max(0, $request_limit - $monthly_requests);
     
@@ -17,8 +17,8 @@ function mgeo_render_settings_tab()
             <div class="mgeo-admin-card">
                 <form method="post" action="options.php">
                 <?php
-                settings_fields('maki_geo_options');
-                do_settings_sections('maki_geo_options');
+                settings_fields('mgeo_general_options');
+                do_settings_sections('mgeo_general_options');
                 submit_button();
                 ?>
                 <hr />
@@ -30,7 +30,7 @@ function mgeo_render_settings_tab()
                 </p>
                 <script>
                     document.getElementById('verify-api-key').addEventListener('click', async function() {
-                        const apiKeyInput = document.querySelector('input[name="maki_geo_options[api_key]"]');
+                        const apiKeyInput = document.querySelector('input[name="mgeo_general_options[api_key]"]');
                         const apiKey = apiKeyInput.value.trim();
                         
                         if (!apiKey) {

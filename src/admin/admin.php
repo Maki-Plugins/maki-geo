@@ -33,7 +33,7 @@ function mgeo_register_settings()
     
     // Register settings with the registry
     $registry->register_setting(
-        'maki_geo_options', [
+        'mgeo_general_options', [
         'type' => 'object',
         'default' => [
             'client_server_mode' => 'server',
@@ -47,7 +47,7 @@ function mgeo_register_settings()
         'maki_geo_general_section',
         'General',
         null,
-        'maki_geo_options'
+        'mgeo_general_options'
     );
 
     // Register fields
@@ -55,7 +55,7 @@ function mgeo_register_settings()
         'client_server_mode',
         'Geo Targeting Method',
         'mgeo_render_client_server_mode_field',
-        'maki_geo_options',
+        'mgeo_general_options',
         'maki_geo_general_section'
     );
 
@@ -63,29 +63,29 @@ function mgeo_register_settings()
         'api_key',
         'API Key',
         'mgeo_render_api_key_field',
-        'maki_geo_options',
+        'mgeo_general_options',
         'maki_geo_general_section'
     );
 
     
     // Register rules settings with the registry
-    $registry->register_setting('maki_geo_rules');
+    $registry->register_setting('mgeo_geo_rules');
 
     // Register settings sections for rules
     add_settings_section(
-        'maki_geo_rules_section',
+        'mgeo_geo_rules_section',
         'Default Geo Rules',
         null,
-        'maki_geo_rules'
+        'mgeo_geo_rules'
     );
 }
 
 function mgeo_render_client_server_mode_field()
 {
-    $options = get_option('maki_geo_options', array());
+    $options = get_option('mgeo_general_options', array());
     $method = isset($options['client_server_mode']) ? $options['client_server_mode'] : 'server';
     ?>
-    <select name="maki_geo_options[client_server_mode]">
+    <select name="mgeo_general_options[client_server_mode]">
         <option value="server" <?php selected('server', $method); ?>>Server-side (Default)</option>
         <option value="client" <?php selected('client', $method); ?>>Client-side</option>
     </select>
@@ -99,11 +99,11 @@ function mgeo_render_client_server_mode_field()
 
 function mgeo_render_api_key_field()
 {
-    $options = get_option('maki_geo_options', array());
+    $options = get_option('mgeo_general_options', array());
     $api_key = isset($options['api_key']) ? $options['api_key'] : '';
     ?>
     <input type="text" 
-           name="maki_geo_options[api_key]" 
+           name="mgeo_general_options[api_key]" 
            value="<?php echo esc_attr($api_key); ?>" 
            class="regular-text"
     />
@@ -112,7 +112,7 @@ function mgeo_render_api_key_field()
     </button>
     <p class="description">
         Enter your API key to increase your monthly request limit. 
-        <a href="<?php echo MGEO_MAKI_PLUGINS_URL . '#pricing'?>" target="_blank">
+        <a href="<?php echo esc_url(MGEO_MAKI_PLUGINS_URL . '#pricing'); ?>" target="_blank">
             Get an API key
         </a>
     </p>
@@ -149,7 +149,7 @@ function mgeo_enqueue_admin_scripts($hook)
     wp_localize_script(
         'maki-geo-admin', 'makiGeoData', [
         'nonce' => wp_create_nonce('maki_geo_save_rules'),
-        'globalRules' => get_option('maki_geo_rules', [])
+        'globalRules' => get_option('mgeo_geo_rules', [])
         ]
     );
 }

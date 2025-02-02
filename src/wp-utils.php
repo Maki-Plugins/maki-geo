@@ -7,7 +7,7 @@ if (! defined('ABSPATH')) {
  * Enqueue a script or style
  * 
  * The relpath is from the plugin root dir and shouldn't start with a slash. 
- * I.e. it is appeded to something like "wp-content/plugins/maki-geo/"
+ * I.e. it is appended to something like "wp-content/plugins/maki-geo/"
  */
 function mgeo_enqueue($handle, $relpath, $type='script', $deps=array())
 {
