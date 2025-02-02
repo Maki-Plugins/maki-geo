@@ -140,17 +140,46 @@ function mgeo_enqueue_admin_scripts($hook)
 
     wp_enqueue_style('wp-edit-blocks');  // For block editor styles
     
-    mgeo_enqueue('maki-geo-admin-style', 'src/admin/admin.css', 'style');
-
-    $script_args = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
-    mgeo_enqueue('maki-geo-admin', 'build/admin.js', 'script', $script_args['dependencies']);
-
-    // Admin script data
-    wp_localize_script(
-        'maki-geo-admin', 'makiGeoData', [
+    // Enqueue admin CSS and JS with proper dependencies
+    mgeo_enqueue_admin('maki-geo-admin-style', 'src/admin/admin.css', 'style');
+    
+    // Register admin scripts with dependencies
+    $script_asset = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
+    mgeo_enqueue_admin(
+        'maki-geo-admin',
+        'build/admin.js',
+        'script',
+        $script_asset['dependencies'],
+        ['async' => true, 'defer' => true]
+    );
+    
+    // Add tab management scripts
+    mgeo_enqueue_admin(
+        'maki-geo-admin-tabs',
+        'src/admin/tabs/admin-tabs.js',
+        'script',
+        ['wp-i18n', 'wp-api-fetch']
+    );
+    
+    // Add settings page scripts
+    mgeo_enqueue_admin(
+        'maki-geo-admin-settings',
+        'src/admin/tabs/admin-settings.js', 
+        'script',
+        ['wp-api-fetch', 'wp-i18n', 'wp-dom-ready']
+    );
+    
+    // Pass data to scripts using wp_add_inline_script
+    $maki_geo_data = wp_json_encode([
         'nonce' => wp_create_nonce('maki_geo_save_rules'),
-        'globalRules' => get_option('mgeo_geo_rules', [])
-        ]
+        'globalRules' => get_option('mgeo_geo_rules', []),
+        'apiUrl' => rest_url('/maki-geo/v1/')
+    ]);
+    
+    wp_add_inline_script(
+        'maki-geo-admin',
+        'window.makiGeoData = ' . $maki_geo_data . ';',
+        'before'
     );
 }
 
