@@ -40,7 +40,9 @@ function mgeo_search_cities($request)
     $results = $api->search_cities($search_term);
 
     if (is_wp_error($results)) {
-        error_log('Geonames API Error: ' . $results->get_error_message());
+        if (defined('MGEO_DEBUG')) {
+            error_log('Geonames API Error: ' . $results->get_error_message());
+        }
         return ['cities' => []];
     }
 

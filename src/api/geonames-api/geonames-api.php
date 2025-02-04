@@ -34,7 +34,9 @@ class mgeo_GeoNamesApi
         $response = wp_remote_get($url);
 
         if (is_wp_error($response)) {
-            error_log('Geonames API error: ' . $response->get_error_message());
+            if (defined('MGEO_DEBUG')) {
+                error_log('Geonames API error: ' . $response->get_error_message());
+            }
             return new \WP_Error('api_error', 'Failed to fetch city data', $response->get_error_message());
         }
 
@@ -43,7 +45,9 @@ class mgeo_GeoNamesApi
 
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('JSON decode error: ' . json_last_error_msg());
+            if (defined('MGEO_DEBUG')) {
+                error_log('JSON decode error: ' . json_last_error_msg());
+            }
             return new \WP_Error('json_error', 'Invalid API response format');
         }
 

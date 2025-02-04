@@ -1,4 +1,7 @@
 <?php
+if (!defined("ABSPATH")) {
+    exit();
+}
 
 class mgeo_RequestLimiter
 {

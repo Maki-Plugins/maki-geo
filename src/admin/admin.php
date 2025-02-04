@@ -103,7 +103,7 @@ function mgeo_render_client_server_mode_field()
 
 function mgeo_render_api_key_field()
 {
-    $option = get_option('mgeo_api_key', '');
+    $api_key = get_option('mgeo_api_key', '');
     ?>
     <input type="text" 
            name="mgeo_api_key" 

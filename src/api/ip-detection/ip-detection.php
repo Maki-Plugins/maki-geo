@@ -1,16 +1,22 @@
 <?php
+if (!defined("ABSPATH")) {
+    exit();
+}
 
 class mgeo_IpDetection
 {
     public function getRequestIP()
     {
+        if (!isset($_SERVER["REMOTE_ADDR"])) {
+            return false;
+        }
         $remote_addr = rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["REMOTE_ADDR"])));
         
-        if(!$remote_addr) {
+        if (!$remote_addr) {
             return false;
         }
 
-        if(isset($_SERVER["HTTP_CF_CONNECTING_IP"]) && $this->isCloudflare($remote_addr)) {
+        if (isset($_SERVER["HTTP_CF_CONNECTING_IP"]) && $this->isCloudflare($remote_addr)) {
             return rest_is_ip_address(sanitize_text_field(wp_unslash($_SERVER["HTTP_CF_CONNECTING_IP"])));
         }
         return $remote_addr;
