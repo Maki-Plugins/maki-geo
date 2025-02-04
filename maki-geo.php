@@ -35,7 +35,7 @@ function mgeo_create_mgeo_constant($constant_name, $value)
 mgeo_create_mgeo_constant('URL', plugin_dir_url(__FILE__)); // http://maki-test.local/wp-content/plugins/maki-geo/
 mgeo_create_mgeo_constant('PATH', plugin_dir_path(__FILE__)); // E:\webserver\www\testsite\wp-content\plugins\maki-geo/
 mgeo_create_mgeo_constant('SLUG', dirname(plugin_basename(__FILE__))); // maki-geo
-mgeo_create_mgeo_constant('NAME', $plugin_data['name']); // Maki Geo – Geo targeting
+mgeo_create_mgeo_constant('NAME', $plugin_data['name']); // Maki Geo
 mgeo_create_mgeo_constant('VERSION', $plugin_data['version']); // 1.0.0
 mgeo_create_mgeo_constant('TEXT', $plugin_data['text']); // maki-geo
 mgeo_create_mgeo_constant('PREFIX', 'mgeo');

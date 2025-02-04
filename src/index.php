@@ -60,7 +60,7 @@ function mgeo_create_geo_content_blocks()
                 wp_json_encode(
                     [
                     'nonce' => wp_create_nonce('wp_rest'),
-                    'globalRules' => get_option('maki_geo_rules', [])
+                    'globalRules' => get_option('mgeo_geo_rules', [])
                     ]
                 )
             );

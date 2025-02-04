@@ -16,7 +16,7 @@ async function initGeoTargeting(): Promise<void> {
     const response = await window.wp.apiFetch({
       path: "maki-geo/v1/location",
     });
-    console.log(`API response: ${JSON.stringify(response)}`);
+    // console.log(`API response: ${JSON.stringify(response)}`);
 
     const blocksClass = "mgeo-geo-target-block";
 

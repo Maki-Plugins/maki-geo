@@ -15,7 +15,8 @@ class TestRequestLimiter extends WP_UnitTestCase
         delete_option("mgeo_monthly_requests");
         delete_option("mgeo_last_reset");
         delete_option("mgeo_request_limit");
-        delete_option("maki_geo_options");
+        delete_option("mgeo_api_key");
+        delete_option("mgeo_client_server_mode");
     }
 
     public function test_free_tier_limit()
@@ -61,7 +62,7 @@ class TestRequestLimiter extends WP_UnitTestCase
     public function test_api_sync()
     {
         // Set up API key
-        update_option("maki_geo_options", ["api_key" => "test_key"]);
+        update_option("mgeo_api_key", "test_key");
 
         // Mock API response
         add_filter(
@@ -94,7 +95,7 @@ class TestRequestLimiter extends WP_UnitTestCase
     public function test_api_sync_invalid_key()
     {
         // Set up invalid API key
-        update_option("maki_geo_options", ["api_key" => "invalid_key"]);
+        update_option("mgeo_api_key", "invalid_key");
 
         // Mock API response for invalid key
         add_filter(
@@ -125,7 +126,7 @@ class TestRequestLimiter extends WP_UnitTestCase
     public function test_api_sync_error()
     {
         // Set up API key
-        update_option("maki_geo_options", ["api_key" => "test_key"]);
+        update_option("mgeo_api_key", "test_key");
 
         // Mock API error response
         add_filter(

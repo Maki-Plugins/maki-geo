@@ -37,9 +37,7 @@ function mgeo_verify_api_key($request)
     }
 
     // Save the verified key
-    $options = get_option('maki_geo_options', array());
-    $options['api_key'] = $api_key;
-    update_option('maki_geo_options', $options);
+    update_option('mgeo_api_key', $api_key);
 
     // Update the request limit
     $request_limiter = new mgeo_RequestLimiter();

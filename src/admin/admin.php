@@ -33,12 +33,17 @@ function mgeo_register_settings()
     
     // Register settings with the registry
     $registry->register_setting(
-        'mgeo_general_options', [
-        'type' => 'object',
-        'default' => [
-            'client_server_mode' => 'server',
-            'api_key' => ''
+        'mgeo_client_server_mode', [
+        'type' => 'string',
+        'default' => 'server',
+        'sanitize_callback' => 'sanitize_text_field',
         ]
+    );
+
+    $registry->register_setting(
+        'mgeo_api_key', [
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_key',
         ]
     );
     
@@ -82,10 +87,9 @@ function mgeo_register_settings()
 
 function mgeo_render_client_server_mode_field()
 {
-    $options = get_option('mgeo_general_options', array());
-    $method = isset($options['client_server_mode']) ? $options['client_server_mode'] : 'server';
+    $method = get_option('mgeo_client_server_mode', 'server');
     ?>
-    <select name="mgeo_general_options[client_server_mode]">
+    <select name="mgeo_client_server_mode">
         <option value="server" <?php selected('server', $method); ?>>Server-side (Default)</option>
         <option value="client" <?php selected('client', $method); ?>>Client-side</option>
     </select>
@@ -99,11 +103,10 @@ function mgeo_render_client_server_mode_field()
 
 function mgeo_render_api_key_field()
 {
-    $options = get_option('mgeo_general_options', array());
-    $api_key = isset($options['api_key']) ? $options['api_key'] : '';
+    $option = get_option('mgeo_api_key', '');
     ?>
     <input type="text" 
-           name="mgeo_general_options[api_key]" 
+           name="mgeo_api_key" 
            value="<?php echo esc_attr($api_key); ?>" 
            class="regular-text"
     />
@@ -138,48 +141,38 @@ function mgeo_enqueue_admin_scripts($hook)
         return;
     }
 
-    wp_enqueue_style('wp-edit-blocks');  // For block editor styles
+    // Styles
+    wp_enqueue_style('wp-edit-blocks');
+    mgeo_enqueue('maki-geo-admin-style', 'src/admin/admin.css', 'style');
     
-    // Enqueue admin CSS and JS with proper dependencies
-    mgeo_enqueue_admin('maki-geo-admin-style', 'src/admin/admin.css', 'style');
-    
-    // Register admin scripts with dependencies
-    $script_asset = include plugin_dir_path(__FILE__) . '../../build/admin.asset.php';
-    mgeo_enqueue_admin(
+    // Scripts
+    $script_asset = include plugin_dir_path(__FILE__) . '../../build/admin-geo-rules.asset.php';
+    mgeo_enqueue(
         'maki-geo-admin',
-        'build/admin.js',
+        'build/admin-geo-rules.js',
         'script',
-        $script_asset['dependencies'],
-        ['async' => true, 'defer' => true]
+        $script_asset['dependencies']
     );
     
-    // Add tab management scripts
-    mgeo_enqueue_admin(
+    wp_localize_script(
+        'maki-geo-admin', 'makiGeoData', [
+        'nonce' => wp_create_nonce('maki_geo_save_rules'),
+        'globalRules' => get_option('mgeo_geo_rules', [])
+        ]
+    );
+    
+    mgeo_enqueue(
         'maki-geo-admin-tabs',
         'src/admin/tabs/admin-tabs.js',
         'script',
         ['wp-i18n', 'wp-api-fetch']
     );
     
-    // Add settings page scripts
-    mgeo_enqueue_admin(
+    mgeo_enqueue(
         'maki-geo-admin-settings',
         'src/admin/tabs/admin-settings.js', 
         'script',
         ['wp-api-fetch', 'wp-i18n', 'wp-dom-ready']
-    );
-    
-    // Pass data to scripts using wp_add_inline_script
-    $maki_geo_data = wp_json_encode([
-        'nonce' => wp_create_nonce('maki_geo_save_rules'),
-        'globalRules' => get_option('mgeo_geo_rules', []),
-        'apiUrl' => rest_url('/maki-geo/v1/')
-    ]);
-    
-    wp_add_inline_script(
-        'maki-geo-admin',
-        'window.makiGeoData = ' . $maki_geo_data . ';',
-        'before'
     );
 }
 

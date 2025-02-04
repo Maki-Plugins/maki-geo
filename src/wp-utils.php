@@ -20,22 +20,3 @@ function mgeo_enqueue($handle, $relpath, $type='script', $deps=array())
         wp_enqueue_style($handle, $uri, $deps, $version);
     }      
 }
-
-function mgeo_enqueue_admin($handle, $relpath, $type='script', $deps=array(), $attrs = [])
-{
-    $uri = plugins_url('../' . $relpath, __FILE__);
-    $plugin_root_path = plugin_dir_path(__FILE__) . '../';
-    $version = filemtime($plugin_root_path . $relpath);
-    
-    if ($type === 'script') {
-        wp_register_script($handle, $uri, $deps, $version, true);
-        
-        if (!empty($attrs)) {
-            wp_script_add_data($handle, 'script_attrs', $attrs);
-        }
-        
-        wp_enqueue_script($handle);
-    } else if ($type === 'style') {
-        wp_enqueue_style($handle, $uri, $deps, $version);
-    }
-}

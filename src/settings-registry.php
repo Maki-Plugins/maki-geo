@@ -37,7 +37,7 @@ class mgeo_SettingsRegistry
             
             // Register with WordPress if admin is initialized
             if (did_action('admin_init')) {
-                register_setting('maki_geo_options', $option_name, $merged_args);
+                register_setting('mgeo_general_options', $option_name, $merged_args);
             }
         }
     }

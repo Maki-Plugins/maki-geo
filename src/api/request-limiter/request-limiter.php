@@ -35,9 +35,7 @@ class mgeo_RequestLimiter
 
     public function get_request_limit()
     {
-        $options = get_option('maki_geo_options', array());
-        $api_key = isset($options['api_key']) ? $options['api_key'] : '';
-        
+        $api_key = get_option('mgeo_api_key');
         if (!$api_key) {
             return 1000; // Free tier limit
         }
@@ -47,9 +45,7 @@ class mgeo_RequestLimiter
 
     public function sync_with_api()
     {
-        $options = get_option('maki_geo_options', array());
-        $api_key = isset($options['api_key']) ? $options['api_key'] : '';
-        
+        $api_key = get_option('mgeo_api_key');
         if (!$api_key) {
             return false;
         }

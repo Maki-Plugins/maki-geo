@@ -1,9 +1,13 @@
 <?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 function mgeo_content_shortcode($atts, $content = '')
 {
     // Check targeting method
-    $options = get_option('maki_geo_options', array());
-    $method = isset($options['client_server_mode']) ? $options['client_server_mode'] : 'server';
+    $method = get_option('mgeo_client_server_mode', 'server');
 
     $attributes = shortcode_atts(
         array(
