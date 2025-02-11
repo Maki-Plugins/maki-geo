@@ -22,7 +22,8 @@ add_action(
     }
 );
 
-function similar_text_custom($str1, $str2) {
+function similar_text_custom($str1, $str2)
+{
     $str1 = strtolower($str1);
     $str2 = strtolower($str2);
     similar_text($str1, $str2, $percent);
@@ -60,7 +61,8 @@ function mgeo_search_cities($request)
     if ($file_handle) {
         while (($line = fgets($file_handle)) !== false) {
             $parts = explode("\t", trim($line));
-            if (empty($parts[0])) continue;
+            if (empty($parts[0])) { continue;
+            }
             
             $city_name = $parts[0];
             $similarity = similar_text_custom($search_term, $city_name);
@@ -76,14 +78,20 @@ function mgeo_search_cities($request)
     }
 
     // Sort by similarity (highest first) and limit results
-    usort($matches, function($a, $b) {
-        return $b['similarity'] <=> $a['similarity'];
-    });
+    usort(
+        $matches, function ($a, $b) {
+            return $b['similarity'] <=> $a['similarity'];
+        }
+    );
 
     $results = array_slice(
-        array_map(function($match) { return $match['name']; }, $matches),
+        array_map(
+            function ($match) {
+                return $match['name']; 
+            }, $matches
+        ),
         0,
-        10
+        5
     );
 
     // Cache results for 1 hour
