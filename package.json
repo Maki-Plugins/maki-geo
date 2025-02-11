@@ -5,6 +5,7 @@
   "author": "Maki Plugins",
   "main": "build/index.js",
   "scripts": {
+    "process-cities": "ts-node scripts/process-cities.ts",
     "build": "wp-scripts build --config webpack.config.js",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
