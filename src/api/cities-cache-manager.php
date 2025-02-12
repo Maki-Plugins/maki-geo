@@ -3,22 +3,26 @@ if (!defined("ABSPATH")) {
     exit();
 }
 
-class mgeo_CitiesCacheManager {
+class mgeo_CitiesCacheManager
+{
     private static $instance = null;
     private $indexed_cities = [];
     
-    public static function get_instance() {
+    public static function get_instance()
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
     
-    private function __construct() {
+    private function __construct()
+    {
         $this->load_cities_data();
     }
     
-    private function load_cities_data() {
+    private function load_cities_data()
+    {
         $cities_file = plugin_dir_path(__FILE__) . '../../src/assets/cities500_updated.json';
         
         if (!file_exists($cities_file)) {
@@ -32,7 +36,8 @@ class mgeo_CitiesCacheManager {
         $this->indexed_cities = json_decode($json_contents, true);
     }
     
-    public function search_cities($search_term, $limit = 5) {
+    public function search_cities($search_term, $limit = 5)
+    {
         $search_term = strtolower(trim($search_term));
         if (empty($search_term)) {
             return [];
@@ -69,15 +74,19 @@ class mgeo_CitiesCacheManager {
         }
         
         // Sort results by population
-        usort($results, function($a, $b) {
-            return $b['population'] - $a['population'];
-        });
+        usort(
+            $results, function ($a, $b) {
+                return $b['population'] - $a['population'];
+            }
+        );
         
         // Format final results
         return array_slice(
-            array_map(function($city) {
-                return sprintf('%s (%s)', $city['name'], $city['countryCode']);
-            }, $results),
+            array_map(
+                function ($city) {
+                    return sprintf('%s (%s)', $city['name'], $city['countryCode']);
+                }, $results
+            ),
             0,
             $limit
         );
