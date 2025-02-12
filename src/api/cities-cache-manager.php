@@ -51,39 +51,24 @@ class mgeo_CitiesCacheManager
                 $cityName = strtolower($city['n']);
                 // Prioritize exact matches first
                 if (str_starts_with($cityName, $search_term)) {
-                    $results[] = [
-                        'name' => $city['n'],
-                        'population' => $city['p']
-                    ];
+                    $results[] = $city;
                 }
             }
             
             // If we need more results, look for partial matches
             if (count($results) < $limit) {
                 foreach ($this->indexed_cities[$prefix] as $city) {
-                    $cityName = strtolower($city['n']);
+                    $cityName = strtolower($city);
                     if (!str_starts_with($cityName, $search_term)  
                         && stripos($cityName, $search_term) !== false
                     ) {
-                        $results[] = [
-                            'name' => $city['n'],
-                            'population' => $city['p']
-                        ];
+                        $results[] = $city;
                     }
                 }
             }
         }
         
         // Results are already sorted by population from the index
-        return array_slice(
-            array_map(
-                function ($city) {
-                    return $city['name'];
-                },
-                $results
-            ),
-            0,
-            $limit
-        );
+        return array_slice($results, 0, $limit);
     }
 }
