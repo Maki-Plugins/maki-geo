@@ -80,6 +80,7 @@ require_once "api/ip-detection/ip-detection.php";
 require_once "api/maki-plugins-api/maki-plugins-api.php";
 require_once "api/request-limiter/request-limiter.php";
 require_once "api/api-utils.php";
+require_once "api/cities-cache-manager.php";
 require_once "api/city-search.php";
 require_once "api/geo-rules.php";
 require_once "api/location.php";

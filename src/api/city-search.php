@@ -3,8 +3,6 @@ if (!defined("ABSPATH")) {
     exit();
 }
 
-require_once(__DIR__ . '/cities-cache-manager.php');
-
 add_action(
     'rest_api_init', function () {
         register_rest_route(
@@ -24,7 +22,8 @@ add_action(
     }
 );
 
-function mgeo_search_cities($request) {
+function mgeo_search_cities($request)
+{
     mgeo_verify_nonce();
 
     $search_term = $request->get_param('search');

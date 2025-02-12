@@ -10,9 +10,9 @@ class mgeo_CitiesCacheManager
     
     public static function get_instance()
     {
-        // if (self::$instance === null) {
+        if (self::$instance === null) {
             self::$instance = new self();
-        // }
+        }
         return self::$instance;
     }
     
@@ -48,7 +48,7 @@ class mgeo_CitiesCacheManager
         
         if (isset($this->indexed_cities[$prefix])) {
             foreach ($this->indexed_cities[$prefix] as $city) {
-                $cityName = strtolower($city['n']);
+                $cityName = strtolower($city);
                 // Prioritize exact matches first
                 if (str_starts_with($cityName, $search_term)) {
                     $results[] = $city;

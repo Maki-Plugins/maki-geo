@@ -3,3 +3,6 @@ https://github.com/venkatmcajj/react-country-state-city/blob/master/data/countri
 
 regions.json:
 https://github.com/venkatmcajj/react-country-state-city/blob/master/data/statesminified.json
+
+cities500_updates.json:
+https://download.geonames.org/export/dump/

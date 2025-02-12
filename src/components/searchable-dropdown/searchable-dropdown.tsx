@@ -23,8 +23,8 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   onSearch,
   options: staticOptions,
   placeholder = "Search...",
-  minSearchLength = 2,
-  debounceMs = 300,
+  minSearchLength = 3,
+  debounceMs = 150,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,7 +70,6 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
 
     setIsLoading(true);
     try {
-      console.log('Trying to search.');
       const results = await onSearch(term);
       setOptions(results);
     } catch (error) {
@@ -92,7 +91,6 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     }
 
     searchTimeoutRef.current = setTimeout(() => {
-      console.log('Debounced search now.');
       handleSearch(term);
     }, debounceMs);
   };
