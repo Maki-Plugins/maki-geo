@@ -18,7 +18,7 @@
     "js-test": "jest",
     "js-test:watch": "jest --watch",
     "php-test": "wp-env run tests-cli --env-cwd=wp-content/plugins/maki-geo ./vendor/bin/phpunit",
-    "plugin-zip": "npm run build && rimraf maki-geo maki-geo.zip && mkdir maki-geo && xcopy /E /I src maki-geo\\src /EXCLUDE:scripts\\exclude-from-zip.txt && xcopy /E /I build maki-geo\\build && copy maki-geo.php maki-geo\\ && copy readme.txt maki-geo\\ && 7z a -tzip maki-geo.zip ./maki-geo/* && rimraf maki-geo"
+    "zip": "npm run build && rimraf maki-geo maki-geo.zip && mkdir maki-geo && xcopy /E /I src maki-geo\\src /EXCLUDE:scripts\\exclude-from-zip.txt && xcopy /E /I build maki-geo\\build && copy maki-geo.php maki-geo\\ && copy readme.txt maki-geo\\ && 7z a -tzip maki-geo.zip ./maki-geo/* && rimraf maki-geo"
   },
   "devDependencies": {
     "@prettier/plugin-php": "^0.22.2",
