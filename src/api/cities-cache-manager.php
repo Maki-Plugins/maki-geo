@@ -10,9 +10,9 @@ class mgeo_CitiesCacheManager
     
     public static function get_instance()
     {
-        if (self::$instance === null) {
+        // if (self::$instance === null) {
             self::$instance = new self();
-        }
+        // }
         return self::$instance;
     }
     
@@ -62,8 +62,9 @@ class mgeo_CitiesCacheManager
             if (count($results) < $limit) {
                 foreach ($this->indexed_cities[$prefix] as $city) {
                     $cityName = strtolower($city['n']);
-                    if (!str_starts_with($cityName, $search_term) && 
-                        stripos($cityName, $search_term) !== false) {
+                    if (!str_starts_with($cityName, $search_term)  
+                        && stripos($cityName, $search_term) !== false
+                    ) {
                         $results[] = [
                             'name' => $city['n'],
                             'population' => $city['p']
