@@ -2,76 +2,61 @@ import fs from 'fs';
 import path from 'path';
 
 interface CityEntry {
-    name: string;
-    countryCode: string;
-    population: number;
-    latitude: string;
-    longitude: string;
+    n: string;  // name
+    p: number;  // population
 }
 
 interface IndexedCities {
-    [prefix: string]: {
-        exactMatches: CityEntry[];
-        partialMatches: CityEntry[];
-    };
+    [prefix: string]: CityEntry[];
 }
 
 function processCitiesFile(inputPath: string, outputPath: string): void {
     const rawData = fs.readFileSync(inputPath, 'utf-8');
     const lines = rawData.split('\n');
     
-    // First pass: collect unique cities with highest population
+    // Collect cities with population over 50,000
     const cityMap = new Map<string, CityEntry>();
+    const MIN_POPULATION = 50000;
     
     lines.forEach(line => {
         if (!line.trim()) return;
         const columns = line.split('\t');
         
-        const [, name, , , latitude, longitude, , , countryCode, , , , , , population] = columns;
-        const cityKey = `${name.toLowerCase()}_${countryCode}`;
-        
-        const existingCity = cityMap.get(cityKey);
+        const [, name, , , , , , , , , , , , , population] = columns;
+        const cityKey = name.toLowerCase();
         const currentPopulation = Number(population);
         
-        if (!existingCity || currentPopulation > existingCity.population) {
+        if (currentPopulation < MIN_POPULATION) return;
+        
+        const existingCity = cityMap.get(cityKey);
+        if (!existingCity || currentPopulation > existingCity.p) {
             cityMap.set(cityKey, {
-                name,
-                countryCode,
-                population: currentPopulation,
-                latitude,
-                longitude
+                n: name,
+                p: currentPopulation
             });
         }
     });
 
     // Create prefix-based index structure
     const indexedCities: IndexedCities = {};
-    const prefixLength = 3; // Index by first 3 characters
+    const prefixLength = 3;
     
     Array.from(cityMap.values())
-        .sort((a, b) => b.population - a.population)
+        .sort((a, b) => b.p - a.p)
         .forEach(city => {
-            const normalizedName = city.name.toLowerCase();
+            const normalizedName = city.n.toLowerCase();
             const prefix = normalizedName.slice(0, Math.min(prefixLength, normalizedName.length));
             
             if (!indexedCities[prefix]) {
-                indexedCities[prefix] = {
-                    exactMatches: [],
-                    partialMatches: []
-                };
+                indexedCities[prefix] = [];
             }
             
-            // Add to exact matches if the name starts with prefix
-            if (normalizedName.startsWith(prefix)) {
-                indexedCities[prefix].exactMatches.push(city);
-            } else {
-                indexedCities[prefix].partialMatches.push(city);
-            }
+            indexedCities[prefix].push(city);
         });
 
-    // Write the indexed structure to file
-    fs.writeFileSync(outputPath, JSON.stringify(indexedCities, null, 2));
-    console.log(`Processed ${cityMap.size} unique cities into ${Object.keys(indexedCities).length} prefixes`);
+    // Write the indexed structure to file with minimal whitespace
+    fs.writeFileSync(outputPath, JSON.stringify(indexedCities));
+    console.log(`Processed ${cityMap.size} cities into ${Object.keys(indexedCities).length} prefixes`);
 }
 
 // Set paths relative to project root

@@ -46,46 +46,40 @@ class mgeo_CitiesCacheManager
         $results = [];
         $prefix = substr($search_term, 0, 3);
         
-        // First try exact prefix matches
         if (isset($this->indexed_cities[$prefix])) {
-            // Add exact matches that start with the search term
-            foreach ($this->indexed_cities[$prefix]['exactMatches'] as $city) {
-                if (str_starts_with(strtolower($city['name']), $search_term)) {
+            foreach ($this->indexed_cities[$prefix] as $city) {
+                $cityName = strtolower($city['n']);
+                // Prioritize exact matches first
+                if (str_starts_with($cityName, $search_term)) {
                     $results[] = [
-                        'name' => $city['name'],
-                        'population' => $city['population'],
-                        'countryCode' => $city['countryCode']
+                        'name' => $city['n'],
+                        'population' => $city['p']
                     ];
                 }
             }
             
-            // If we don't have enough results, add partial matches
+            // If we need more results, look for partial matches
             if (count($results) < $limit) {
-                foreach ($this->indexed_cities[$prefix]['partialMatches'] as $city) {
-                    if (stripos($city['name'], $search_term) !== false) {
+                foreach ($this->indexed_cities[$prefix] as $city) {
+                    $cityName = strtolower($city['n']);
+                    if (!str_starts_with($cityName, $search_term) && 
+                        stripos($cityName, $search_term) !== false) {
                         $results[] = [
-                            'name' => $city['name'],
-                            'population' => $city['population'],
-                            'countryCode' => $city['countryCode']
+                            'name' => $city['n'],
+                            'population' => $city['p']
                         ];
                     }
                 }
             }
         }
         
-        // Sort results by population
-        usort(
-            $results, function ($a, $b) {
-                return $b['population'] - $a['population'];
-            }
-        );
-        
-        // Format final results
+        // Results are already sorted by population from the index
         return array_slice(
             array_map(
                 function ($city) {
-                    return sprintf('%s (%s)', $city['name'], $city['countryCode']);
-                }, $results
+                    return $city['name'];
+                },
+                $results
             ),
             0,
             $limit
