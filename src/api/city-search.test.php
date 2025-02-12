@@ -33,7 +33,7 @@ class TestCitySearch extends WP_UnitTestCase
 
         $this->assertArrayHasKey('cities', $response);
         $this->assertNotEmpty($response['cities']);
-        $this->assertContains('New York', $response['cities']);
+        $this->assertContains('New York City', $response['cities']);
         
         // Verify the results were cached
         $cache_key = 'mgeo_city_search_' . md5('new yor');

@@ -75,7 +75,6 @@ add_action('init', 'mgeo_create_geo_content_blocks');
 
 
 require_once "admin/admin.php";
-require_once "api/geonames-api/geonames-api.php";
 require_once "api/ip-detection/ip-detection.php";
 require_once "api/maki-plugins-api/maki-plugins-api.php";
 require_once "api/request-limiter/request-limiter.php";
