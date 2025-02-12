@@ -5,7 +5,7 @@ if (!defined("ABSPATH")) {
 
 class mgeo_CitiesCacheManager {
     private static $instance = null;
-    private $cities_data = [];
+    private $indexed_cities = [];
     
     public static function get_instance() {
         if (self::$instance === null) {
@@ -19,7 +19,7 @@ class mgeo_CitiesCacheManager {
     }
     
     private function load_cities_data() {
-        $cities_file = plugin_dir_path(__FILE__) . '../../src/assets/cities500_updated.txt';
+        $cities_file = plugin_dir_path(__FILE__) . '../../src/assets/cities500_updated.json';
         
         if (!file_exists($cities_file)) {
             if (defined('MGEO_DEBUG')) {
@@ -28,45 +28,58 @@ class mgeo_CitiesCacheManager {
             return;
         }
         
-        $file_contents = file_get_contents($cities_file);
-        $lines = explode("\n", $file_contents);
-        
-        foreach ($lines as $line) {
-            $parts = explode("\t", trim($line));
-            if (!empty($parts[0])) {
-                $this->cities_data[] = $parts[0];
-            }
-        }
+        $json_contents = file_get_contents($cities_file);
+        $this->indexed_cities = json_decode($json_contents, true);
     }
     
-    public function search_cities($search_term, $similarity_threshold = 60, $limit = 5) {
-        $matches = [];
-        $search_term = strtolower($search_term);
+    public function search_cities($search_term, $limit = 5) {
+        $search_term = strtolower(trim($search_term));
+        if (empty($search_term)) {
+            return [];
+        }
+
+        $results = [];
+        $prefix = substr($search_term, 0, 3);
         
-        foreach ($this->cities_data as $city) {
-            $similarity = $this->calculate_similarity($search_term, strtolower($city));
+        // First try exact prefix matches
+        if (isset($this->indexed_cities[$prefix])) {
+            // Add exact matches that start with the search term
+            foreach ($this->indexed_cities[$prefix]['exactMatches'] as $city) {
+                if (str_starts_with(strtolower($city['name']), $search_term)) {
+                    $results[] = [
+                        'name' => $city['name'],
+                        'population' => $city['population'],
+                        'countryCode' => $city['countryCode']
+                    ];
+                }
+            }
             
-            if ($similarity >= $similarity_threshold) {
-                $matches[] = [
-                    'name' => $city,
-                    'similarity' => $similarity
-                ];
+            // If we don't have enough results, add partial matches
+            if (count($results) < $limit) {
+                foreach ($this->indexed_cities[$prefix]['partialMatches'] as $city) {
+                    if (stripos($city['name'], $search_term) !== false) {
+                        $results[] = [
+                            'name' => $city['name'],
+                            'population' => $city['population'],
+                            'countryCode' => $city['countryCode']
+                        ];
+                    }
+                }
             }
         }
         
-        usort($matches, function($a, $b) {
-            return $b['similarity'] <=> $a['similarity'];
+        // Sort results by population
+        usort($results, function($a, $b) {
+            return $b['population'] - $a['population'];
         });
         
+        // Format final results
         return array_slice(
-            array_map(function($match) { return $match['name']; }, $matches),
+            array_map(function($city) {
+                return sprintf('%s (%s)', $city['name'], $city['countryCode']);
+            }, $results),
             0,
             $limit
         );
-    }
-    
-    private function calculate_similarity($str1, $str2) {
-        similar_text($str1, $str2, $percent);
-        return $percent;
     }
 }

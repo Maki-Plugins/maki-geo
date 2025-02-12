@@ -29,6 +29,10 @@ function mgeo_search_cities($request) {
 
     $search_term = $request->get_param('search');
     
+    if (strlen($search_term) < 2) {
+        return ['cities' => []];
+    }
+    
     // Check transient cache first
     $cache_key = 'mgeo_city_search_' . md5($search_term);
     $cached_results = get_transient($cache_key);
