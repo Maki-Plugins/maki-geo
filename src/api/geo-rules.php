@@ -110,6 +110,49 @@ function mgeo_delete_all_global_geo_rules()
     return array('success' => true);
 }
 
+function mgeo_sanitize_geo_rules($rules) {
+    if (!is_array($rules)) {
+        return array();
+    }
+
+    return array_map(function($rule) {
+        // Ensure required fields exist and are properly sanitized
+        $sanitized_rule = array(
+            'id' => isset($rule['id']) ? sanitize_key($rule['id']) : '',
+            'name' => isset($rule['name']) ? sanitize_text_field($rule['name']) : '',
+            'conditions' => array(),
+            'operator' => isset($rule['operator']) && in_array($rule['operator'], array('AND', 'OR')) 
+                ? $rule['operator'] 
+                : 'AND',
+            'action' => isset($rule['action']) && in_array($rule['action'], array('show', 'hide')) 
+                ? $rule['action'] 
+                : 'show',
+            'ruleType' => 'global'
+        );
+
+        // Sanitize conditions
+        if (isset($rule['conditions']) && is_array($rule['conditions'])) {
+            $sanitized_rule['conditions'] = array_map(function($condition) {
+                return array(
+                    'type' => isset($condition['type']) && 
+                             in_array($condition['type'], array('continent', 'country', 'region', 'city', 'ip'))
+                        ? $condition['type']
+                        : 'country',
+                    'operator' => isset($condition['operator']) && 
+                                 in_array($condition['operator'], array('is', 'is not'))
+                        ? $condition['operator']
+                        : 'is',
+                    'value' => isset($condition['value']) 
+                        ? sanitize_text_field($condition['value'])
+                        : ''
+                );
+            }, $rule['conditions']);
+        }
+
+        return $sanitized_rule;
+    }, $rules);
+}
+
 function mgeo_validate_rule($rule)
 {
     // Validate basic rule structure
