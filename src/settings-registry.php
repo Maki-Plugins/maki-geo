@@ -29,7 +29,7 @@ class mgeo_SettingsRegistry
             $default_args = [
                 'type' => 'string',
                 'description' => '',
-                'sanitize_callback' => null,
+                'sanitize_callback' => 'sanitize_text_field',
                 'show_in_rest' => true
             ];
             
