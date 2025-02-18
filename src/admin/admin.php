@@ -37,6 +37,7 @@ function mgeo_register_settings()
         'type' => 'string',
         'default' => 'server',
         'sanitize_callback' => 'sanitize_text_field',
+        'show_in_rest' => true
         ]
     );
 
@@ -74,10 +75,12 @@ function mgeo_register_settings()
 
     
     // Register rules settings with the registry
-    $registry->register_setting('mgeo_geo_rules', [
+    $registry->register_setting(
+        'mgeo_geo_rules', [
         'type' => 'array',
         'sanitize_callback' => 'mgeo_sanitize_geo_rules'
-    ]);
+        ]
+    );
 
     // Register settings sections for rules
     add_settings_section(

@@ -28,9 +28,7 @@ class mgeo_SettingsRegistry
             // Merge default args with provided args
             $default_args = [
                 'type' => 'string',
-                'description' => '',
                 'sanitize_callback' => 'sanitize_text_field',
-                'show_in_rest' => true
             ];
             
             $merged_args = wp_parse_args($args, $default_args);
