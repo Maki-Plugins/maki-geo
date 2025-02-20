@@ -4,7 +4,8 @@ import { TabPanel } from "@wordpress/components";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
-  const [settings, setSettings] = useState<AdminSettings>({
+
+function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
     clientServerMode: "server",
     apiKey: "",
     monthlyRequests: 0,
