@@ -95,7 +95,7 @@ export function SettingsTab(): JSX.Element {
         apiFetch({
           path: "/wp/v2/settings/mgeo_api_key",
           method: "POST",
-           settings.apiKey,
+          data: settings.apiKey,
         }),
       ]);
       alert("Settings saved successfully!");

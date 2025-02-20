@@ -28,19 +28,22 @@ function mgeo_register_settings()
         "show_in_rest" => true,
     ]);
 
-    register_setting("mgeo_options", "mgeo_monthly_requests", [
+    $registry->register_setting("mgeo_monthly_requests", [
         "type" => "integer",
         "default" => 0,
+        "sanitize_callback" => "sanitize_text_field", // Todo: Create sanitize number
         "show_in_rest" => true,
     ]);
 
-    register_setting("mgeo_options", "mgeo_request_limit", [
+    $registry->register_setting("mgeo_request_limit", [
         "type" => "integer",
         "default" => 1000,
+        "sanitize_callback" => "sanitize_text_field", // Todo: Create sanitize number
         "show_in_rest" => true,
     ]);
 
-    register_setting("mgeo_options", "mgeo_geo_rules", [
+    $registry->register_setting("mgeo_geo_rules", [
+        "sanitize_callback" => "mgeo_sanitize_geo_rules",
         "show_in_rest" => true,
     ]);
 }
@@ -64,26 +67,22 @@ function mgeo_enqueue_admin_scripts($hook)
         return;
     }
 
-    wp_enqueue_style("wp-components");
-    wp_enqueue_style(
-        "maki-geo-admin-style",
-        plugins_url("admin.css", __FILE__)
-    );
+    // Styles
+    wp_enqueue_style("wp-edit-blocks");
+    mgeo_enqueue("maki-geo-admin-style", "src/admin/admin.css", "style");
 
-    $asset_file = include plugin_dir_path(__FILE__) .
-        "../../build/admin.asset.php";
-
-    wp_enqueue_script(
+    // Scripts
+    $admin_script_asset = include plugin_dir_path(__FILE__) .
+        "../../build/admin-geo-rules.asset.php";
+    mgeo_enqueue(
         "maki-geo-admin",
-        plugins_url("../../build/admin.js", __FILE__),
-        array_merge($asset_file["dependencies"], ["wp-api-fetch"]),
-        $asset_file["version"],
-        true
+        "build/admin.js",
+        "script",
+        $admin_script_asset["dependencies"]
     );
 
     wp_localize_script("maki-geo-admin", "makiGeoData", [
-        "nonce" => wp_create_nonce("wp_rest"),
-        "restUrl" => esc_url_raw(rest_url()),
+        "nonce" => wp_create_nonce("maki_geo_save_rules"),
         "globalRules" => get_option("mgeo_geo_rules", []),
     ]);
 }
