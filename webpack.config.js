@@ -3,6 +3,11 @@ const defaultConfig = require("@wordpress/scripts/config/webpack.config");
 
 module.exports = {
   ...defaultConfig,
+  devServer: {
+    ...defaultConfig.devServer,
+    host: "maki-test.maki",
+    allowedHosts: "maki-test.maki",
+  },
   entry: {
     ...defaultConfig.entry(),
     admin: path.resolve(__dirname, "src/admin/index.tsx"),
