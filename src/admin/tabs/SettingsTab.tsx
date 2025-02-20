@@ -1,9 +1,9 @@
-import { render } from "@wordpress/element";
-import { useState } from "@wordpress/element";
-import { TabPanel } from "@wordpress/components";
-import { AdminTabsProps } from "../types/admin-types";
-import { GeoRulesTab } from "./tabs/GeoRulesTab";
-import { SettingsTab } from "./tabs/SettingsTab";
+import { useState, useEffect } from "@wordpress/element";
+import { Button, SelectControl, TextControl } from "@wordpress/components";
+import apiFetch from "@wordpress/api-fetch";
+import { AdminSettings, ApiKeyResponse } from "../../types/admin-types";
+
+export function SettingsTab(): JSX.Element {
   const [settings, setSettings] = useState<AdminSettings>({
     clientServerMode: "server",
     apiKey: "",
@@ -42,7 +42,7 @@ import { SettingsTab } from "./tabs/SettingsTab";
       const response: ApiKeyResponse = await apiFetch({
         path: "maki-geo/v1/verify-key",
         method: "POST",
-         { api_key: settings.apiKey },
+        data: { api_key: settings.apiKey },
       });
 
       if (response.success) {
@@ -176,55 +176,3 @@ import { SettingsTab } from "./tabs/SettingsTab";
     </div>
   );
 }
-
-function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
-  const tabs = [
-    {
-      name: "settings",
-      title: "General",
-      className: "mgeo-tab-settings",
-      component: SettingsTab,
-    },
-    {
-      name: "geo-rules",
-      title: "Global Geo Rules",
-      className: "mgeo-tab-geo-rules",
-      component: GeoRulesTab,
-    },
-  ];
-
-  return (
-    <TabPanel
-      className="mgeo-admin-tabs"
-      activeClass="active-tab"
-      tabs={tabs}
-      onSelect={onTabChange}
-      selected={activeTab}
-    >
-      {(tab) => {
-        const TabComponent = tab.component;
-        return <TabComponent />;
-      }}
-    </TabPanel>
-  );
-}
-
-function Admin(): JSX.Element {
-  const [activeTab, setActiveTab] = useState("settings");
-
-  return (
-    <div className="wrap">
-      <h1>Maki Geo Settings</h1>
-      <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
-    </div>
-  );
-}
-
-// Wait for DOM to be ready
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("maki-geo-admin-root");
-  console.log("React running in:", process.env.NODE_ENV);
-  if (container) {
-    render(<Admin />, container);
-  }
-});
