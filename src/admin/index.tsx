@@ -43,7 +43,8 @@ function Admin(): JSX.Element {
   return (
     <div className="wrap">
       <h1>
-        <img width="auto" height="24px" src="../assets/maki-geo-logo.svg" /> Maki Geo Settings
+        <img width="auto" height="24px" src="../assets/maki-geo-logo.svg" />{" "}
+        Maki Geo Settings
       </h1>
       <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
