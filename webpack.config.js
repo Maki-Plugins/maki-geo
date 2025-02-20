@@ -5,10 +5,7 @@ module.exports = {
   ...defaultConfig,
   entry: {
     ...defaultConfig.entry(),
-    "admin-geo-rules": path.resolve(
-      __dirname,
-      "src/admin/admin-global-geo-rules.tsx",
-    ),
+    admin: path.resolve(__dirname, "src/admin/index.tsx"),
     "geo-content-frontend": path.resolve(
       __dirname,
       "src/geo-rules/evaluate-rule-frontend.ts",
