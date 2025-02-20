@@ -1,5 +1,6 @@
 import { render } from "@wordpress/element";
 import { useState } from "@wordpress/element";
+import makiGeoLogo from "../assets/maki-geo-logo.svg";
 import { TabPanel } from "@wordpress/components";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
@@ -43,7 +44,7 @@ function Admin(): JSX.Element {
   return (
     <div className="wrap">
       <h1>
-        <img width="auto" height="24px" src="../assets/maki-geo-logo.svg" />{" "}
+        <img width="auto" height="24px" src={makiGeoLogo} alt="Maki Geo Logo" />{" "}
         Maki Geo Settings
       </h1>
       <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
