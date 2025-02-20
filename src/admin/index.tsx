@@ -6,18 +6,6 @@ import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 
 function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
-    clientServerMode: "server",
-    apiKey: "",
-    monthlyRequests: 0,
-    requestLimit: 1000,
-  });
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
     try {
       const [clientServerMode, apiKey, monthlyRequests, requestLimit] =
         await Promise.all([
