@@ -1,0 +1,7 @@
+# Add patterns to ignore here, one per line
+# Example:
+# *.log
+# tmp/
+scripts/cities500.txt
+src/assets
+src/blocks/geo-content/update-category-icon.tsx

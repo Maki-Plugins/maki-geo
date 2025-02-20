@@ -5,3 +5,4 @@ build
 vendor
 .phpunit*
 maki-geo.zip
+repomix-output.txt

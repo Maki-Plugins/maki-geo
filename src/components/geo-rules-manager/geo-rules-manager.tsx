@@ -53,7 +53,7 @@ export function GeoRulesManager({ rules, onChange }: GeoRulesManagerProps) {
             />
             <div className="rule-actions">
               <Button
-                variant="secondary"
+                variant="primary"
                 isDestructive
                 onClick={() => removeRule(index)}
                 className="remove-rule-button"

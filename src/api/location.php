@@ -15,6 +15,21 @@ add_action(
     }
 );
 
+/**
+ * Gets the location of the requestor based on IP geolocation.
+ * 
+ * Returns a type like:
+ * type LocationData = {
+ *  continent: string;
+ *  country_code: string;
+ *  country: string;
+ *  region: string;
+ *  city: string;
+ *  latitude: string;
+ *  longitude: string;
+ *  attribution?: string;
+ * };
+ */
 function mgeo_get_geolocation_data()
 {
     mgeo_verify_nonce();
