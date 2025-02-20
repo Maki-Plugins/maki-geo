@@ -42,9 +42,9 @@ function Admin(): JSX.Element {
   const [activeTab, setActiveTab] = useState("settings");
 
   return (
-    <div className="wrap maki-geo">
-      <h1>
-        <img className="inline w-6" src={makiGeoLogo} alt="Maki Geo Logo" />{" "}
+    <div className="wrap maki-geo bg-white">
+      <h1 className="flex items-center gap-2">
+        <img className="w-6" src={makiGeoLogo} alt="Maki Geo Logo" />
         Maki Geo Settings
       </h1>
       <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />

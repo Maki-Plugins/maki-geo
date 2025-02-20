@@ -109,7 +109,7 @@ export function SettingsTab(): JSX.Element {
 
   return (
     <div className="mgeo-settings-tab">
-      <div className="mgeo-admin-card">
+      <div className="mgeo-admin-card bg-white border border-gray-300 p-5 mb-5 rounded">
         <h2>General Settings</h2>
 
         <SelectControl
@@ -141,11 +141,11 @@ export function SettingsTab(): JSX.Element {
           Verify Key
         </Button>
 
-        <div className="mgeo-stats-grid" style={{ marginTop: "20px" }}>
-          <div className="mgeo-stat-box">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 mt-5">
+          <div className="bg-gray-50 p-4 rounded text-center">
             <h3>Location API Requests this month</h3>
-            <p className="mgeo-stat-number">{settings.monthlyRequests}</p>
-            <p className="mgeo-stat-subtext">
+            <p className="text-2xl font-bold my-2.5 text-blue-600">{settings.monthlyRequests}</p>
+            <p className="text-gray-600">
               Limit: {settings.requestLimit} (
               {Math.max(0, settings.requestLimit - settings.monthlyRequests)}{" "}
               remaining)

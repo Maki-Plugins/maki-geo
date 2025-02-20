@@ -45,12 +45,12 @@ export function GeoRulesTab(): JSX.Element {
   };
 
   return (
-    <div className="mgeo-admin-card">
+    <div className="mgeo-admin-card bg-white border border-gray-300 p-5 mb-5 rounded">
       <h2>Global Geo Rules</h2>
       <p>Configure global geo-targeting rules that you can reuse site-wide.</p>
-      <div className="geo-rules-admin-wrapper">
+      <div className="flex flex-col">
         <GeoRulesManager rules={rules} onChange={handleRulesChange} />
-        <div className="geo-rules-save-button">
+        <div className="mt-5 p-2.5">
           <Button
             variant="primary"
             onClick={handleSave}
