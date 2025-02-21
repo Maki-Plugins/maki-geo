@@ -90,4 +90,5 @@ function mgeo_enqueue_admin_scripts($hook)
 
 add_action("admin_menu", "mgeo_add_admin_menu");
 add_action("admin_init", "mgeo_register_settings");
+add_action("rest_api_init", "mgeo_register_settings");
 add_action("admin_enqueue_scripts", "mgeo_enqueue_admin_scripts");

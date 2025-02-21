@@ -11,13 +11,15 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
     {
       name: "settings",
       title: "General",
-      className: "mgeo-tab-settings",
+      className:
+        "mgeo-tab-settings border-solid border-[1px] border-b-0 border-gray-300",
       component: SettingsTab,
     },
     {
       name: "geo-rules",
       title: "Global Geo Rules",
-      className: "mgeo-tab-geo-rules",
+      className:
+        "mgeo-tab-geo-rules border-solid border-[1px] border-b-0 border-gray-300",
       component: GeoRulesTab,
     },
   ];
@@ -25,7 +27,7 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   return (
     <TabPanel
       className="mgeo-admin-tabs"
-      activeClass="border-solid border-0 border-b-2 border-blue-500"
+      activeClass="border-gray-700 bg-white"
       tabs={tabs}
       onSelect={onTabChange}
       selected={activeTab}
@@ -44,8 +46,10 @@ function Admin(): JSX.Element {
   return (
     <div className="wrap maki-geo bg-white">
       <h1 className="flex items-center gap-2">
-        <img className="w-6" src={makiGeoLogo} alt="Maki Geo Logo" />
-        Maki Geo Settings
+        <div className="text-4xl flex flex-row items-center gap-3 m-5 justify-center tracking-tighter font-light">
+          <img className="h-16 w-16" src={makiGeoLogo} alt="Maki Geo Logo" />
+          Maki Geo
+        </div>
       </h1>
       <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
     </div>

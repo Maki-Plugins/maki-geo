@@ -42,6 +42,7 @@ declare global {
   interface Window {
     makiGeoData?: {
       globalRules: GlobalGeoRule[];
+      nonce: string;
     };
   }
 }
