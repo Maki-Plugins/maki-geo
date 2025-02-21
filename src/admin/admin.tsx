@@ -5,6 +5,7 @@ import { TabPanel } from "@wordpress/components";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
+import "../styles/tailwind.css";
 
 function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   const tabs = [
@@ -44,7 +45,7 @@ function Admin(): JSX.Element {
   const [activeTab, setActiveTab] = useState("settings");
 
   return (
-    <div className="wrap maki-geo bg-white">
+    <div className="wrap maki-geo">
       <h1 className="flex items-center gap-2">
         <div className="text-4xl flex flex-row items-center gap-3 m-5 justify-center tracking-tighter font-light">
           <img className="h-16 w-16" src={makiGeoLogo} alt="Maki Geo Logo" />

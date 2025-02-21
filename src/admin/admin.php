@@ -69,8 +69,7 @@ function mgeo_enqueue_admin_scripts($hook)
 
     // Styles
     wp_enqueue_style("wp-edit-blocks");
-    mgeo_enqueue("maki-geo-admin-style", "src/admin/admin.css", "style");
-    mgeo_enqueue("maki-geo-tailwind-style", "build/tailwind.css", "style");
+    mgeo_enqueue("maki-geo-admin-style", "build/admin.css", "style");
 
     // Scripts
     $admin_script_asset = include plugin_dir_path(__FILE__) .

@@ -171,7 +171,7 @@ export function SettingsTab(): JSX.Element {
               <>
                 Enter your API key to increase your monthly request limit.{" "}
                 <a
-                  className="underline text-blue-950"
+                  className="link"
                   href={`${MGEO_MAKI_PLUGINS_URL}#pricing`}
                   target="_blank"
                 >
@@ -187,25 +187,28 @@ export function SettingsTab(): JSX.Element {
                     setSettings({ ...settings, apiKey: value })
                   }
                 />
-                <Button
-                  className="mb-4 hover:bg-gray-100"
-                  variant="secondary"
+                <button
+                  className="btn btn-secondary btn-outline mb-4 hover:bg-gray-100"
                   onClick={handleVerifyApiKey}
-                  style={{ marginTop: "8px" }}
                 >
                   Verify Key
-                </Button>
+                </button>
               </>
             }
           />
-          <Button
-            variant="primary"
+          <button
+            className="btn btn-primary mt-5"
             onClick={saveSettings}
             disabled={isSaving}
-            style={{ marginTop: "20px" }}
           >
-            {isSaving ? "Saving..." : "Save Settings"}
-          </Button>
+            {isSaving ? (
+              <>
+                <span className="loading loading-spinner"></span>Saving...
+              </>
+            ) : (
+              "Save Settings"
+            )}
+          </button>
           <hr style={{ margin: "20px 0" }} />
           <h3 className="text-lg font-semibold mb-5">Danger Zone</h3>
           <Button
