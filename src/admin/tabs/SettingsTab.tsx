@@ -34,6 +34,7 @@ export function SettingsTab(): JSX.Element {
     requestLimit: 1000,
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -117,7 +118,9 @@ export function SettingsTab(): JSX.Element {
           },
         }),
       ]);
-      alert("Settings saved successfully!");
+      setSaveSuccess(true);
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error("Failed to save settings:", error);
       alert("Failed to save settings. Please try again.");
@@ -196,19 +199,24 @@ export function SettingsTab(): JSX.Element {
               </>
             }
           />
-          <button
-            className="btn btn-primary mt-5"
-            onClick={saveSettings}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <span className="loading loading-spinner"></span>Saving...
-              </>
-            ) : (
-              "Save Settings"
+          <div className="mt-5">
+            <button
+              className="btn btn-primary"
+              onClick={saveSettings}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <span className="loading loading-spinner"></span>Saving...
+                </>
+              ) : (
+                "Save Settings"
+              )}
+            </button>
+            {saveSuccess && (
+              <p className="text-green-600 mt-2">Settings saved successfully!</p>
             )}
-          </button>
+          </div>
           <hr style={{ margin: "20px 0" }} />
           <h3 className="text-lg font-semibold mb-5">Danger Zone</h3>
           <Button
