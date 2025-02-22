@@ -19,7 +19,7 @@ function SettingRow({
         <div className="text-right font-semibold mt-2">{title}</div>
         <div>
           {settingElement}
-          <p className="text-gray-600">{description}</p>
+          <p className="text-gray-600 mt-2">{description}</p>
         </div>
       </div>
     </>
@@ -131,7 +131,7 @@ export function SettingsTab(): JSX.Element {
 
   return (
     <div className="mgeo-settings-tab">
-      <div className="bg-white border border-gray-600 mb-5 rounded-none grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-5">
+      <div className="bg-white border border-gray-300 mb-5 grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-5">
         <div className="p-5">
           <h2 className="text-2xl font-bold mb-2">General Settings</h2>
           <p className="mb-3">
@@ -153,19 +153,19 @@ export function SettingsTab(): JSX.Element {
               </>
             }
             settingElement={
-              <SelectControl
+              <select
+                className="select select-sm"
                 value={settings.clientServerMode}
-                options={[
-                  { label: "Server-side (Default)", value: "server" },
-                  { label: "Client-side", value: "client" },
-                ]}
-                onChange={(value) =>
+                onChange={(e) =>
                   setSettings({
                     ...settings,
-                    clientServerMode: value as "server" | "client",
+                    clientServerMode: e.target.value as "server" | "client",
                   })
                 }
-              />
+              >
+                <option label="Server-side (Default)">server</option>
+                <option label="Client-side">client</option>
+              </select>
             }
           />
           <SettingRow
@@ -184,18 +184,22 @@ export function SettingsTab(): JSX.Element {
             }
             settingElement={
               <>
-                <TextControl
-                  value={settings.apiKey}
-                  onChange={(value) =>
-                    setSettings({ ...settings, apiKey: value })
-                  }
-                />
-                <button
-                  className="btn btn-secondary btn-outline mb-4 hover:bg-gray-100"
-                  onClick={handleVerifyApiKey}
-                >
-                  Verify Key
-                </button>
+                <div className="join">
+                  <input
+                    value={settings.apiKey}
+                    onChange={(e) =>
+                      setSettings({ ...settings, apiKey: e.target.value })
+                    }
+                    className="input input-bordered input-sm w-full max-w-xs join-item"
+                    placeholder="Api key"
+                  />
+                  <button
+                    className="btn btn-sm btn-secondary btn-outline join-item"
+                    onClick={handleVerifyApiKey}
+                  >
+                    Verify key
+                  </button>
+                </div>
               </>
             }
           />
@@ -214,7 +218,9 @@ export function SettingsTab(): JSX.Element {
               )}
             </button>
             {saveSuccess && (
-              <p className="text-green-600 mt-2">Settings saved successfully!</p>
+              <p className="text-green-600 mt-2">
+                Settings saved successfully!
+              </p>
             )}
           </div>
           <hr style={{ margin: "20px 0" }} />
@@ -228,18 +234,18 @@ export function SettingsTab(): JSX.Element {
             Delete All Global Geo Rules
           </Button>
         </div>
-        <div className="md:border-l border-solid border-l-gray-600 p-5">
+        <div className=" p-5">
           <h2 className="text-2xl font-bold mb-3">Statistics</h2>
-          <div className="bg-gray-50 p-4 rounded text-center">
-            <h3>Location API Requests this month</h3>
-            <p className="text-2xl font-bold my-2.5 text-blue-600">
-              {settings.monthlyRequests}
-            </p>
-            <p className="text-gray-600">
-              Limit: {settings.requestLimit} (
-              {Math.max(0, settings.requestLimit - settings.monthlyRequests)}{" "}
-              remaining)
-            </p>
+          <div className="stats shadow w-full">
+            <div className="stat place-items-center text-accent">
+              <div className="stat-title">Location API Requests this month</div>
+              <div className="stat-value">{settings.monthlyRequests}</div>
+              <div className="stat-desc">
+                Limit: {settings.requestLimit} (
+                {Math.max(0, settings.requestLimit - settings.monthlyRequests)}{" "}
+                remaining)
+              </div>
+            </div>
           </div>
         </div>
       </div>

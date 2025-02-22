@@ -28,7 +28,7 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   return (
     <TabPanel
       className="mgeo-admin-tabs"
-      activeClass="border-gray-700 bg-white"
+      activeClass="bg-white"
       tabs={tabs}
       onSelect={onTabChange}
       selected={activeTab}
