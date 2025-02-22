@@ -30,7 +30,7 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   return (
     <div className="flex flex-col">
       <div className="">
-        <nav className="flex gap-2 items-end max-w-xl" aria-label="Tabs">
+        <nav className="flex gap-2 items-end max-w-2xl" aria-label="Tabs">
           {tabs.map((tab) => (
             <button
               key={tab.id}
