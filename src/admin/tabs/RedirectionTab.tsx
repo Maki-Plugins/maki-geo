@@ -69,15 +69,14 @@ export function RedirectionTab(): JSX.Element {
               }
             >
               <div className="flex items-center gap-4">
-                <div className="form-control">
-                  <label className="label cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="toggle toggle-primary"
-                      checked={rule.isEnabled}
-                      onChange={(e) => e.stopPropagation()}
-                    />
-                  </label>
+                <div 
+                  className={`badge ${
+                    rule.isEnabled 
+                      ? "badge-success text-white" 
+                      : "badge-error text-white"
+                  }`}
+                >
+                  {rule.isEnabled ? "Enabled" : "Disabled"}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold">{rule.name}</h3>
