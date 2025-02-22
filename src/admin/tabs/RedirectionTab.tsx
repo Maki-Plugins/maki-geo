@@ -139,9 +139,30 @@ export function RedirectionTab(): JSX.Element {
                       ))}
                     </ul>
 
-                    <div className="flex justify-end gap-2 mt-4">
-                      <button className="btn btn-sm">Edit</button>
-                      <button className="btn btn-sm btn-error">Delete</button>
+                    <div className="flex justify-between items-center gap-2 mt-4">
+                      <div className="form-control">
+                        <label className="label cursor-pointer gap-2">
+                          <span className="label-text">Enable rule</span>
+                          <input
+                            type="checkbox"
+                            className="toggle toggle-success"
+                            checked={rule.isEnabled}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              const updatedRules = rules.map((r) =>
+                                r.id === rule.id
+                                  ? { ...r, isEnabled: e.target.checked }
+                                  : r
+                              );
+                              setRules(updatedRules);
+                            }}
+                          />
+                        </label>
+                      </div>
+                      <div>
+                        <button className="btn btn-sm">Edit</button>
+                        <button className="btn btn-sm btn-error ml-2">Delete</button>
+                      </div>
                     </div>
                   </div>
                 </div>
