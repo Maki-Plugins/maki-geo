@@ -1,5 +1,6 @@
 import { useState } from "@wordpress/element";
 import { RedirectionRule } from "../../types/types";
+import { RedirectionTypeModal, RedirectionType } from "../components/RedirectionTypeModal";
 
 const dummyRules: RedirectionRule[] = [
   {
@@ -32,6 +33,13 @@ const dummyRules: RedirectionRule[] = [
 export function RedirectionTab(): JSX.Element {
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
   const [rules, setRules] = useState<RedirectionRule[]>(dummyRules);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleRedirectionTypeSelect = (type: RedirectionType) => {
+    console.log("Selected redirection type:", type);
+    setIsModalOpen(false);
+    // TODO: Implement next step of wizard
+  };
 
   const handleDeleteRule = (ruleId: string) => {
     if (window.confirm('Are you sure you want to delete this redirection rule?')) {
@@ -67,7 +75,12 @@ export function RedirectionTab(): JSX.Element {
             Manage your geo-based URL redirections
           </p>
         </div>
-        <button className="btn btn-primary">Add New Rule</button>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setIsModalOpen(true)}
+        >
+          Add New Rule
+        </button>
       </div>
 
       <div className="space-y-4">
@@ -188,6 +201,12 @@ export function RedirectionTab(): JSX.Element {
           </div>
         ))}
       </div>
+
+      <RedirectionTypeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleRedirectionTypeSelect}
+      />
     </div>
   );
 }
