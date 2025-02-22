@@ -1,7 +1,6 @@
 import { render } from "@wordpress/element";
 import { useState } from "@wordpress/element";
 import makiGeoLogo from "../assets/maki-geo-logo.svg";
-import { TabPanel } from "@wordpress/components";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
@@ -9,35 +8,42 @@ import "../styles/tailwind.css";
 
 function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   const tabs = [
-    {
-      name: "settings",
-      title: "General",
-      className:
-        "mgeo-tab-settings border-solid border-[1px] border-b-0 border-gray-300",
-      component: SettingsTab,
-    },
-    {
-      name: "geo-rules",
-      title: "Global Geo Rules",
-      className:
-        "mgeo-tab-geo-rules border-solid border-[1px] border-b-0 border-gray-300",
-      component: GeoRulesTab,
-    },
+    { id: "settings", label: "General" },
+    { id: "geo-rules", label: "Global Geo Rules" },
   ];
 
   return (
-    <TabPanel
-      className="mgeo-admin-tabs"
-      activeClass="bg-white"
-      tabs={tabs}
-      onSelect={onTabChange}
-      selected={activeTab}
-    >
-      {(tab) => {
-        const TabComponent = tab.component;
-        return <TabComponent />;
-      }}
-    </TabPanel>
+    <div className="flex flex-col">
+      <div className="border-b border-gray-300">
+        <nav className="flex gap-2" aria-label="Tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`
+                px-4 py-2 text-sm font-medium rounded-t-lg
+                ${
+                  activeTab === tab.id
+                    ? "bg-white text-blue-600 border-t border-x border-gray-300"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="mt-4">
+        <div className={activeTab === "settings" ? "block" : "hidden"}>
+          <SettingsTab />
+        </div>
+        <div className={activeTab === "geo-rules" ? "block" : "hidden"}>
+          <GeoRulesTab />
+        </div>
+      </div>
+    </div>
   );
 }
 
