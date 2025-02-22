@@ -63,12 +63,12 @@ export function RedirectionTab(): JSX.Element {
             className="card bg-base-100 shadow-sm rounded-none max-w-full"
           >
             <div
-              className="card-body p-4 cursor-pointer"
-              onClick={() =>
-                setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)
-              }
+              className="card-body p-4"
             >
-              <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center gap-4 cursor-pointer" 
+                onClick={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+              >
                 <div
                   className={`badge ${
                     rule.isEnabled
