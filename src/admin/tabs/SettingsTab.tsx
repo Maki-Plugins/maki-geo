@@ -1,5 +1,5 @@
-import { useState, useEffect } from "@wordpress/element";
-import { Button, SelectControl, TextControl } from "@wordpress/components";
+import { useState } from "@wordpress/element";
+import { Button } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
 import { AdminSettings, ApiKeyResponse } from "../../types/admin-types";
 import { MGEO_MAKI_PLUGINS_URL } from "../../constants";
@@ -15,7 +15,7 @@ function SettingRow({
 }) {
   return (
     <>
-      <div className="grid grid-cols-[1fr_3fr] gap-7 py-4 border-t border-solid border-t-gray-300">
+      <div className="grid grid-cols-[1fr_3fr] gap-7 py-4">
         <div className="text-right font-semibold mt-2">{title}</div>
         <div>
           {settingElement}
@@ -27,12 +27,14 @@ function SettingRow({
 }
 
 export function SettingsTab(): JSX.Element {
-  const [settings, setSettings] = useState<AdminSettings>(window.makiGeoData?.settings || {
-    clientServerMode: "server",
-    apiKey: "",
-    monthlyRequests: 0,
-    requestLimit: 1000,
-  });
+  const [settings, setSettings] = useState<AdminSettings>(
+    window.makiGeoData?.settings || {
+      clientServerMode: "server",
+      apiKey: "",
+      monthlyRequests: 0,
+      requestLimit: 1000,
+    },
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -108,12 +110,13 @@ export function SettingsTab(): JSX.Element {
 
   return (
     <div className="mgeo-settings-tab">
-      <div className="bg-white border border-gray-300 mb-5 grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-5">
+      <div className="mb-5 grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-5">
         <div className="p-5">
-          <h2 className="text-2xl font-bold mb-2">General Settings</h2>
+          <h2 className="text-2xl mb-2 text-secondary">General Settings</h2>
           <p className="mb-3">
             Change the general Maki Geo settings for this website.
           </p>
+          <div className="divider before:h-2 after:h-2"></div>
           <SettingRow
             title="Geo Targeting Method"
             description={
@@ -200,7 +203,7 @@ export function SettingsTab(): JSX.Element {
               </p>
             )}
           </div>
-          <hr style={{ margin: "20px 0" }} />
+          <div className="divider before:h-2 after:h-2 my-5"></div>
           <h3 className="text-lg font-semibold mb-5">Danger Zone</h3>
           <Button
             className="hover:bg-gray-100"
@@ -212,8 +215,8 @@ export function SettingsTab(): JSX.Element {
           </Button>
         </div>
         <div className=" p-5">
-          <h2 className="text-2xl font-bold mb-3">Statistics</h2>
-          <div className="stats shadow w-full">
+          <h2 className="text-2xl mb-2 text-secondary">Statistics</h2>
+          <div className="stats w-full rounded-none">
             <div className="stat place-items-center text-accent">
               <div className="stat-title">Location API Requests this month</div>
               <div className="stat-value">{settings.monthlyRequests}</div>

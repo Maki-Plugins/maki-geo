@@ -45,7 +45,7 @@ export function GeoRulesTab(): JSX.Element {
   };
 
   return (
-    <div className="mgeo-admin-card bg-white border border-gray-300 p-5 mb-5 rounded">
+    <div className="mgeo-admin-card bg-white p-5 mb-5">
       <h2>Global Geo Rules</h2>
       <p>Configure global geo-targeting rules that you can reuse site-wide.</p>
       <div className="flex flex-col">

@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .hard-shadow{
+        @apply shadow-[3px_3px_0px_rgba(0,0,0,0.4)]
+    }
+}

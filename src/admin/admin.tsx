@@ -1,5 +1,6 @@
 import { render } from "@wordpress/element";
 import { useState } from "@wordpress/element";
+import { Dashicon } from "@wordpress/components";
 import makiGeoLogo from "../assets/maki-geo-logo.svg";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
@@ -8,34 +9,43 @@ import "../styles/tailwind.css";
 
 function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   const tabs = [
-    { id: "settings", label: "General" },
-    { id: "geo-rules", label: "Global Geo Rules" },
+    {
+      id: "settings",
+      label: "General settings",
+      icon: <Dashicon icon="admin-generic" />,
+    },
+    {
+      id: "geo-rules",
+      label: "Global Geo Rules",
+      icon: <Dashicon icon="list-view" />,
+    },
   ];
 
   return (
     <div className="flex flex-col">
-      <div className="border-b border-gray-300">
-        <nav className="flex gap-2" aria-label="Tabs">
+      <div className="">
+        <nav className="flex gap-2 items-end max-w-xl" aria-label="Tabs">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                px-4 py-2 text-sm font-medium rounded-t-lg
+                flex-1 flex items-end justify-center gap-1 px-6 text-base rounded-none text-gray-700
                 ${
                   activeTab === tab.id
-                    ? "bg-white text-blue-600 border-t border-x border-gray-300"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    ? "bg-white py-3 hard-shadow border-gray-300"
+                    : " py-2 bg-[#D4D1D0] hover:hard-shadow hover:py-3"
                 }
               `}
             >
+              {tab.icon}
               {tab.label}
             </button>
           ))}
         </nav>
       </div>
 
-      <div className="mt-4">
+      <div className="bg-white hard-shadow">
         <div className={activeTab === "settings" ? "block" : "hidden"}>
           <SettingsTab />
         </div>

@@ -81,17 +81,17 @@ function mgeo_enqueue_admin_scripts($hook)
         $admin_script_asset["dependencies"]
     );
 
-    $registry = mgeo_SettingsRegistry::get_instance();
-    $settings = $registry->get_all_settings();
-
     wp_localize_script("maki-geo-admin", "makiGeoData", [
         "nonce" => wp_create_nonce("maki_geo_save_rules"),
         "globalRules" => get_option("mgeo_geo_rules", []),
         "settings" => [
-            "clientServerMode" => $settings["mgeo_client_server_mode"],
-            "apiKey" => $settings["mgeo_api_key"],
-            "monthlyRequests" => intval($settings["mgeo_monthly_requests"]),
-            "requestLimit" => intval($settings["mgeo_request_limit"]),
+            "clientServerMode" => get_option(
+                "mgeo_client_server_mode",
+                "server"
+            ),
+            "apiKey" => get_option("mgeo_api_key", ""),
+            "monthlyRequests" => intval(get_option("mgeo_monthly_requests", 0)),
+            "requestLimit" => intval(get_option("mgeo_request_limit", 1000)),
         ],
     ]);
 }
