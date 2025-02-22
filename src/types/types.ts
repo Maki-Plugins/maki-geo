@@ -43,6 +43,7 @@ declare global {
     makiGeoData?: {
       globalRules: GlobalGeoRule[];
       nonce: string;
+      settings: AdminSettings;
     };
   }
 }

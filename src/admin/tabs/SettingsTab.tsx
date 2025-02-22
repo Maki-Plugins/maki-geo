@@ -27,7 +27,7 @@ function SettingRow({
 }
 
 export function SettingsTab(): JSX.Element {
-  const [settings, setSettings] = useState<AdminSettings>({
+  const [settings, setSettings] = useState<AdminSettings>(window.makiGeoData?.settings || {
     clientServerMode: "server",
     apiKey: "",
     monthlyRequests: 0,
@@ -35,29 +35,6 @@ export function SettingsTab(): JSX.Element {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      const settings = await apiFetch({
-        path: "/wp/v2/settings",
-        method: "GET",
-        credentials: "include",
-      });
-
-      setSettings({
-        clientServerMode: settings.mgeo_client_server_mode,
-        apiKey: settings.mgeo_api_key,
-        monthlyRequests: settings.mgeo_monthly_requests,
-        requestLimit: settings.mgeo_request_limit,
-      });
-    } catch (error) {
-      console.error("Failed to load settings:", error);
-    }
-  };
 
   const handleVerifyApiKey = async () => {
     try {
