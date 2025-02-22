@@ -22,6 +22,16 @@ export interface LocalGeoRule extends GeoRuleBase {
 
 export type GeoRule = GlobalGeoRule | LocalGeoRule;
 
+export interface RedirectionRule {
+  id: string;
+  name: string;
+  type: 'one-way' | 'multi-domain' | 'same-site';
+  fromUrls: string[];
+  toUrl: string;
+  conditions: GeoCondition[];
+  isEnabled: boolean;
+}
+
 export interface BlockAttributes {
   ruleType: "local" | "global";
   localRule: LocalGeoRule | null;
