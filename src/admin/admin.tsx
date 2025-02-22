@@ -5,6 +5,7 @@ import makiGeoLogo from "../assets/maki-geo-logo.svg";
 import { AdminTabsProps } from "../types/admin-types";
 import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
+import { RedirectionTab } from "./tabs/RedirectionTab";
 import "../styles/tailwind.css";
 
 function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
@@ -18,6 +19,11 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
       id: "geo-rules",
       label: "Global Geo Rules",
       icon: <Dashicon icon="list-view" />,
+    },
+    {
+      id: "redirection",
+      label: "Geo Redirection",
+      icon: <Dashicon icon="randomize" />,
     },
   ];
 
@@ -51,6 +57,9 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
         </div>
         <div className={activeTab === "geo-rules" ? "block" : "hidden"}>
           <GeoRulesTab />
+        </div>
+        <div className={activeTab === "redirection" ? "block" : "hidden"}>
+          <RedirectionTab />
         </div>
       </div>
     </div>
