@@ -69,11 +69,11 @@ export function RedirectionTab(): JSX.Element {
               }
             >
               <div className="flex items-center gap-4">
-                <div 
+                <div
                   className={`badge ${
-                    rule.isEnabled 
-                      ? "badge-success text-white" 
-                      : "badge-error text-white"
+                    rule.isEnabled
+                      ? "badge-success text-success-content"
+                      : "badge-error text-error-content"
                   }`}
                 >
                   {rule.isEnabled ? "Enabled" : "Disabled"}
