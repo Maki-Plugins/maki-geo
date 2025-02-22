@@ -31,7 +31,21 @@ const dummyRules: RedirectionRule[] = [
 
 export function RedirectionTab(): JSX.Element {
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
-  const [rules] = useState<RedirectionRule[]>(dummyRules);
+  const [rules, setRules] = useState<RedirectionRule[]>(dummyRules);
+
+  const handleDeleteRule = (ruleId: string) => {
+    if (window.confirm('Are you sure you want to delete this redirection rule?')) {
+      setRules(rules.filter(rule => rule.id !== ruleId));
+    }
+  };
+
+  const handleToggleRule = (ruleId: string, enabled: boolean) => {
+    setRules(rules.map(rule => 
+      rule.id === ruleId 
+        ? { ...rule, isEnabled: enabled }
+        : rule
+    ));
+  };
 
   const getLocationSummary = (rule: RedirectionRule) => {
     const count = rule.conditions.length;
@@ -149,19 +163,22 @@ export function RedirectionTab(): JSX.Element {
                             checked={rule.isEnabled}
                             onChange={(e) => {
                               e.stopPropagation();
-                              const updatedRules = rules.map((r) =>
-                                r.id === rule.id
-                                  ? { ...r, isEnabled: e.target.checked }
-                                  : r
-                              );
-                              setRules(updatedRules);
+                              handleToggleRule(rule.id, e.target.checked);
                             }}
                           />
                         </label>
                       </div>
                       <div>
                         <button className="btn btn-sm">Edit</button>
-                        <button className="btn btn-sm btn-error ml-2">Delete</button>
+                        <button 
+                          className="btn btn-sm btn-error ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRule(rule.id);
+                          }}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
