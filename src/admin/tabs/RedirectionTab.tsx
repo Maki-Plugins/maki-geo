@@ -21,12 +21,10 @@ const dummyRules: RedirectionRule[] = [
     fromUrls: [
       "https://example.com/*",
       "https://example.de/*",
-      "https://example.fr/*"
+      "https://example.fr/*",
     ],
     toUrl: "https://eu.example.com/*",
-    conditions: [
-      { type: "continent", value: "EU", operator: "is" }
-    ],
+    conditions: [{ type: "continent", value: "EU", operator: "is" }],
     isEnabled: true,
   },
 ];
@@ -38,7 +36,7 @@ export function RedirectionTab(): JSX.Element {
   const getLocationSummary = (rule: RedirectionRule) => {
     const count = rule.conditions.length;
     const firstLocation = rule.conditions[0];
-    return `${count} ${firstLocation.type}${count > 1 ? 's' : ''} including ${firstLocation.value}${count > 1 ? '...' : ''}`;
+    return `${count} ${firstLocation.type}${count > 1 ? "s" : ""} including ${firstLocation.value}${count > 1 ? "..." : ""}`;
   };
 
   const getUrlSummary = (urls: string[]) => {
@@ -51,19 +49,36 @@ export function RedirectionTab(): JSX.Element {
       <div className="mb-5 flex justify-between items-center">
         <div>
           <h2 className="text-2xl mb-2 text-secondary">Geo Redirection</h2>
-          <p className="text-gray-600">Manage your geo-based URL redirections</p>
+          <p className="text-gray-600">
+            Manage your geo-based URL redirections
+          </p>
         </div>
         <button className="btn btn-primary">Add New Rule</button>
       </div>
 
       <div className="space-y-4">
         {rules.map((rule) => (
-          <div key={rule.id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-            <div 
+          <div
+            key={rule.id}
+            className="card bg-base-100 shadow-sm rounded-none max-w-full"
+          >
+            <div
               className="card-body p-4 cursor-pointer"
-              onClick={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+              onClick={() =>
+                setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)
+              }
             >
               <div className="flex items-center gap-4">
+                <div className="form-control">
+                  <label className="label cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={rule.isEnabled}
+                      onChange={(e) => e.stopPropagation()}
+                    />
+                  </label>
+                </div>
                 <div className="flex-1">
                   <h3 className="font-semibold">{rule.name}</h3>
                   <div className="text-sm text-gray-600 mt-1">
@@ -76,30 +91,27 @@ export function RedirectionTab(): JSX.Element {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="form-control">
-                    <label className="label cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        className="toggle toggle-primary"
-                        checked={rule.isEnabled}
-                        onChange={(e) => e.stopPropagation()}
-                      />
-                    </label>
-                  </div>
-                  <button 
+                  <button
                     className="btn btn-square btn-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id);
+                      setExpandedRuleId(
+                        expandedRuleId === rule.id ? null : rule.id,
+                      );
                     }}
                   >
-                    <svg 
-                      className={`w-4 h-4 transition-transform ${expandedRuleId === rule.id ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className={`w-4 h-4 transition-transform ${expandedRuleId === rule.id ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -114,7 +126,7 @@ export function RedirectionTab(): JSX.Element {
                         <li key={index}>{url}</li>
                       ))}
                     </ul>
-                    
+
                     <h4 className="font-medium mt-4">Destination URL</h4>
                     <p>{rule.toUrl}</p>
 
@@ -122,7 +134,8 @@ export function RedirectionTab(): JSX.Element {
                     <ul className="list-disc list-inside">
                       {rule.conditions.map((condition, index) => (
                         <li key={index}>
-                          {condition.type} {condition.operator} {condition.value}
+                          {condition.type} {condition.operator}{" "}
+                          {condition.value}
                         </li>
                       ))}
                     </ul>
