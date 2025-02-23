@@ -1,10 +1,10 @@
 import { useState } from "@wordpress/element";
+import { TextControl, ToggleControl } from "@wordpress/components";
+import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
+import { GeoCondition, RedirectionRule } from "../../types/types";
 
-export type RedirectionType =
-  | "one-way"
-  | "same-site"
-  | "popup"
-  | "query-string";
+export type RedirectionType = "one-way" | "same-site" | "popup" | "query-string";
+export type WizardStep = "type" | "settings" | "urls" | "review";
 
 interface RedirectionTypeOption {
   type: RedirectionType;
@@ -45,19 +45,121 @@ const redirectionTypes: RedirectionTypeOption[] = [
 interface RedirectionTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (type: RedirectionType) => void;
+  onComplete: (rule: RedirectionRule) => void;
 }
 
 export function RedirectionTypeModal({
   isOpen,
   onClose,
-  onSelect,
+  onComplete,
 }: RedirectionTypeModalProps): JSX.Element {
-  const [selectedType, setSelectedType] = useState<RedirectionType | null>(
-    null,
-  );
+  const [currentStep, setCurrentStep] = useState<WizardStep>("type");
+  const [selectedType, setSelectedType] = useState<RedirectionType | null>(null);
+  const [rule, setRule] = useState<Partial<RedirectionRule>>({
+    type: null,
+    name: "",
+    isEnabled: true,
+    conditions: [{ type: "country", value: "", operator: "is" }],
+    fromUrls: [],
+    toUrl: "",
+  });
 
   if (!isOpen) return <></>;
+
+  const updateRule = (updates: Partial<RedirectionRule>) => {
+    setRule({ ...rule, ...updates });
+  };
+
+  const handleTypeSelect = (type: RedirectionType) => {
+    setSelectedType(type);
+    setRule(prev => ({ ...prev, type }));
+    setCurrentStep("settings");
+  };
+
+  const handleConditionsChange = (conditions: GeoCondition[], operator: "AND" | "OR") => {
+    updateRule({ conditions, operator });
+  };
+
+  const handleNext = () => {
+    switch (currentStep) {
+      case "type":
+        if (!selectedType) {
+          alert("Please select a redirection type");
+          return;
+        }
+        setCurrentStep("settings");
+        break;
+      case "settings":
+        if (!rule.name?.trim()) {
+          alert("Please enter a rule name");
+          return;
+        }
+        if (!rule.conditions?.length || !rule.conditions[0].value) {
+          alert("Please set at least one geo condition");
+          return;
+        }
+        setCurrentStep("urls");
+        break;
+      case "urls":
+        // URL validation will go here
+        setCurrentStep("review");
+        break;
+      case "review":
+        onComplete(rule as RedirectionRule);
+        onClose();
+        break;
+    }
+  };
+
+  const handleBack = () => {
+    switch (currentStep) {
+      case "settings":
+        setCurrentStep("type");
+        break;
+      case "urls":
+        setCurrentStep("settings");
+        break;
+      case "review":
+        setCurrentStep("urls");
+        break;
+    }
+  };
+
+  const renderSettings = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-medium">Basic Settings</h3>
+      
+      <div className="form-control w-full max-w-md">
+        <TextControl
+          label="Rule Name"
+          value={rule.name}
+          onChange={(name) => updateRule({ name })}
+          placeholder="e.g., EU to English Site"
+        />
+      </div>
+
+      {currentStep === "settings" && renderSettings()}
+
+      <div className="form-control">
+        <ToggleControl
+          label="Enable Rule"
+          checked={rule.isEnabled}
+          onChange={(isEnabled) => updateRule({ isEnabled })}
+        />
+      </div>
+
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-medium">Geo Conditions</span>
+        </label>
+        <GeoConditionEditor
+          conditions={rule.conditions || []}
+          operator="OR"
+          onChange={handleConditionsChange}
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -96,16 +198,29 @@ export function RedirectionTypeModal({
         </div>
 
         <div className="flex justify-end gap-2">
-          <button className="btn btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button
-            className="btn btn-primary"
-            disabled={!selectedType}
-            onClick={() => selectedType && onSelect(selectedType)}
-          >
-            Continue
-          </button>
+          {currentStep === "type" ? (
+            <>
+              <button className="btn btn-ghost" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                disabled={!selectedType}
+                onClick={() => selectedType && handleTypeSelect(selectedType)}
+              >
+                Continue
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="btn btn-ghost" onClick={handleBack}>
+                Back
+              </button>
+              <button className="btn btn-primary" onClick={handleNext}>
+                {currentStep === "review" ? "Create Rule" : "Next Step"}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

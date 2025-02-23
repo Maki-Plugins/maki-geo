@@ -40,13 +40,9 @@ export function RedirectionTab(): JSX.Element {
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
   const [rules, setRules] = useState<RedirectionRule[]>(dummyRules);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<RedirectionType | null>(
-    null,
-  );
-
-  const handleRedirectionTypeSelect = (type: RedirectionType) => {
+  const handleRedirectionComplete = (rule: RedirectionRule) => {
+    setRules([...rules, { ...rule, id: String(Date.now()) }]);
     setIsModalOpen(false);
-    setSelectedType(type);
   };
 
   const handleDeleteRule = (ruleId: string) => {
@@ -215,23 +211,8 @@ export function RedirectionTab(): JSX.Element {
       <RedirectionTypeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSelect={handleRedirectionTypeSelect}
+        onComplete={handleRedirectionComplete}
       />
-
-      {selectedType && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <RedirectionWizard
-              type={selectedType}
-              onComplete={(rule) => {
-                setRules([...rules, { ...rule, id: String(Date.now()) }]);
-                setSelectedType(null);
-              }}
-              onCancel={() => setSelectedType(null)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
