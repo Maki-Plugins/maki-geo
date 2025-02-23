@@ -57,13 +57,15 @@ export function RedirectionTypeModal({
     null,
   );
 
-  if (!isOpen) return null;
+  if (!isOpen) return <></>;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-none shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white p-6 rounded-none hard-shadow max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Choose redirection type</h2>
+          <h2 className="text-2xl mb-2 text-secondary">
+            Choose redirection type
+          </h2>
           <button className="btn btn-sm btn-circle" onClick={onClose}>
             ✕
           </button>

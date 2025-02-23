@@ -1,6 +1,9 @@
 import { useState } from "@wordpress/element";
 import { RedirectionRule } from "../../types/types";
-import { RedirectionTypeModal, RedirectionType } from "../components/RedirectionTypeModal";
+import {
+  RedirectionTypeModal,
+  RedirectionType,
+} from "../components/RedirectionTypeModal";
 import { RedirectionWizard } from "../components/RedirectionWizard";
 
 const dummyRules: RedirectionRule[] = [
@@ -14,6 +17,7 @@ const dummyRules: RedirectionRule[] = [
       { type: "country", value: "US", operator: "is" },
       { type: "country", value: "CA", operator: "is" },
     ],
+    operator: "OR",
     isEnabled: true,
   },
   {
@@ -27,6 +31,7 @@ const dummyRules: RedirectionRule[] = [
     ],
     toUrl: "https://eu.example.com/*",
     conditions: [{ type: "continent", value: "EU", operator: "is" }],
+    operator: "OR",
     isEnabled: true,
   },
 ];
@@ -35,7 +40,9 @@ export function RedirectionTab(): JSX.Element {
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
   const [rules, setRules] = useState<RedirectionRule[]>(dummyRules);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<RedirectionType | null>(null);
+  const [selectedType, setSelectedType] = useState<RedirectionType | null>(
+    null,
+  );
 
   const handleRedirectionTypeSelect = (type: RedirectionType) => {
     setIsModalOpen(false);
@@ -43,17 +50,19 @@ export function RedirectionTab(): JSX.Element {
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    if (window.confirm('Are you sure you want to delete this redirection rule?')) {
-      setRules(rules.filter(rule => rule.id !== ruleId));
+    if (
+      window.confirm("Are you sure you want to delete this redirection rule?")
+    ) {
+      setRules(rules.filter((rule) => rule.id !== ruleId));
     }
   };
 
   const handleToggleRule = (ruleId: string, enabled: boolean) => {
-    setRules(rules.map(rule => 
-      rule.id === ruleId 
-        ? { ...rule, isEnabled: enabled }
-        : rule
-    ));
+    setRules(
+      rules.map((rule) =>
+        rule.id === ruleId ? { ...rule, isEnabled: enabled } : rule,
+      ),
+    );
   };
 
   const getLocationSummary = (rule: RedirectionRule) => {
@@ -76,7 +85,7 @@ export function RedirectionTab(): JSX.Element {
             Manage your geo-based URL redirections
           </p>
         </div>
-        <button 
+        <button
           className="btn btn-primary"
           onClick={() => setIsModalOpen(true)}
         >
@@ -90,12 +99,12 @@ export function RedirectionTab(): JSX.Element {
             key={rule.id}
             className="card bg-base-100 shadow-sm rounded-none max-w-full"
           >
-            <div
-              className="card-body p-4"
-            >
-              <div 
-                className="flex items-center gap-4 cursor-pointer" 
-                onClick={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+            <div className="card-body p-4">
+              <div
+                className="flex items-center gap-4 cursor-pointer"
+                onClick={() =>
+                  setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)
+                }
               >
                 <div
                   className={`badge ${
@@ -184,7 +193,7 @@ export function RedirectionTab(): JSX.Element {
                       </div>
                       <div>
                         <button className="btn btn-sm">Edit</button>
-                        <button 
+                        <button
                           className="btn btn-sm btn-error ml-2"
                           onClick={(e) => {
                             e.stopPropagation();
