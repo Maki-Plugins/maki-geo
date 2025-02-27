@@ -1,7 +1,7 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import { GeoCondition, Redirection } from "../../types/types";
-import { ToggleControl } from "@wordpress/components";
+import { ToggleControl, Dashicon } from "@wordpress/components";
 
 // Types
 export type WizardStep = "settings" | "review";
@@ -434,7 +434,7 @@ export function NewRedirectionModal({
                       {location.redirectMappings.map((mapping) => (
                         <div
                           key={mapping.id}
-                          className="flex gap-2 items-center"
+                          className="join flex items-center"
                         >
                           <input
                             type="text"
@@ -445,9 +445,9 @@ export function NewRedirectionModal({
                               })
                             }
                             placeholder="From URL"
-                            className="input input-bordered input-sm w-full"
+                            className="input input-bordered input-sm w-full join-item"
                           />
-                          <span>→</span>
+                          <span className="join-item mx-2">→</span>
                           <input
                             type="text"
                             value={mapping.toUrl}
@@ -457,10 +457,10 @@ export function NewRedirectionModal({
                               })
                             }
                             placeholder="To URL"
-                            className="input input-bordered input-sm w-full"
+                            className="input input-bordered input-sm w-full join-item"
                           />
                           <button
-                            className="btn btn-sm btn-error"
+                            className="btn btn-sm btn-error btn-ghost join-item"
                             onClick={() =>
                               deleteRedirectMapping(location.id, mapping.id)
                             }
@@ -470,10 +470,10 @@ export function NewRedirectionModal({
                         </div>
                       ))}
                       <button
-                        className="btn btn-sm btn-secondary"
+                        className="btn btn-sm btn-accent"
                         onClick={() => addRedirectMapping(location.id)}
                       >
-                        Add URL Mapping
+                        <Dashicon icon="plus" /> Add URL Mapping
                       </button>
                     </div>
                   </div>
@@ -527,10 +527,10 @@ export function NewRedirectionModal({
                       </div>
                     ))}
                     <button
-                      className="btn btn-sm btn-secondary"
+                      className="btn btn-sm btn-accent"
                       onClick={() => addExclusion(location.id)}
                     >
-                      Add Exclusion
+                      <Dashicon icon="plus" /> Add Exclusion
                     </button>
                   </div>
                 </div>
@@ -561,7 +561,7 @@ export function NewRedirectionModal({
 
                 <div className="flex justify-end">
                   <button
-                    className="btn btn-sm btn-error"
+                    className="btn btn-sm btn-error btn-outline"
                     onClick={() => deleteLocation(location.id)}
                     disabled={locations.length <= 1}
                   >
@@ -593,6 +593,54 @@ export function NewRedirectionModal({
             />
           </div>
           <div className="form-control">
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Remember me</span>
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="checkbox checkbox-primary checkbox-lg"
+                />
+              </label>
+            </div>
+            <label className="cursor-pointer flex items-center">
+              <input type="checkbox" className="peer hidden" />
+              <div
+                className="w-12 h-6 bg-base-300 rounded-full relative 
+               after:absolute after:left-1 after:top-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-all 
+               peer-checked:bg-primary peer-checked:after:translate-x-6"
+              ></div>
+            </label>
+            <div className="form-control w-52">
+              <label className="label cursor-pointer">
+                <span className="label-text">Remember me</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  defaultChecked
+                />
+              </label>
+            </div>
+            <div className="join">
+              <input
+                className="join-item btn"
+                type="radio"
+                name="options"
+                aria-label="Radio 1"
+              />
+              <input
+                className="join-item btn"
+                type="radio"
+                name="options"
+                aria-label="Radio 2"
+              />
+              <input
+                className="join-item btn"
+                type="radio"
+                name="options"
+                aria-label="Radio 3"
+              />
+            </div>
             <label className="label">
               <span className="label-text">Status</span>
             </label>
@@ -610,11 +658,8 @@ export function NewRedirectionModal({
           </label>
           <div className="space-y-2">
             {locations.map(renderLocationCard)}
-            <button 
-              className="btn btn-sm btn-secondary" 
-              onClick={addLocation}
-            >
-              Add Location
+            <button className="btn btn-sm btn-accent" onClick={addLocation}>
+              <Dashicon icon="plus" /> Add Location
             </button>
           </div>
         </div>
@@ -711,7 +756,7 @@ export function NewRedirectionModal({
           </div>
           <div className="mt-4">
             <button
-              className="btn btn-sm btn-secondary"
+              className="btn btn-sm btn-accent"
               onClick={() => {
                 // This would be replaced with actual test logic
                 alert(
