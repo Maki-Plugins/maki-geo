@@ -1,7 +1,7 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import { GeoCondition, Redirection } from "../../types/types";
-import { Button, ToggleControl } from "@wordpress/components";
+import { ToggleControl } from "@wordpress/components";
 
 // Types
 export type WizardStep = "settings" | "review";
@@ -469,13 +469,12 @@ export function NewRedirectionModal({
                           </button>
                         </div>
                       ))}
-                      <Button
-                        variant="secondary"
-                        isSmall
+                      <button
+                        className="btn btn-sm btn-secondary"
                         onClick={() => addRedirectMapping(location.id)}
                       >
                         Add URL Mapping
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -527,13 +526,12 @@ export function NewRedirectionModal({
                         </button>
                       </div>
                     ))}
-                    <Button
-                      variant="secondary"
-                      isSmall
+                    <button
+                      className="btn btn-sm btn-secondary"
                       onClick={() => addExclusion(location.id)}
                     >
                       Add Exclusion
-                    </Button>
+                    </button>
                   </div>
                 </div>
 
@@ -612,9 +610,12 @@ export function NewRedirectionModal({
           </label>
           <div className="space-y-2">
             {locations.map(renderLocationCard)}
-            <Button variant="secondary" onClick={addLocation}>
+            <button 
+              className="btn btn-sm btn-secondary" 
+              onClick={addLocation}
+            >
               Add Location
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -709,8 +710,8 @@ export function NewRedirectionModal({
             </div>
           </div>
           <div className="mt-4">
-            <Button
-              variant="secondary"
+            <button
+              className="btn btn-sm btn-secondary"
               onClick={() => {
                 // This would be replaced with actual test logic
                 alert(
@@ -719,7 +720,7 @@ export function NewRedirectionModal({
               }}
             >
               Test Redirection
-            </Button>
+            </button>
           </div>
         </div>
       </div>
