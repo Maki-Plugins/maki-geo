@@ -1,7 +1,7 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import { GeoCondition, Redirection } from "../../types/types";
-import { Button, TextControl, ToggleControl } from "@wordpress/components";
+import { Button, ToggleControl } from "@wordpress/components";
 
 // Types
 export type WizardStep = "settings" | "review";
@@ -387,11 +387,12 @@ export function NewRedirectionModal({
                     <label className="label">
                       <span className="label-text">Redirect URL</span>
                     </label>
-                    <TextControl
+                    <input
+                      type="text"
                       value={location.redirectUrl}
-                      onChange={(value) => updateLocation(location.id, { redirectUrl: value })}
+                      onChange={(e) => updateLocation(location.id, { redirectUrl: e.target.value })}
                       placeholder="https://example.com"
-                      className="input input-bordered w-full"
+                      className="input input-bordered input-sm w-full"
                     />
                   </div>
                 ) : (
@@ -402,22 +403,24 @@ export function NewRedirectionModal({
                     <div className="space-y-2">
                       {location.redirectMappings.map((mapping) => (
                         <div key={mapping.id} className="flex gap-2 items-center">
-                          <TextControl
+                          <input
+                            type="text"
                             value={mapping.fromUrl}
-                            onChange={(value) => 
-                              updateRedirectMapping(location.id, mapping.id, { fromUrl: value })
+                            onChange={(e) => 
+                              updateRedirectMapping(location.id, mapping.id, { fromUrl: e.target.value })
                             }
                             placeholder="From URL"
-                            className="input input-bordered w-full"
+                            className="input input-bordered input-sm w-full"
                           />
                           <span>→</span>
-                          <TextControl
+                          <input
+                            type="text"
                             value={mapping.toUrl}
-                            onChange={(value) => 
-                              updateRedirectMapping(location.id, mapping.id, { toUrl: value })
+                            onChange={(e) => 
+                              updateRedirectMapping(location.id, mapping.id, { toUrl: e.target.value })
                             }
                             placeholder="To URL"
-                            className="input input-bordered w-full"
+                            className="input input-bordered input-sm w-full"
                           />
                           <button
                             className="btn btn-sm btn-error"
@@ -445,13 +448,14 @@ export function NewRedirectionModal({
                   <div className="space-y-2">
                     {location.exclusions.map((exclusion) => (
                       <div key={exclusion.id} className="flex gap-2 items-center">
-                        <TextControl
+                        <input
+                          type="text"
                           value={exclusion.value}
-                          onChange={(value) => 
-                            updateExclusion(location.id, exclusion.id, { value })
+                          onChange={(e) => 
+                            updateExclusion(location.id, exclusion.id, { value: e.target.value })
                           }
                           placeholder="URL or path"
-                          className="input input-bordered w-full"
+                          className="input input-bordered input-sm w-full"
                         />
                         <select
                           value={exclusion.type}
@@ -534,11 +538,12 @@ export function NewRedirectionModal({
             <label className="label">
               <span className="label-text">Geo Redirect Name</span>
             </label>
-            <TextControl
+            <input
+              type="text"
               value={redirectionName}
-              onChange={setRedirectionName}
+              onChange={(e) => setRedirectionName(e.target.value)}
               placeholder="e.g., US/CA to English Site"
-              className="input input-bordered w-full"
+              className="input input-bordered input-sm w-full"
             />
           </div>
           <div className="form-control">
@@ -625,22 +630,24 @@ export function NewRedirectionModal({
               <label className="label">
                 <span className="label-text">Test URL</span>
               </label>
-              <TextControl
+              <input
+                type="text"
                 value={testUrl}
-                onChange={setTestUrl}
+                onChange={(e) => setTestUrl(e.target.value)}
                 placeholder="https://example.com/page"
-                className="input input-bordered w-full"
+                className="input input-bordered input-sm w-full"
               />
             </div>
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Test Country</span>
               </label>
-              <TextControl
+              <input
+                type="text"
                 value={testCountry}
-                onChange={setTestCountry}
+                onChange={(e) => setTestCountry(e.target.value)}
                 placeholder="US"
-                className="input input-bordered w-full"
+                className="input input-bordered input-sm w-full"
               />
             </div>
           </div>
