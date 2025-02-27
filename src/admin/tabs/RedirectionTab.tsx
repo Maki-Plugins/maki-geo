@@ -1,6 +1,6 @@
 import { useState } from "@wordpress/element";
 import { Redirection } from "../../types/types";
-import { NewRedirectionModal } from "../components/NewRedirectionModal";
+import { NewRedirectionModal } from "../components/RedirectionCard";
 import { Dashicon } from "@wordpress/components";
 
 const dummyRedirections: Redirection[] = [

@@ -9,7 +9,7 @@ import {
   RedirectMapping,
 } from "../../types/types";
 import { Dashicon } from "@wordpress/components";
-import Toggle from "../components/Toggle";
+import Toggle from "./Toggle";
 import HelpHover from "./HelpHover";
 
 // Types
