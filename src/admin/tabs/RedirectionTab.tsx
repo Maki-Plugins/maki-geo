@@ -1,6 +1,7 @@
 import { useState } from "@wordpress/element";
 import { Redirection } from "../../types/types";
 import { NewRedirectionModal } from "../components/NewRedirectionModal";
+import { Dashicon } from "@wordpress/components";
 
 const dummyRedirections: Redirection[] = [
   {
@@ -89,7 +90,7 @@ export function RedirectionTab(): JSX.Element {
           className="btn btn-primary"
           onClick={() => setIsModalOpen(true)}
         >
-          Add New Redirection
+          <Dashicon icon="plus" /> Add New Redirection
         </button>
       </div>
 
@@ -203,7 +204,9 @@ export function RedirectionTab(): JSX.Element {
                         </label>
                       </div>
                       <div>
-                        <button className="btn btn-sm">Edit</button>
+                        <button className="btn btn-sm">
+                          <Dashicon icon="edit" /> Edit
+                        </button>
                         <button
                           className="btn btn-sm btn-error ml-2"
                           onClick={(e) => {
@@ -211,7 +214,7 @@ export function RedirectionTab(): JSX.Element {
                             handleDeleteRedirection(redirection.id);
                           }}
                         >
-                          Delete
+                          <Dashicon icon="trash" /> Delete
                         </button>
                       </div>
                     </div>

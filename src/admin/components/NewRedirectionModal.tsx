@@ -579,7 +579,7 @@ export function NewRedirectionModal({
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         Pass page path to redirect URLs
-                        <HelpHover text="When enabled, the current page path will be appended to the destination URL." position="left" />
+                        <HelpHover text="When enabled, the current page path will be appended to the destination URL." />
                       </span>
                       <Toggle
                         checked={location.passPath}
@@ -593,7 +593,7 @@ export function NewRedirectionModal({
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         Pass query string to redirect URLs
-                        <HelpHover text="When enabled, query parameters from the current URL will be preserved and added to the destination URL." position="left" />
+                        <HelpHover text="When enabled, query parameters from the current URL will be preserved and added to the destination URL." />
                       </span>
                       <Toggle
                         checked={location.passQuery}

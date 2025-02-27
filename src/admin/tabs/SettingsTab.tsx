@@ -1,5 +1,5 @@
 import { useState } from "@wordpress/element";
-import { Button } from "@wordpress/components";
+import { Button, Dashicon } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
 import { AdminSettings, ApiKeyResponse } from "../../types/admin-types";
 import { MGEO_MAKI_PLUGINS_URL } from "../../constants";
@@ -174,7 +174,7 @@ export function SettingsTab(): JSX.Element {
                     placeholder="Api key"
                   />
                   <button
-                    className="btn btn-sm btn-secondary btn-outline join-item"
+                    className="btn btn-sm btn-primary btn-outline join-item"
                     onClick={handleVerifyApiKey}
                   >
                     Verify key
@@ -194,7 +194,9 @@ export function SettingsTab(): JSX.Element {
                   <span className="loading loading-spinner"></span>Saving...
                 </>
               ) : (
-                "Save Settings"
+                <>
+                  <Dashicon icon="saved" /> Save Settings
+                </>
               )}
             </button>
             {saveSuccess && (
