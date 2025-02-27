@@ -24,19 +24,40 @@ export type GeoRule = GlobalGeoRule | LocalGeoRule;
 
 export interface Redirection {
   id: string;
+  isEnabled: boolean;
   name: string;
-  type: "one-way" | "multi-domain" | "same-site" | "popup" | "query-string";
-  fromUrls: string[];
-  toUrl: string;
+  locations: RedirectionLocation[];
+}
+
+export type PageTargetingType = "all" | "specific";
+export type ExclusionType =
+  | "url_equals"
+  | "url_contains"
+  | "query_contains"
+  | "hash_contains";
+
+export interface RedirectionLocation {
+  id: string;
   conditions: GeoCondition[];
   operator: "AND" | "OR";
-  isEnabled: boolean;
-  pageExclusions?: {
-    value: string;
-    type: "url_equals" | "url_contains" | "query_contains" | "hash_contains";
-  }[];
-  passPath?: boolean;
-  passQuery?: boolean;
+  pageTargetingType: PageTargetingType;
+  redirectUrl: string;
+  redirectMappings: RedirectMapping[];
+  exclusions: PageExclusion[];
+  passPath: boolean;
+  passQuery: boolean;
+}
+
+export interface RedirectMapping {
+  id: string;
+  fromUrl: string;
+  toUrl: string;
+}
+
+export interface PageExclusion {
+  id: string;
+  value: string;
+  type: ExclusionType;
 }
 
 export interface BlockAttributes {

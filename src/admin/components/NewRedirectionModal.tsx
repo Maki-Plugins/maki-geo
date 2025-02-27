@@ -1,42 +1,19 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
-import { GeoCondition, Redirection } from "../../types/types";
+import {
+  ExclusionType,
+  GeoCondition,
+  PageExclusion,
+  Redirection,
+  RedirectionLocation,
+  RedirectMapping,
+} from "../../types/types";
 import { Dashicon } from "@wordpress/components";
 import Toggle from "../components/Toggle";
 import HelpHover from "./HelpHover";
 
 // Types
 export type WizardStep = "settings" | "review";
-export type PageTargetingType = "all" | "specific";
-export type ExclusionType =
-  | "url_equals"
-  | "url_contains"
-  | "query_contains"
-  | "hash_contains";
-
-interface RedirectionLocation {
-  id: string;
-  conditions: GeoCondition[];
-  operator: "AND" | "OR";
-  pageTargeting: PageTargetingType;
-  redirectUrl: string;
-  redirectMappings: RedirectMapping[];
-  exclusions: PageExclusion[];
-  passPath: boolean;
-  passQuery: boolean;
-}
-
-interface RedirectMapping {
-  id: string;
-  fromUrl: string;
-  toUrl: string;
-}
-
-interface PageExclusion {
-  id: string;
-  value: string;
-  type: ExclusionType;
-}
 
 interface NewRedirectionModalProps {
   isOpen: boolean;
@@ -86,7 +63,7 @@ export function NewRedirectionModal({
       id: `loc_${Date.now()}`,
       conditions: [{ type: "country", value: "", operator: "is" }],
       operator: "OR",
-      pageTargeting: "all",
+      pageTargetingType: "all",
       redirectUrl: "",
       redirectMappings: [],
       exclusions: [],
@@ -234,11 +211,11 @@ export function NewRedirectionModal({
 
       // Check if all locations have valid redirect URLs
       const hasInvalidRedirects = locations.some((loc) => {
-        if (loc.pageTargeting === "all" && !loc.redirectUrl.trim()) {
+        if (loc.pageTargetingType === "all" && !loc.redirectUrl.trim()) {
           return true;
         }
         if (
-          loc.pageTargeting === "specific" &&
+          loc.pageTargetingType === "specific" &&
           (loc.redirectMappings.length === 0 ||
             loc.redirectMappings.some(
               (m) => !m.fromUrl.trim() || !m.toUrl.trim(),
@@ -260,11 +237,7 @@ export function NewRedirectionModal({
       const redirection: Redirection = {
         id: `red_${Date.now()}`,
         name: redirectionName,
-        type: "one-way", // Default type
-        fromUrls: getFromUrls(),
-        toUrl: locations[0]?.redirectUrl || "", // Default to first location
-        conditions: locations.flatMap((loc) => loc.conditions),
-        operator: "OR", // Default operator between locations
+        locations: locations,
         isEnabled: isEnabled,
       };
 
@@ -278,7 +251,7 @@ export function NewRedirectionModal({
     const allFromUrls: string[] = [];
 
     locations.forEach((loc) => {
-      if (loc.pageTargeting === "all") {
+      if (loc.pageTargetingType === "all") {
         allFromUrls.push("*"); // Wildcard for all pages
       } else {
         loc.redirectMappings.forEach((mapping) => {
@@ -310,7 +283,7 @@ export function NewRedirectionModal({
 
     // Get a summary of the page targeting
     let pageSummary = "All pages";
-    if (location.pageTargeting === "specific") {
+    if (location.pageTargetingType === "specific") {
       const count = location.redirectMappings.length;
       pageSummary =
         count > 0
@@ -408,10 +381,10 @@ export function NewRedirectionModal({
                           type="radio"
                           name={`pageTargeting-${location.id}`}
                           className="radio radio-primary"
-                          checked={location.pageTargeting === "all"}
+                          checked={location.pageTargetingType === "all"}
                           onChange={() =>
                             updateLocation(location.id, {
-                              pageTargeting: "all",
+                              pageTargetingType: "all",
                             })
                           }
                         />
@@ -422,10 +395,10 @@ export function NewRedirectionModal({
                           type="radio"
                           name={`pageTargeting-${location.id}`}
                           className="radio radio-primary"
-                          checked={location.pageTargeting === "specific"}
+                          checked={location.pageTargetingType === "specific"}
                           onChange={() =>
                             updateLocation(location.id, {
-                              pageTargeting: "specific",
+                              pageTargetingType: "specific",
                             })
                           }
                         />
@@ -434,7 +407,7 @@ export function NewRedirectionModal({
                     </div>
                   </div>
 
-                  {location.pageTargeting === "all" ? (
+                  {location.pageTargetingType === "all" ? (
                     <div className="form-control">
                       <label className="label">
                         <span className="label-text font-semibold flex items-center">
@@ -726,7 +699,7 @@ export function NewRedirectionModal({
                       .join(` ${location.operator} `)}
                   </li>
                   <li>
-                    {location.pageTargeting === "all"
+                    {location.pageTargetingType === "all"
                       ? `Redirect all pages to: ${location.redirectUrl}`
                       : `Redirect ${location.redirectMappings.length} specific pages`}
                   </li>

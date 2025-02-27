@@ -7,28 +7,61 @@ const dummyRedirections: Redirection[] = [
   {
     id: "1",
     name: "US/CA to English",
-    type: "one-way",
-    fromUrls: ["https://example.com/*"],
-    toUrl: "https://example.com/en/*",
-    conditions: [
-      { type: "country", value: "US", operator: "is" },
-      { type: "country", value: "CA", operator: "is" },
+    locations: [
+      {
+        conditions: [
+          { type: "country", value: "US", operator: "is" },
+          { type: "country", value: "CA", operator: "is" },
+        ],
+        exclusions: [],
+        id: "1",
+        operator: "OR",
+        pageTargetingType: "all",
+        passPath: false,
+        passQuery: false,
+        redirectMappings: [
+          {
+            id: "",
+            fromUrl: "https://example.com/*",
+            toUrl: "https://example.com/en/*",
+          },
+        ],
+        redirectUrl: "",
+      },
     ],
-    operator: "OR",
     isEnabled: true,
   },
   {
     id: "2",
     name: "EU Multi-domain",
-    type: "multi-domain",
-    fromUrls: [
-      "https://example.com/*",
-      "https://example.de/*",
-      "https://example.fr/*",
+    locations: [
+      {
+        conditions: [{ type: "continent", value: "EU", operator: "is" }],
+        exclusions: [],
+        id: "1",
+        operator: "OR",
+        pageTargetingType: "all",
+        passPath: false,
+        passQuery: false,
+        redirectMappings: [
+          {
+            id: "",
+            fromUrl: "https://example.fr/*",
+            toUrl: "https://eu.example.com/*",
+          },
+        ],
+        redirectUrl: "",
+      },
     ],
-    toUrl: "https://eu.example.com/*",
-    conditions: [{ type: "continent", value: "EU", operator: "is" }],
-    operator: "OR",
+    // type: "multi-domain",
+    // fromUrls: [
+    //   "https://example.com/*",
+    //   "https://example.de/*",
+    //   "https://example.fr/*",
+    // ],
+    // toUrl: "https://eu.example.com/*",
+    // conditions: [{ type: "continent", value: "EU", operator: "is" }],
+    // operator: "OR",
     isEnabled: true,
   },
 ];
@@ -67,8 +100,8 @@ export function RedirectionTab(): JSX.Element {
   };
 
   const getLocationSummary = (redirection: Redirection) => {
-    const count = redirection.conditions.length;
-    const firstLocation = redirection.conditions[0];
+    const count = redirection.locations.length;
+    const firstLocation = redirection.locations[0].conditions[0];
     return `${count} ${firstLocation.type}${count > 1 ? "s" : ""} including ${firstLocation.value}${count > 1 ? "..." : ""}`;
   };
 
@@ -125,10 +158,28 @@ export function RedirectionTab(): JSX.Element {
                   <div className="text-sm text-gray-600 mt-1">
                     <div className="flex items-center gap-4">
                       <span className="badge badge-outline">
-                        {redirection.type}
+                        {redirection.locations.length} locations
                       </span>
-                      <span>From: {getUrlSummary(redirection.fromUrls)}</span>
-                      <span>To: {redirection.toUrl}</span>
+                      <span>
+                        From:{" "}
+                        {getUrlSummary(
+                          redirection.locations.flatMap((location) =>
+                            location.redirectMappings.map(
+                              (mapping) => mapping.fromUrl,
+                            ),
+                          ),
+                        )}
+                      </span>
+                      <span>
+                        To:{" "}
+                        {getUrlSummary(
+                          redirection.locations.flatMap((location) =>
+                            location.redirectMappings.map(
+                              (mapping) => mapping.toUrl,
+                            ),
+                          ),
+                        )}
+                      </span>
                       <span>{getLocationSummary(redirection)}</span>
                     </div>
                   </div>
@@ -167,22 +218,24 @@ export function RedirectionTab(): JSX.Element {
                   <div className="space-y-2">
                     <h4 className="font-medium">Source URLs</h4>
                     <ul className="list-disc list-inside">
-                      {redirection.fromUrls.map((url, index) => (
-                        <li key={index}>{url}</li>
+                      {redirection.locations.map((location, index) => (
+                        <li key={index}>{location.pageTargetingType}</li>
                       ))}
                     </ul>
 
-                    <h4 className="font-medium mt-4">Destination URL</h4>
-                    <p>{redirection.toUrl}</p>
+                    <h4 className="font-medium mt-4">Destination URL(s)</h4>
+                    <p>{redirection.locations[0].redirectMappings[0].toUrl}</p>
 
                     <h4 className="font-medium mt-4">Conditions</h4>
                     <ul className="list-disc list-inside">
-                      {redirection.conditions.map((condition, index) => (
-                        <li key={index}>
-                          {condition.type} {condition.operator}{" "}
-                          {condition.value}
-                        </li>
-                      ))}
+                      {redirection.locations.map((location, index) =>
+                        location.conditions.map((condition, index) => (
+                          <li key={index}>
+                            {condition.type} {condition.operator}{" "}
+                            {condition.value}
+                          </li>
+                        )),
+                      )}
                     </ul>
 
                     <div className="flex justify-between items-center gap-2 mt-4">

@@ -174,7 +174,7 @@ export function SettingsTab(): JSX.Element {
                     placeholder="Api key"
                   />
                   <button
-                    className="btn btn-sm btn-primary btn-outline join-item"
+                    className="btn btn-sm btn-accent btn-outline join-item"
                     onClick={handleVerifyApiKey}
                   >
                     Verify key
