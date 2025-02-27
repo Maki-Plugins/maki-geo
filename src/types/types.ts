@@ -22,13 +22,14 @@ export interface LocalGeoRule extends GeoRuleBase {
 
 export type GeoRule = GlobalGeoRule | LocalGeoRule;
 
-export interface RedirectionRule {
+export interface Redirection {
   id: string;
   name: string;
-  type: 'one-way' | 'multi-domain' | 'same-site';
+  type: "one-way" | "multi-domain" | "same-site";
   fromUrls: string[];
   toUrl: string;
   conditions: GeoCondition[];
+  operator: "AND" | "OR";
   isEnabled: boolean;
 }
 

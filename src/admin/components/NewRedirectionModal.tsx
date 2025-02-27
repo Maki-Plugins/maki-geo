@@ -1,6 +1,6 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
-import { GeoCondition, RedirectionRule } from "../../types/types";
+import { GeoCondition, Redirection } from "../../types/types";
 
 export type RedirectionType =
   | "one-way"
@@ -57,7 +57,7 @@ const redirectionTypes: NewRedirectionOption[] = [
 interface NewRedirectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (rule: RedirectionRule) => void;
+  onComplete: (redirection: Redirection) => void;
 }
 
 export function NewRedirectionModal({
@@ -68,7 +68,7 @@ export function NewRedirectionModal({
   const [currentStep, setCurrentStep] = useState<WizardStep>("type");
   const [selectedRedirectionType, setSelectedRedirectionType] =
     useState<RedirectionProps | null>(null);
-  const [rule, setRule] = useState<Partial<RedirectionRule>>({
+  const [redirection, setRedirection] = useState<Partial<Redirection>>({
     type: undefined,
     name: "",
     isEnabled: true,
@@ -79,13 +79,13 @@ export function NewRedirectionModal({
 
   if (!isOpen) return <></>;
 
-  const updateRule = (updates: Partial<RedirectionRule>) => {
-    setRule({ ...rule, ...updates });
+  const updateRedirection = (updates: Partial<Redirection>) => {
+    setRedirection({ ...redirection, ...updates });
   };
 
   const handleTypeSelect = (redirection: RedirectionProps) => {
     setSelectedRedirectionType(redirection);
-    setRule((prev) => ({ ...prev, type: redirection.type }));
+    setRedirection((prev) => ({ ...prev, type: redirection.type }));
     setCurrentStep("settings");
   };
 
@@ -93,7 +93,7 @@ export function NewRedirectionModal({
     conditions: GeoCondition[],
     operator: "AND" | "OR",
   ) => {
-    updateRule({ conditions, operator });
+    updateRedirection({ conditions, operator });
   };
 
   const handleNext = () => {
@@ -106,11 +106,14 @@ export function NewRedirectionModal({
         }
         break;
       case "settings":
-        if (!rule.name?.trim()) {
-          alert("Please enter a rule name");
+        if (!redirection.name?.trim()) {
+          alert("Please enter a redirection name");
           return;
         }
-        if (!rule.conditions?.length || !rule.conditions[0].value) {
+        if (
+          !redirection.conditions?.length ||
+          !redirection.conditions[0].value
+        ) {
           alert("Please set at least one geo condition");
           return;
         }
@@ -126,7 +129,7 @@ export function NewRedirectionModal({
         (x) => x == currentStep,
       );
       if (currentStepIndex + 1 == selectedRedirectionType.steps.length) {
-        onComplete(rule as RedirectionRule);
+        onComplete(redirection as Redirection);
         onClose();
       } else {
         setCurrentStep(selectedRedirectionType.steps[currentStepIndex + 1]);
@@ -212,31 +215,26 @@ export function NewRedirectionModal({
     <>
       <label className="form-control w-full max-w-xs">
         <div className="label">
-          <span className="label-text">Rule name</span>
+          <span className="label-text">Redirection name</span>
         </div>
         <input
-          value={rule.name}
-          onChange={(e) => updateRule({ name: e.target.value })}
+          value={redirection.name}
+          onChange={(e) => updateRedirection({ name: e.target.value })}
           className="input input-bordered input-sm w-full max-w-xs"
           placeholder="e.g., EU to English Site"
         />
       </label>
       <div className="form-control">
         <div className="label">
-          <span className="label-text">Activate rule</span>
+          <span className="label-text">Activate redirection</span>
         </div>
         <input
           type="checkbox"
           className="toggle"
-          checked={rule.isEnabled}
-          onChange={(e) => updateRule({ isEnabled: e.target.checked })}
+          checked={redirection.isEnabled}
+          onChange={(e) => updateRedirection({ isEnabled: e.target.checked })}
           defaultChecked
         />
-        {/* <ToggleControl
-          label="Enable Rule"
-          checked={rule.isEnabled}
-          onChange={(isEnabled) => updateRule({ isEnabled })}
-        /> */}
       </div>
 
       <div className="form-control">
@@ -244,8 +242,8 @@ export function NewRedirectionModal({
           <span className="label-text font-medium">Geo Conditions</span>
         </label>
         <GeoConditionEditor
-          conditions={rule.conditions || []}
-          operator={rule.operator || "OR"}
+          conditions={redirection.conditions || []}
+          operator={redirection.operator || "OR"}
           onChange={handleConditionsChange}
         />
       </div>
@@ -308,7 +306,7 @@ export function NewRedirectionModal({
                 Back
               </button>
               <button className="btn btn-primary" onClick={handleNext}>
-                {currentStep === "review" ? "Create Rule" : "Next Step"}
+                {currentStep === "review" ? "Create Redirection" : "Next Step"}
               </button>
             </>
           )}

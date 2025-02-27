@@ -1,8 +1,8 @@
 import { useState } from "@wordpress/element";
-import { RedirectionRule } from "../../types/types";
+import { Redirection } from "../../types/types";
 import { NewRedirectionModal } from "../components/NewRedirectionModal";
 
-const dummyRules: RedirectionRule[] = [
+const dummyRedirections: Redirection[] = [
   {
     id: "1",
     name: "US/CA to English",
@@ -33,33 +33,41 @@ const dummyRules: RedirectionRule[] = [
 ];
 
 export function RedirectionTab(): JSX.Element {
-  const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
-  const [rules, setRules] = useState<RedirectionRule[]>(dummyRules);
+  const [expandedRedirectionId, setExpandedRedirectionId] = useState<
+    string | null
+  >(null);
+  const [redirections, setRedirections] =
+    useState<Redirection[]>(dummyRedirections);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleRedirectionComplete = (rule: RedirectionRule) => {
-    setRules([...rules, { ...rule, id: String(Date.now()) }]);
+  const handleRedirectionComplete = (redirection: Redirection) => {
+    setRedirections([
+      ...redirections,
+      { ...redirection, id: String(Date.now()) },
+    ]);
     setIsModalOpen(false);
   };
 
-  const handleDeleteRule = (ruleId: string) => {
-    if (
-      window.confirm("Are you sure you want to delete this redirection rule?")
-    ) {
-      setRules(rules.filter((rule) => rule.id !== ruleId));
+  const handleDeleteRedirection = (redirectionId: string) => {
+    if (window.confirm("Are you sure you want to delete this redirection?")) {
+      setRedirections(
+        redirections.filter((redirection) => redirection.id !== redirectionId),
+      );
     }
   };
 
-  const handleToggleRule = (ruleId: string, enabled: boolean) => {
-    setRules(
-      rules.map((rule) =>
-        rule.id === ruleId ? { ...rule, isEnabled: enabled } : rule,
+  const handleToggleRedirection = (redirectionId: string, enabled: boolean) => {
+    setRedirections(
+      redirections.map((redirection) =>
+        redirection.id === redirectionId
+          ? { ...redirection, isEnabled: enabled }
+          : redirection,
       ),
     );
   };
 
-  const getLocationSummary = (rule: RedirectionRule) => {
-    const count = rule.conditions.length;
-    const firstLocation = rule.conditions[0];
+  const getLocationSummary = (redirection: Redirection) => {
+    const count = redirection.conditions.length;
+    const firstLocation = redirection.conditions[0];
     return `${count} ${firstLocation.type}${count > 1 ? "s" : ""} including ${firstLocation.value}${count > 1 ? "..." : ""}`;
   };
 
@@ -81,40 +89,46 @@ export function RedirectionTab(): JSX.Element {
           className="btn btn-primary"
           onClick={() => setIsModalOpen(true)}
         >
-          Add New Rule
+          Add New Redirection
         </button>
       </div>
 
       <div className="space-y-4">
-        {rules.map((rule) => (
+        {redirections.map((redirection) => (
           <div
-            key={rule.id}
+            key={redirection.id}
             className="card bg-base-100 shadow-sm rounded-none max-w-full"
           >
             <div className="card-body p-4">
               <div
                 className="flex items-center gap-4 cursor-pointer"
                 onClick={() =>
-                  setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)
+                  setExpandedRedirectionId(
+                    expandedRedirectionId === redirection.id
+                      ? null
+                      : redirection.id,
+                  )
                 }
               >
                 <div
                   className={`badge ${
-                    rule.isEnabled
+                    redirection.isEnabled
                       ? "badge-success text-success-content"
                       : "badge-error text-error-content"
                   }`}
                 >
-                  {rule.isEnabled ? "Enabled" : "Disabled"}
+                  {redirection.isEnabled ? "Enabled" : "Disabled"}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold">{rule.name}</h3>
+                  <h3 className="font-semibold">{redirection.name}</h3>
                   <div className="text-sm text-gray-600 mt-1">
                     <div className="flex items-center gap-4">
-                      <span className="badge badge-outline">{rule.type}</span>
-                      <span>From: {getUrlSummary(rule.fromUrls)}</span>
-                      <span>To: {rule.toUrl}</span>
-                      <span>{getLocationSummary(rule)}</span>
+                      <span className="badge badge-outline">
+                        {redirection.type}
+                      </span>
+                      <span>From: {getUrlSummary(redirection.fromUrls)}</span>
+                      <span>To: {redirection.toUrl}</span>
+                      <span>{getLocationSummary(redirection)}</span>
                     </div>
                   </div>
                 </div>
@@ -123,13 +137,15 @@ export function RedirectionTab(): JSX.Element {
                     className="btn btn-square btn-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setExpandedRuleId(
-                        expandedRuleId === rule.id ? null : rule.id,
+                      setExpandedRedirectionId(
+                        expandedRedirectionId === redirection.id
+                          ? null
+                          : redirection.id,
                       );
                     }}
                   >
                     <svg
-                      className={`w-4 h-4 transition-transform ${expandedRuleId === rule.id ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 transition-transform ${expandedRedirectionId === redirection.id ? "rotate-180" : ""}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -145,22 +161,22 @@ export function RedirectionTab(): JSX.Element {
                 </div>
               </div>
 
-              {expandedRuleId === rule.id && (
+              {expandedRedirectionId === redirection.id && (
                 <div className="mt-4 pt-4 border-t">
                   <div className="space-y-2">
                     <h4 className="font-medium">Source URLs</h4>
                     <ul className="list-disc list-inside">
-                      {rule.fromUrls.map((url, index) => (
+                      {redirection.fromUrls.map((url, index) => (
                         <li key={index}>{url}</li>
                       ))}
                     </ul>
 
                     <h4 className="font-medium mt-4">Destination URL</h4>
-                    <p>{rule.toUrl}</p>
+                    <p>{redirection.toUrl}</p>
 
                     <h4 className="font-medium mt-4">Conditions</h4>
                     <ul className="list-disc list-inside">
-                      {rule.conditions.map((condition, index) => (
+                      {redirection.conditions.map((condition, index) => (
                         <li key={index}>
                           {condition.type} {condition.operator}{" "}
                           {condition.value}
@@ -171,14 +187,17 @@ export function RedirectionTab(): JSX.Element {
                     <div className="flex justify-between items-center gap-2 mt-4">
                       <div className="form-control">
                         <label className="label cursor-pointer gap-2">
-                          <span className="label-text">Enable rule</span>
+                          <span className="label-text">Enable redirection</span>
                           <input
                             type="checkbox"
                             className="toggle toggle-success"
-                            checked={rule.isEnabled}
+                            checked={redirection.isEnabled}
                             onChange={(e) => {
                               e.stopPropagation();
-                              handleToggleRule(rule.id, e.target.checked);
+                              handleToggleRedirection(
+                                redirection.id,
+                                e.target.checked,
+                              );
                             }}
                           />
                         </label>
@@ -189,7 +208,7 @@ export function RedirectionTab(): JSX.Element {
                           className="btn btn-sm btn-error ml-2"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteRule(rule.id);
+                            handleDeleteRedirection(redirection.id);
                           }}
                         >
                           Delete
