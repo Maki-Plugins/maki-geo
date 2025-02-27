@@ -26,30 +26,6 @@ export function RedirectionTab(): JSX.Element {
     }
   };
 
-  const handleToggleRedirection = (redirectionId: string, enabled: boolean) => {
-    setRedirections(
-      redirections.map((redirection) =>
-        redirection.id === redirectionId
-          ? { ...redirection, isEnabled: enabled }
-          : redirection,
-      ),
-    );
-  };
-
-  const getLocationSummary = (redirection: Redirection) => {
-    const count = redirection.locations.length;
-    if (count === 0) return "No locations";
-    const firstLocation = redirection.locations[0].conditions[0];
-    if (!firstLocation) return "No conditions";
-    return `${count} ${firstLocation.type}${count > 1 ? "s" : ""} including ${firstLocation.value}${count > 1 ? "..." : ""}`;
-  };
-
-  const getUrlSummary = (urls: string[]) => {
-    if (urls.length === 0) return "None";
-    if (urls.length === 1) return urls[0];
-    return `${urls[0]} +${urls.length - 1} more`;
-  };
-
   return (
     <div className="p-5">
       <div className="mb-5 flex justify-between items-center">
@@ -77,10 +53,10 @@ export function RedirectionTab(): JSX.Element {
             key={newRedirectionId}
             className="card bg-base-100 shadow-sm rounded-none max-w-full"
           >
-            <div className="card-body p-4">
+            <div className="card-body p-1">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold">New Redirection</h3>
+                  <h3 className="font-semibold text-base">New Redirection</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -91,21 +67,12 @@ export function RedirectionTab(): JSX.Element {
                   </button>
                 </div>
               </div>
-              
+
               <div className="mt-4 pt-4 border-t">
                 <RedirectionCard
                   onComplete={handleRedirectionComplete}
                   isNew={true}
                 />
-                
-                <div className="flex justify-end mt-4">
-                  <button
-                    className="btn btn-sm btn-error"
-                    onClick={() => setNewRedirectionId(null)}
-                  >
-                    Cancel
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -116,17 +83,8 @@ export function RedirectionTab(): JSX.Element {
             key={redirection.id}
             className="card bg-base-100 shadow-sm rounded-none max-w-full"
           >
-            <div className="card-body p-4">
-              <div
-                className="flex items-center gap-4 cursor-pointer"
-                onClick={() =>
-                  setExpandedRedirectionId(
-                    expandedRedirectionId === redirection.id
-                      ? null
-                      : redirection.id,
-                  )
-                }
-              >
+            <div className="card-body p-1">
+              <div className="flex items-center gap-4">
                 <div
                   className={`badge ${
                     redirection.isEnabled
@@ -138,38 +96,10 @@ export function RedirectionTab(): JSX.Element {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold">{redirection.name}</h3>
-                  <div className="text-sm text-gray-600 mt-1">
-                    <div className="flex items-center gap-4">
-                      <span className="badge badge-outline">
-                        {redirection.locations.length} locations
-                      </span>
-                      <span>
-                        From:{" "}
-                        {getUrlSummary(
-                          redirection.locations.flatMap((location) =>
-                            location.redirectMappings.map(
-                              (mapping) => mapping.fromUrl,
-                            ),
-                          ),
-                        )}
-                      </span>
-                      <span>
-                        To:{" "}
-                        {getUrlSummary(
-                          redirection.locations.flatMap((location) =>
-                            location.redirectMappings.map(
-                              (mapping) => mapping.toUrl,
-                            ),
-                          ),
-                        )}
-                      </span>
-                      <span>{getLocationSummary(redirection)}</span>
-                    </div>
-                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    className="btn btn-square btn-sm"
+                    className="btn btn-sm flex flex-row gap-1"
                     onClick={(e) => {
                       e.stopPropagation();
                       setExpandedRedirectionId(
@@ -179,6 +109,7 @@ export function RedirectionTab(): JSX.Element {
                       );
                     }}
                   >
+                    <Dashicon icon="edit" />
                     <svg
                       className={`w-4 h-4 transition-transform ${expandedRedirectionId === redirection.id ? "rotate-180" : ""}`}
                       fill="none"
@@ -193,6 +124,15 @@ export function RedirectionTab(): JSX.Element {
                       />
                     </svg>
                   </button>
+                  <button
+                    className="btn btn-error btn-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteRedirection(redirection.id);
+                    }}
+                  >
+                    <Dashicon icon="trash" />
+                  </button>
                 </div>
               </div>
 
@@ -204,26 +144,14 @@ export function RedirectionTab(): JSX.Element {
                         redirections.map((r) =>
                           r.id === redirection.id
                             ? { ...updatedRedirection, id: redirection.id }
-                            : r
-                        )
+                            : r,
+                        ),
                       );
                       setExpandedRedirectionId(null);
                     }}
                     isNew={false}
                     initialData={redirection}
                   />
-                  
-                  <div className="flex justify-end mt-4">
-                    <button
-                      className="btn btn-sm btn-error"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteRedirection(redirection.id);
-                      }}
-                    >
-                      <Dashicon icon="trash" /> Delete
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

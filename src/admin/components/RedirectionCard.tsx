@@ -43,18 +43,6 @@ export function RedirectionCard({
   const [testUrl, setTestUrl] = useState<string>("");
   const [testCountry, setTestCountry] = useState<string>("");
 
-  function resetState() {
-    setCurrentStep("settings");
-    setRedirectionName("");
-    setIsEnabled(true);
-    const defaultLocation = createDefaultLocation();
-    setLocations([defaultLocation]);
-    setExpandedLocationId(defaultLocation.id);
-    setIsAdvancedOpen(false);
-    setTestUrl("");
-    setTestCountry("");
-  }
-
   function createDefaultLocation(): RedirectionLocation {
     return {
       id: `loc_${Date.now()}`,
@@ -239,27 +227,7 @@ export function RedirectionCard({
       };
 
       onComplete(redirection);
-      handleClose();
     }
-  }
-
-  function getFromUrls(): string[] {
-    // Collect all fromUrls from all locations
-    const allFromUrls: string[] = [];
-
-    locations.forEach((loc) => {
-      if (loc.pageTargetingType === "all") {
-        allFromUrls.push("*"); // Wildcard for all pages
-      } else {
-        loc.redirectMappings.forEach((mapping) => {
-          if (mapping.fromUrl.trim()) {
-            allFromUrls.push(mapping.fromUrl);
-          }
-        });
-      }
-    });
-
-    return allFromUrls;
   }
 
   function handleBack() {
@@ -597,7 +565,7 @@ export function RedirectionCard({
   function renderSettingsStep() {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
             <label className="label">
               <span className="label-text font-semibold flex items-center">
@@ -766,34 +734,14 @@ export function RedirectionCard({
 
   return (
     <div className="space-y-6">
-      <div className="relative py-2 mb-6">
-        <div className="flex justify-center mb-4">
-          <ul className="steps">
-            <li
-              className={`step ${currentStep === "settings" || currentStep === "review" ? "step-primary" : ""}`}
-            >
-              Settings
-            </li>
-            <li
-              className={`step ${currentStep === "review" ? "step-primary" : ""}`}
-            >
-              Review & Test
-            </li>
-          </ul>
-        </div>
-      </div>
-
       {currentStep === "settings" && renderSettingsStep()}
       {currentStep === "review" && renderReviewStep()}
 
       <div className="flex justify-end gap-2 mt-6">
         {currentStep === "settings" ? (
           <>
-            <button className="btn btn-ghost" onClick={resetState}>
-              Reset
-            </button>
             <button className="btn btn-primary" onClick={handleNext}>
-              Next Step
+              Review & save
             </button>
           </>
         ) : (
