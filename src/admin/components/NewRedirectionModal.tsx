@@ -1,7 +1,8 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import { GeoCondition, Redirection } from "../../types/types";
-import { ToggleControl, Dashicon } from "@wordpress/components";
+import { Dashicon } from "@wordpress/components";
+import Toggle from "../components/Toggle";
 
 // Types
 export type WizardStep = "settings" | "review";
@@ -542,20 +543,24 @@ export function NewRedirectionModal({
                     </span>
                   </label>
                   <div className="space-y-2">
-                    <ToggleControl
-                      label="Pass page path to redirect URLs"
-                      checked={location.passPath}
-                      onChange={(checked) =>
-                        updateLocation(location.id, { passPath: checked })
-                      }
-                    />
-                    <ToggleControl
-                      label="Pass query string to redirect URLs"
-                      checked={location.passQuery}
-                      onChange={(checked) =>
-                        updateLocation(location.id, { passQuery: checked })
-                      }
-                    />
+                    <div className="flex items-center justify-between">
+                      <span>Pass page path to redirect URLs</span>
+                      <Toggle
+                        checked={location.passPath}
+                        onChange={(e) =>
+                          updateLocation(location.id, { passPath: e.target.checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Pass query string to redirect URLs</span>
+                      <Toggle
+                        checked={location.passQuery}
+                        onChange={(e) =>
+                          updateLocation(location.id, { passQuery: e.target.checked })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -593,62 +598,16 @@ export function NewRedirectionModal({
             />
           </div>
           <div className="form-control">
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text">Remember me</span>
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="checkbox checkbox-primary checkbox-lg"
-                />
-              </label>
-            </div>
-            <label className="cursor-pointer flex items-center">
-              <input type="checkbox" className="peer hidden" />
-              <div
-                className="w-12 h-6 bg-base-300 rounded-full relative 
-               after:absolute after:left-1 after:top-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-all 
-               peer-checked:bg-primary peer-checked:after:translate-x-6"
-              ></div>
-            </label>
-            <div className="form-control w-52">
-              <label className="label cursor-pointer">
-                <span className="label-text">Remember me</span>
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  defaultChecked
-                />
-              </label>
-            </div>
-            <div className="join">
-              <input
-                className="join-item btn"
-                type="radio"
-                name="options"
-                aria-label="Radio 1"
-              />
-              <input
-                className="join-item btn"
-                type="radio"
-                name="options"
-                aria-label="Radio 2"
-              />
-              <input
-                className="join-item btn"
-                type="radio"
-                name="options"
-                aria-label="Radio 3"
-              />
-            </div>
             <label className="label">
               <span className="label-text">Status</span>
             </label>
-            <ToggleControl
-              label="Activated"
-              checked={isEnabled}
-              onChange={setIsEnabled}
-            />
+            <div className="flex items-center gap-2">
+              <span>Activated</span>
+              <Toggle
+                checked={isEnabled}
+                onChange={(e) => setIsEnabled(e.target.checked)}
+              />
+            </div>
           </div>
         </div>
 
