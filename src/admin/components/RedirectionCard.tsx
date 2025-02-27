@@ -15,23 +15,23 @@ import HelpHover from "./HelpHover";
 // Types
 export type WizardStep = "settings" | "review";
 
-interface NewRedirectionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface RedirectionCardProps {
   onComplete: (redirection: Redirection) => void;
+  isNew?: boolean;
+  initialData?: Redirection;
 }
 
-export function NewRedirectionModal({
-  isOpen,
-  onClose,
+export function RedirectionCard({
   onComplete,
-}: NewRedirectionModalProps): JSX.Element {
+  isNew = true,
+  initialData,
+}: RedirectionCardProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<WizardStep>("settings");
-  const [redirectionName, setRedirectionName] = useState<string>("");
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-  const [locations, setLocations] = useState<RedirectionLocation[]>([
-    createDefaultLocation(),
-  ]);
+  const [redirectionName, setRedirectionName] = useState<string>(initialData?.name || "");
+  const [isEnabled, setIsEnabled] = useState<boolean>(initialData?.isEnabled ?? true);
+  const [locations, setLocations] = useState<RedirectionLocation[]>(
+    initialData?.locations || [createDefaultLocation()]
+  );
   const [expandedLocationId, setExpandedLocationId] = useState<string | null>(
     locations[0]?.id || null,
   );
@@ -39,7 +39,7 @@ export function NewRedirectionModal({
   const [testUrl, setTestUrl] = useState<string>("");
   const [testCountry, setTestCountry] = useState<string>("");
 
-  function resetModalState() {
+  function resetState() {
     setCurrentStep("settings");
     setRedirectionName("");
     setIsEnabled(true);
@@ -50,13 +50,6 @@ export function NewRedirectionModal({
     setTestUrl("");
     setTestCountry("");
   }
-
-  const handleClose = () => {
-    resetModalState();
-    onClose();
-  };
-
-  if (!isOpen) return <></>;
 
   function createDefaultLocation(): RedirectionLocation {
     return {
@@ -768,15 +761,13 @@ export function NewRedirectionModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-none hard-shadow max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="relative flex justify-between items-center py-2 mb-6">
+    <div className="card bg-base-100 shadow-sm rounded-none max-w-full">
+      <div className="card-body p-4">
+        <div className="relative py-2 mb-6">
           <h2 className="text-2xl mb-2 text-secondary">
-            {currentStep === "settings"
-              ? "Redirection Settings"
-              : "Review & Test"}
+            {isNew ? "New Redirection" : "Edit Redirection"}
           </h2>
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+          <div className="flex justify-center mb-4">
             <ul className="steps">
               <li
                 className={`step ${currentStep === "settings" || currentStep === "review" ? "step-primary" : ""}`}
@@ -790,9 +781,6 @@ export function NewRedirectionModal({
               </li>
             </ul>
           </div>
-          <button className="btn btn-sm btn-circle" onClick={handleClose}>
-            ✕
-          </button>
         </div>
 
         {currentStep === "settings" && renderSettingsStep()}
@@ -801,8 +789,8 @@ export function NewRedirectionModal({
         <div className="flex justify-end gap-2 mt-6">
           {currentStep === "settings" ? (
             <>
-              <button className="btn btn-ghost" onClick={handleClose}>
-                Cancel
+              <button className="btn btn-ghost" onClick={resetState}>
+                Reset
               </button>
               <button className="btn btn-primary" onClick={handleNext}>
                 Next Step
@@ -814,7 +802,7 @@ export function NewRedirectionModal({
                 Back
               </button>
               <button className="btn btn-primary" onClick={handleNext}>
-                Create Redirection
+                {isNew ? "Create Redirection" : "Update Redirection"}
               </button>
             </>
           )}

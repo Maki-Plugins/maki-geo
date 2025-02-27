@@ -1,84 +1,21 @@
 import { useState } from "@wordpress/element";
 import { Redirection } from "../../types/types";
-import { NewRedirectionModal } from "../components/RedirectionCard";
+import { RedirectionCard } from "../components/RedirectionCard";
 import { Dashicon } from "@wordpress/components";
-
-const dummyRedirections: Redirection[] = [
-  {
-    id: "1",
-    name: "US/CA to English",
-    locations: [
-      {
-        conditions: [
-          { type: "country", value: "US", operator: "is" },
-          { type: "country", value: "CA", operator: "is" },
-        ],
-        exclusions: [],
-        id: "1",
-        operator: "OR",
-        pageTargetingType: "all",
-        passPath: false,
-        passQuery: false,
-        redirectMappings: [
-          {
-            id: "",
-            fromUrl: "https://example.com/*",
-            toUrl: "https://example.com/en/*",
-          },
-        ],
-        redirectUrl: "",
-      },
-    ],
-    isEnabled: true,
-  },
-  {
-    id: "2",
-    name: "EU Multi-domain",
-    locations: [
-      {
-        conditions: [{ type: "continent", value: "EU", operator: "is" }],
-        exclusions: [],
-        id: "1",
-        operator: "OR",
-        pageTargetingType: "all",
-        passPath: false,
-        passQuery: false,
-        redirectMappings: [
-          {
-            id: "",
-            fromUrl: "https://example.fr/*",
-            toUrl: "https://eu.example.com/*",
-          },
-        ],
-        redirectUrl: "",
-      },
-    ],
-    // type: "multi-domain",
-    // fromUrls: [
-    //   "https://example.com/*",
-    //   "https://example.de/*",
-    //   "https://example.fr/*",
-    // ],
-    // toUrl: "https://eu.example.com/*",
-    // conditions: [{ type: "continent", value: "EU", operator: "is" }],
-    // operator: "OR",
-    isEnabled: true,
-  },
-];
 
 export function RedirectionTab(): JSX.Element {
   const [expandedRedirectionId, setExpandedRedirectionId] = useState<
     string | null
   >(null);
-  const [redirections, setRedirections] =
-    useState<Redirection[]>(dummyRedirections);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [redirections, setRedirections] = useState<Redirection[]>([]);
+  const [showNewRedirectionCard, setShowNewRedirectionCard] = useState(false);
+
   const handleRedirectionComplete = (redirection: Redirection) => {
     setRedirections([
       ...redirections,
       { ...redirection, id: String(Date.now()) },
     ]);
-    setIsModalOpen(false);
+    setShowNewRedirectionCard(false);
   };
 
   const handleDeleteRedirection = (redirectionId: string) => {
@@ -101,11 +38,14 @@ export function RedirectionTab(): JSX.Element {
 
   const getLocationSummary = (redirection: Redirection) => {
     const count = redirection.locations.length;
+    if (count === 0) return "No locations";
     const firstLocation = redirection.locations[0].conditions[0];
+    if (!firstLocation) return "No conditions";
     return `${count} ${firstLocation.type}${count > 1 ? "s" : ""} including ${firstLocation.value}${count > 1 ? "..." : ""}`;
   };
 
   const getUrlSummary = (urls: string[]) => {
+    if (urls.length === 0) return "None";
     if (urls.length === 1) return urls[0];
     return `${urls[0]} +${urls.length - 1} more`;
   };
@@ -121,13 +61,20 @@ export function RedirectionTab(): JSX.Element {
         </div>
         <button
           className="btn btn-primary"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setShowNewRedirectionCard(!showNewRedirectionCard)}
         >
           <Dashicon icon="plus" /> Add New Redirection
         </button>
       </div>
 
       <div className="space-y-4">
+        {showNewRedirectionCard && (
+          <RedirectionCard 
+            onComplete={handleRedirectionComplete}
+            isNew={true}
+          />
+        )}
+
         {redirections.map((redirection) => (
           <div
             key={redirection.id}
@@ -215,62 +162,31 @@ export function RedirectionTab(): JSX.Element {
 
               {expandedRedirectionId === redirection.id && (
                 <div className="mt-4 pt-4 border-t">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Source URLs</h4>
-                    <ul className="list-disc list-inside">
-                      {redirection.locations.map((location, index) => (
-                        <li key={index}>{location.pageTargetingType}</li>
-                      ))}
-                    </ul>
-
-                    <h4 className="font-medium mt-4">Destination URL(s)</h4>
-                    <p>{redirection.locations[0].redirectMappings[0].toUrl}</p>
-
-                    <h4 className="font-medium mt-4">Conditions</h4>
-                    <ul className="list-disc list-inside">
-                      {redirection.locations.map((location, index) =>
-                        location.conditions.map((condition, index) => (
-                          <li key={index}>
-                            {condition.type} {condition.operator}{" "}
-                            {condition.value}
-                          </li>
-                        )),
-                      )}
-                    </ul>
-
-                    <div className="flex justify-between items-center gap-2 mt-4">
-                      <div className="form-control">
-                        <label className="label cursor-pointer gap-2">
-                          <span className="label-text">Enable redirection</span>
-                          <input
-                            type="checkbox"
-                            className="toggle toggle-success"
-                            checked={redirection.isEnabled}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              handleToggleRedirection(
-                                redirection.id,
-                                e.target.checked,
-                              );
-                            }}
-                          />
-                        </label>
-                      </div>
-                      <div>
-                        <button className="btn btn-sm">
-                          <Dashicon icon="edit" /> Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-error ml-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteRedirection(redirection.id);
-                          }}
-                        >
-                          <Dashicon icon="trash" /> Delete
-                        </button>
-                      </div>
-                    </div>
+                  <RedirectionCard
+                    onComplete={(updatedRedirection) => {
+                      setRedirections(
+                        redirections.map((r) =>
+                          r.id === redirection.id
+                            ? { ...updatedRedirection, id: redirection.id }
+                            : r
+                        )
+                      );
+                      setExpandedRedirectionId(null);
+                    }}
+                    isNew={false}
+                    initialData={redirection}
+                  />
+                  
+                  <div className="flex justify-end mt-4">
+                    <button
+                      className="btn btn-sm btn-error"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRedirection(redirection.id);
+                      }}
+                    >
+                      <Dashicon icon="trash" /> Delete
+                    </button>
                   </div>
                 </div>
               )}
@@ -278,12 +194,6 @@ export function RedirectionTab(): JSX.Element {
           </div>
         ))}
       </div>
-
-      <NewRedirectionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onComplete={handleRedirectionComplete}
-      />
     </div>
   );
 }
