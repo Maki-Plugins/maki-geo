@@ -1,58 +1,36 @@
 import { useState } from "@wordpress/element";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import { GeoCondition, Redirection } from "../../types/types";
+import { Button, TextControl, ToggleControl } from "@wordpress/components";
 
-export type RedirectionType =
-  | "one-way"
-  | "same-site"
-  | "popup"
-  | "query-string";
+// Types
+export type WizardStep = "settings" | "review";
+export type PageTargetingType = "all" | "specific";
+export type ExclusionType = "url_equals" | "url_contains" | "query_contains" | "hash_contains";
 
-export type WizardStep = "type" | "settings" | "urls" | "review";
-
-interface RedirectionProps {
-  type: RedirectionType;
-  steps: WizardStep[];
+interface RedirectionLocation {
+  id: string;
+  conditions: GeoCondition[];
+  operator: "AND" | "OR";
+  pageTargeting: PageTargetingType;
+  redirectUrl: string;
+  redirectMappings: RedirectMapping[];
+  exclusions: PageExclusion[];
+  passPath: boolean;
+  passQuery: boolean;
 }
 
-interface NewRedirectionOption {
-  redirection: RedirectionProps;
-  title: string;
-  description: string;
-  example: string;
+interface RedirectMapping {
+  id: string;
+  fromUrl: string;
+  toUrl: string;
 }
 
-const redirectionTypes: NewRedirectionOption[] = [
-  {
-    redirection: { type: "one-way", steps: ["settings", "urls", "review"] },
-    title: "One-way redirection",
-    description:
-      "Redirect visitors from one URL to another based on their location.",
-    example: "example.com → example.fr (for visitors from France)",
-  },
-  {
-    redirection: { type: "same-site", steps: ["settings", "urls", "review"] },
-    title: "Same-site redirection",
-    description: "Redirect visitors to a different path on the same domain.",
-    example: "example.com → example.com/fr (for visitors from France)",
-  },
-  {
-    redirection: {
-      type: "query-string",
-      steps: ["settings", "urls", "review"],
-    },
-    title: "Query String redirection",
-    description: "Add location parameters to URLs without changing the page.",
-    example: "example.com → example.com?country=fr",
-  },
-  {
-    redirection: { type: "popup", steps: ["settings", "urls", "review"] },
-    title: "Popup redirection",
-    description:
-      "Show a popup asking visitors if they want to be redirected to a location-specific page.",
-    example: "Show popup: 'Visit our French site?' → example.fr",
-  },
-];
+interface PageExclusion {
+  id: string;
+  value: string;
+  type: ExclusionType;
+}
 
 interface NewRedirectionModalProps {
   isOpen: boolean;
@@ -65,202 +43,621 @@ export function NewRedirectionModal({
   onClose,
   onComplete,
 }: NewRedirectionModalProps): JSX.Element {
-  const [currentStep, setCurrentStep] = useState<WizardStep>("type");
-  const [selectedRedirectionType, setSelectedRedirectionType] =
-    useState<RedirectionProps | null>(null);
-  const [redirection, setRedirection] = useState<Partial<Redirection>>({
-    type: undefined,
-    name: "",
-    isEnabled: true,
-    conditions: [{ type: "country", value: "", operator: "is" }],
-    fromUrls: [],
-    toUrl: "",
-  });
+  const [currentStep, setCurrentStep] = useState<WizardStep>("settings");
+  const [redirectionName, setRedirectionName] = useState<string>("");
+  const [isEnabled, setIsEnabled] = useState<boolean>(true);
+  const [locations, setLocations] = useState<RedirectionLocation[]>([
+    createDefaultLocation(),
+  ]);
+  const [expandedLocationId, setExpandedLocationId] = useState<string | null>(
+    locations[0]?.id || null
+  );
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
+  const [testUrl, setTestUrl] = useState<string>("");
+  const [testCountry, setTestCountry] = useState<string>("");
 
   if (!isOpen) return <></>;
 
-  const updateRedirection = (updates: Partial<Redirection>) => {
-    setRedirection({ ...redirection, ...updates });
-  };
+  function createDefaultLocation(): RedirectionLocation {
+    return {
+      id: `loc_${Date.now()}`,
+      conditions: [{ type: "country", value: "", operator: "is" }],
+      operator: "OR",
+      pageTargeting: "all",
+      redirectUrl: "",
+      redirectMappings: [],
+      exclusions: [],
+      passPath: true,
+      passQuery: true,
+    };
+  }
 
-  const handleTypeSelect = (redirection: RedirectionProps) => {
-    setSelectedRedirectionType(redirection);
-    setRedirection((prev) => ({ ...prev, type: redirection.type }));
-    setCurrentStep("settings");
-  };
+  function addLocation() {
+    const newLocation = createDefaultLocation();
+    setLocations([...locations, newLocation]);
+    setExpandedLocationId(newLocation.id);
+  }
 
-  const handleConditionsChange = (
-    conditions: GeoCondition[],
-    operator: "AND" | "OR",
-  ) => {
-    updateRedirection({ conditions, operator });
-  };
-
-  const handleNext = () => {
-    // Validation
-    switch (currentStep) {
-      case "type":
-        if (!selectedRedirectionType) {
-          alert("Please select a redirection type");
-          return;
-        }
-        break;
-      case "settings":
-        if (!redirection.name?.trim()) {
-          alert("Please enter a redirection name");
-          return;
-        }
-        if (
-          !redirection.conditions?.length ||
-          !redirection.conditions[0].value
-        ) {
-          alert("Please set at least one geo condition");
-          return;
-        }
-        break;
-      case "urls":
-        // URL validation will go here
-        break;
-    }
-
-    // Go to next step
-    if (selectedRedirectionType) {
-      const currentStepIndex = selectedRedirectionType.steps.findIndex(
-        (x) => x == currentStep,
-      );
-      if (currentStepIndex + 1 == selectedRedirectionType.steps.length) {
-        onComplete(redirection as Redirection);
-        onClose();
-      } else {
-        setCurrentStep(selectedRedirectionType.steps[currentStepIndex + 1]);
-      }
-    }
-  };
-
-  const handleBack = () => {
-    switch (currentStep) {
-      case "settings":
-        setCurrentStep("type");
-        break;
-      case "urls":
-        setCurrentStep("settings");
-        break;
-      case "review":
-        setCurrentStep("urls");
-        break;
-    }
-    if (selectedRedirectionType) {
-      const currentStepIndex = selectedRedirectionType.steps.findIndex(
-        (x) => x == currentStep,
-      );
-      if (currentStepIndex > 0) {
-        setCurrentStep(selectedRedirectionType.steps[currentStepIndex - 1]);
-      } else {
-        setCurrentStep("type");
-      }
-    }
-  };
-
-  const renderRedirectionTypes = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      {redirectionTypes.map((option) => (
-        <div
-          key={option.redirection.type}
-          className={`
-                border rounded-none p-4 cursor-pointer transition-all
-                ${
-                  selectedRedirectionType === option.redirection
-                    ? "border-primary bg-primary bg-opacity-5"
-                    : "border-gray-200 hover:border-primary"
-                }
-              `}
-          onClick={() => setSelectedRedirectionType(option.redirection)}
-        >
-          <h3 className="text-lg font-semibold mb-2">{option.title}</h3>
-          <p className="text-gray-600 mb-4">{option.description}</p>
-          <div className="bg-base-200 p-3">
-            <span className="text-sm font-medium">Example:</span>
-            <p className="text-sm text-gray-600">{option.example}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  function renderSteps(
-    allSteps: WizardStep[] | undefined,
-    currentStep: WizardStep,
+  function updateLocation(
+    locationId: string,
+    updates: Partial<RedirectionLocation>
   ) {
-    if (!allSteps) return <></>;
-
-    const currentStepIndex = allSteps.findIndex((x) => x == currentStep);
-    return (
-      <ul className="steps">
-        {allSteps.map((step, index) => (
-          <li
-            className={`step ${currentStepIndex >= index ? "step-primary" : ""}`}
-          >
-            {wizardStepToTitle(step)}
-          </li>
-        ))}
-        {/* <li className="step step-primary">Register</li>
-        <li className="step step-primary">Choose plan</li>
-        <li className="step">Purchase</li>
-        <li className="step">Receive Product</li> */}
-      </ul>
+    setLocations(
+      locations.map((loc) =>
+        loc.id === locationId ? { ...loc, ...updates } : loc
+      )
     );
   }
 
-  const renderSettings = () => (
-    <>
-      <label className="form-control w-full max-w-xs">
-        <div className="label">
-          <span className="label-text">Redirection name</span>
-        </div>
-        <input
-          value={redirection.name}
-          onChange={(e) => updateRedirection({ name: e.target.value })}
-          className="input input-bordered input-sm w-full max-w-xs"
-          placeholder="e.g., EU to English Site"
-        />
-      </label>
-      <div className="form-control">
-        <div className="label">
-          <span className="label-text">Activate redirection</span>
-        </div>
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={redirection.isEnabled}
-          onChange={(e) => updateRedirection({ isEnabled: e.target.checked })}
-          defaultChecked
-        />
-      </div>
-
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-medium">Geo Conditions</span>
-        </label>
-        <GeoConditionEditor
-          conditions={redirection.conditions || []}
-          operator={redirection.operator || "OR"}
-          onChange={handleConditionsChange}
-        />
-      </div>
-    </>
-  );
-
-  function wizardStepToTitle(step: WizardStep) {
-    switch (step) {
-      case "type":
-        return "Choose redirection type";
-      case "settings":
-        return "Basic settings";
-      case "urls":
-        return "Page targeting";
-      case "review":
-        return "Review & save";
+  function deleteLocation(locationId: string) {
+    if (locations.length <= 1) {
+      return; // Don't delete the last location
     }
+    setLocations(locations.filter((loc) => loc.id !== locationId));
+    if (expandedLocationId === locationId) {
+      setExpandedLocationId(null);
+    }
+  }
+
+  function addRedirectMapping(locationId: string) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const newMapping = {
+      id: `map_${Date.now()}`,
+      fromUrl: "",
+      toUrl: "",
+    };
+
+    updateLocation(locationId, {
+      redirectMappings: [...location.redirectMappings, newMapping],
+    });
+  }
+
+  function updateRedirectMapping(
+    locationId: string,
+    mappingId: string,
+    updates: Partial<RedirectMapping>
+  ) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const updatedMappings = location.redirectMappings.map((mapping) =>
+      mapping.id === mappingId ? { ...mapping, ...updates } : mapping
+    );
+
+    updateLocation(locationId, { redirectMappings: updatedMappings });
+  }
+
+  function deleteRedirectMapping(locationId: string, mappingId: string) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const updatedMappings = location.redirectMappings.filter(
+      (mapping) => mapping.id !== mappingId
+    );
+
+    updateLocation(locationId, { redirectMappings: updatedMappings });
+  }
+
+  function addExclusion(locationId: string) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const newExclusion = {
+      id: `excl_${Date.now()}`,
+      value: "",
+      type: "url_equals" as ExclusionType,
+    };
+
+    updateLocation(locationId, {
+      exclusions: [...location.exclusions, newExclusion],
+    });
+  }
+
+  function updateExclusion(
+    locationId: string,
+    exclusionId: string,
+    updates: Partial<PageExclusion>
+  ) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const updatedExclusions = location.exclusions.map((exclusion) =>
+      exclusion.id === exclusionId ? { ...exclusion, ...updates } : exclusion
+    );
+
+    updateLocation(locationId, { exclusions: updatedExclusions });
+  }
+
+  function deleteExclusion(locationId: string, exclusionId: string) {
+    const location = locations.find((loc) => loc.id === locationId);
+    if (!location) return;
+
+    const updatedExclusions = location.exclusions.filter(
+      (exclusion) => exclusion.id !== exclusionId
+    );
+
+    updateLocation(locationId, { exclusions: updatedExclusions });
+  }
+
+  function handleConditionsChange(
+    locationId: string,
+    conditions: GeoCondition[],
+    operator: "AND" | "OR"
+  ) {
+    updateLocation(locationId, { conditions, operator });
+  }
+
+  function handleNext() {
+    if (currentStep === "settings") {
+      // Validate settings
+      if (!redirectionName.trim()) {
+        alert("Please enter a redirection name");
+        return;
+      }
+
+      // Check if at least one location has valid conditions
+      const hasValidLocation = locations.some(
+        (loc) =>
+          loc.conditions.length > 0 &&
+          loc.conditions.every((c) => c.value.trim() !== "")
+      );
+
+      if (!hasValidLocation) {
+        alert("Please set at least one valid geo condition");
+        return;
+      }
+
+      // Check if all locations have valid redirect URLs
+      const hasInvalidRedirects = locations.some((loc) => {
+        if (loc.pageTargeting === "all" && !loc.redirectUrl.trim()) {
+          return true;
+        }
+        if (
+          loc.pageTargeting === "specific" &&
+          (loc.redirectMappings.length === 0 ||
+            loc.redirectMappings.some(
+              (m) => !m.fromUrl.trim() || !m.toUrl.trim()
+            ))
+        ) {
+          return true;
+        }
+        return false;
+      });
+
+      if (hasInvalidRedirects) {
+        alert("Please set valid redirect URLs for all locations");
+        return;
+      }
+
+      setCurrentStep("review");
+    } else if (currentStep === "review") {
+      // Create the final redirection object
+      const redirection: Redirection = {
+        id: `red_${Date.now()}`,
+        name: redirectionName,
+        type: "one-way", // Default type
+        fromUrls: getFromUrls(),
+        toUrl: locations[0]?.redirectUrl || "", // Default to first location
+        conditions: locations.flatMap((loc) => loc.conditions),
+        operator: "OR", // Default operator between locations
+        isEnabled: isEnabled,
+      };
+
+      onComplete(redirection);
+      onClose();
+    }
+  }
+
+  function getFromUrls(): string[] {
+    // Collect all fromUrls from all locations
+    const allFromUrls: string[] = [];
+    
+    locations.forEach(loc => {
+      if (loc.pageTargeting === "all") {
+        allFromUrls.push("*"); // Wildcard for all pages
+      } else {
+        loc.redirectMappings.forEach(mapping => {
+          if (mapping.fromUrl.trim()) {
+            allFromUrls.push(mapping.fromUrl);
+          }
+        });
+      }
+    });
+    
+    return allFromUrls;
+  }
+
+  function handleBack() {
+    if (currentStep === "review") {
+      setCurrentStep("settings");
+    }
+  }
+
+  function getLocationTitle(location: RedirectionLocation): string {
+    // Get a summary of the conditions
+    const conditionSummary = location.conditions.length > 0
+      ? location.conditions.map(c => `${c.value}`).join(", ")
+      : "Any location";
+    
+    // Get a summary of the page targeting
+    let pageSummary = "All pages";
+    if (location.pageTargeting === "specific") {
+      const count = location.redirectMappings.length;
+      pageSummary = count > 0 
+        ? `${count} specific page${count > 1 ? 's' : ''}`
+        : "No pages";
+    }
+    
+    // Combine the summaries
+    let title = conditionSummary;
+    if (location.conditions.length > 2) {
+      const firstTwo = location.conditions.slice(0, 2).map(c => c.value).join(", ");
+      title = `${firstTwo} + ${location.conditions.length - 2} more`;
+    }
+    
+    return `${title} - ${pageSummary}`;
+  }
+
+  function renderLocationCard(location: RedirectionLocation) {
+    const isExpanded = expandedLocationId === location.id;
+    
+    return (
+      <div key={location.id} className="card bg-base-100 shadow-sm rounded-none max-w-full mb-4">
+        <div className="card-body p-4">
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => setExpandedLocationId(isExpanded ? null : location.id)}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold">{getLocationTitle(location)}</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="btn btn-square btn-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedLocationId(isExpanded ? null : location.id);
+                }}
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {isExpanded && (
+            <div className="mt-4 pt-4 border-t">
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Geo Conditions</span>
+                  </label>
+                  <GeoConditionEditor
+                    conditions={location.conditions}
+                    operator={location.operator}
+                    onChange={(conditions, operator) => 
+                      handleConditionsChange(location.id, conditions, operator)
+                    }
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Page Targeting</span>
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="label cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`pageTargeting-${location.id}`}
+                        className="radio radio-primary"
+                        checked={location.pageTargeting === "all"}
+                        onChange={() => updateLocation(location.id, { pageTargeting: "all" })}
+                      />
+                      <span className="label-text ml-2">All pages</span>
+                    </label>
+                    <label className="label cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`pageTargeting-${location.id}`}
+                        className="radio radio-primary"
+                        checked={location.pageTargeting === "specific"}
+                        onChange={() => updateLocation(location.id, { pageTargeting: "specific" })}
+                      />
+                      <span className="label-text ml-2">Specific pages</span>
+                    </label>
+                  </div>
+                </div>
+
+                {location.pageTargeting === "all" ? (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Redirect URL</span>
+                    </label>
+                    <TextControl
+                      value={location.redirectUrl}
+                      onChange={(value) => updateLocation(location.id, { redirectUrl: value })}
+                      placeholder="https://example.com"
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium">Redirect URLs</span>
+                    </label>
+                    <div className="space-y-2">
+                      {location.redirectMappings.map((mapping) => (
+                        <div key={mapping.id} className="flex gap-2 items-center">
+                          <TextControl
+                            value={mapping.fromUrl}
+                            onChange={(value) => 
+                              updateRedirectMapping(location.id, mapping.id, { fromUrl: value })
+                            }
+                            placeholder="From URL"
+                            className="input input-bordered w-full"
+                          />
+                          <span>→</span>
+                          <TextControl
+                            value={mapping.toUrl}
+                            onChange={(value) => 
+                              updateRedirectMapping(location.id, mapping.id, { toUrl: value })
+                            }
+                            placeholder="To URL"
+                            className="input input-bordered w-full"
+                          />
+                          <button
+                            className="btn btn-sm btn-error"
+                            onClick={() => deleteRedirectMapping(location.id, mapping.id)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="secondary"
+                        isSmall
+                        onClick={() => addRedirectMapping(location.id)}
+                      >
+                        Add URL Mapping
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Page Exclusions</span>
+                  </label>
+                  <div className="space-y-2">
+                    {location.exclusions.map((exclusion) => (
+                      <div key={exclusion.id} className="flex gap-2 items-center">
+                        <TextControl
+                          value={exclusion.value}
+                          onChange={(value) => 
+                            updateExclusion(location.id, exclusion.id, { value })
+                          }
+                          placeholder="URL or path"
+                          className="input input-bordered w-full"
+                        />
+                        <select
+                          value={exclusion.type}
+                          onChange={(e) => 
+                            updateExclusion(
+                              location.id, 
+                              exclusion.id, 
+                              { type: e.target.value as ExclusionType }
+                            )
+                          }
+                          className="select select-bordered"
+                        >
+                          <option value="url_equals">URL equals</option>
+                          <option value="url_contains">URL contains</option>
+                          <option value="query_contains">Query contains</option>
+                          <option value="hash_contains">Hash contains</option>
+                        </select>
+                        <button
+                          className="btn btn-sm btn-error"
+                          onClick={() => deleteExclusion(location.id, exclusion.id)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <Button
+                      variant="secondary"
+                      isSmall
+                      onClick={() => addExclusion(location.id)}
+                    >
+                      Add Exclusion
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Additional Options</span>
+                  </label>
+                  <div className="space-y-2">
+                    <ToggleControl
+                      label="Pass page path to redirect URLs"
+                      checked={location.passPath}
+                      onChange={(checked) => 
+                        updateLocation(location.id, { passPath: checked })
+                      }
+                    />
+                    <ToggleControl
+                      label="Pass query string to redirect URLs"
+                      checked={location.passQuery}
+                      onChange={(checked) => 
+                        updateLocation(location.id, { passQuery: checked })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    className="btn btn-sm btn-error"
+                    onClick={() => deleteLocation(location.id)}
+                    disabled={locations.length <= 1}
+                  >
+                    Delete Location
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function renderSettingsStep() {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Geo Redirect Name</span>
+            </label>
+            <TextControl
+              value={redirectionName}
+              onChange={setRedirectionName}
+              placeholder="e.g., US/CA to English Site"
+              className="input input-bordered w-full"
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Status</span>
+            </label>
+            <ToggleControl
+              label="Activated"
+              checked={isEnabled}
+              onChange={setIsEnabled}
+            />
+          </div>
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-medium">Redirect Locations</span>
+          </label>
+          <div className="space-y-2">
+            {locations.map(renderLocationCard)}
+            <Button
+              variant="secondary"
+              onClick={addLocation}
+            >
+              Add Location
+            </Button>
+          </div>
+        </div>
+
+        <div className="collapse collapse-arrow bg-base-200">
+          <input 
+            type="checkbox" 
+            checked={isAdvancedOpen}
+            onChange={() => setIsAdvancedOpen(!isAdvancedOpen)}
+          />
+          <div className="collapse-title font-medium">
+            Advanced Settings
+          </div>
+          <div className="collapse-content">
+            <p className="text-gray-500">Advanced settings will be added in a future update.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderReviewStep() {
+    return (
+      <div className="space-y-6">
+        <div className="bg-base-200 p-4 rounded-none">
+          <h3 className="text-lg font-semibold mb-2">Redirection Summary</h3>
+          <div className="space-y-2">
+            <p><strong>Name:</strong> {redirectionName}</p>
+            <p><strong>Status:</strong> {isEnabled ? "Active" : "Inactive"}</p>
+            <p><strong>Locations:</strong> {locations.length}</p>
+            
+            {locations.map((location, index) => (
+              <div key={location.id} className="ml-4 mt-2">
+                <p className="font-medium">Location {index + 1}: {getLocationTitle(location)}</p>
+                <ul className="list-disc list-inside ml-4">
+                  <li>
+                    Conditions: {location.conditions.map(c => `${c.type} ${c.operator} ${c.value}`).join(` ${location.operator} `)}
+                  </li>
+                  <li>
+                    {location.pageTargeting === "all" 
+                      ? `Redirect all pages to: ${location.redirectUrl}` 
+                      : `Redirect ${location.redirectMappings.length} specific pages`}
+                  </li>
+                  {location.exclusions.length > 0 && (
+                    <li>
+                      {location.exclusions.length} page exclusion{location.exclusions.length !== 1 ? 's' : ''}
+                    </li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-base-200 p-4 rounded-none">
+          <h3 className="text-lg font-semibold mb-2">Test Redirection</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Test URL</span>
+              </label>
+              <TextControl
+                value={testUrl}
+                onChange={setTestUrl}
+                placeholder="https://example.com/page"
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Test Country</span>
+              </label>
+              <TextControl
+                value={testCountry}
+                onChange={setTestCountry}
+                placeholder="US"
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                // This would be replaced with actual test logic
+                alert(`Testing redirection for URL: ${testUrl} from country: ${testCountry}`);
+              }}
+            >
+              Test Redirection
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -268,36 +665,34 @@ export function NewRedirectionModal({
       <div className="bg-white p-6 rounded-none hard-shadow max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="relative flex justify-between items-center py-2 mb-6">
           <h2 className="text-2xl mb-2 text-secondary">
-            {wizardStepToTitle(currentStep)}
+            {currentStep === "settings" ? "Redirection Settings" : "Review & Test"}
           </h2>
-          {currentStep !== "type" && (
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              {renderSteps(selectedRedirectionType?.steps, currentStep)}
-            </div>
-          )}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <ul className="steps">
+              <li className={`step ${currentStep === "settings" || currentStep === "review" ? "step-primary" : ""}`}>
+                Settings
+              </li>
+              <li className={`step ${currentStep === "review" ? "step-primary" : ""}`}>
+                Review & Test
+              </li>
+            </ul>
+          </div>
           <button className="btn btn-sm btn-circle" onClick={onClose}>
             ✕
           </button>
         </div>
 
-        {currentStep === "type" && renderRedirectionTypes()}
-        {currentStep === "settings" && renderSettings()}
+        {currentStep === "settings" && renderSettingsStep()}
+        {currentStep === "review" && renderReviewStep()}
 
-        <div className="flex justify-end gap-2">
-          {currentStep === "type" ? (
+        <div className="flex justify-end gap-2 mt-6">
+          {currentStep === "settings" ? (
             <>
               <button className="btn btn-ghost" onClick={onClose}>
                 Cancel
               </button>
-              <button
-                className="btn btn-primary"
-                disabled={!selectedRedirectionType}
-                onClick={() =>
-                  selectedRedirectionType &&
-                  handleTypeSelect(selectedRedirectionType)
-                }
-              >
-                Continue
+              <button className="btn btn-primary" onClick={handleNext}>
+                Next Step
               </button>
             </>
           ) : (
@@ -306,7 +701,7 @@ export function NewRedirectionModal({
                 Back
               </button>
               <button className="btn btn-primary" onClick={handleNext}>
-                {currentStep === "review" ? "Create Redirection" : "Next Step"}
+                Create Redirection
               </button>
             </>
           )}

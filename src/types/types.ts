@@ -25,12 +25,18 @@ export type GeoRule = GlobalGeoRule | LocalGeoRule;
 export interface Redirection {
   id: string;
   name: string;
-  type: "one-way" | "multi-domain" | "same-site";
+  type: "one-way" | "multi-domain" | "same-site" | "popup" | "query-string";
   fromUrls: string[];
   toUrl: string;
   conditions: GeoCondition[];
   operator: "AND" | "OR";
   isEnabled: boolean;
+  pageExclusions?: {
+    value: string;
+    type: "url_equals" | "url_contains" | "query_contains" | "hash_contains";
+  }[];
+  passPath?: boolean;
+  passQuery?: boolean;
 }
 
 export interface BlockAttributes {
