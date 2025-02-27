@@ -3,6 +3,7 @@ import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-co
 import { GeoCondition, Redirection } from "../../types/types";
 import { Dashicon } from "@wordpress/components";
 import Toggle from "../components/Toggle";
+import HelpHover from "./HelpHover";
 
 // Types
 export type WizardStep = "settings" | "review";
@@ -380,8 +381,9 @@ export function NewRedirectionModal({
               <div className="space-y-16">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">
+                    <span className="label-text font-semibold flex items-center">
                       Location Conditions
+                      <HelpHover text="Set conditions based on visitor's location data such as country, region, or city. Multiple conditions can be combined with AND/OR operators." />
                     </span>
                   </label>
                   <GeoConditionEditor
@@ -395,8 +397,9 @@ export function NewRedirectionModal({
                 <div>
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">
+                      <span className="label-text font-semibold flex items-center">
                         Page Targeting
+                        <HelpHover text="Choose whether to redirect all pages or only specific URLs. 'All pages' applies the redirection site-wide, while 'Specific pages' allows URL-by-URL mapping." />
                       </span>
                     </label>
                     <div className="flex gap-4">
@@ -434,8 +437,9 @@ export function NewRedirectionModal({
                   {location.pageTargeting === "all" ? (
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-semibold">
+                        <span className="label-text font-semibold flex items-center">
                           Redirect URL
+                          <HelpHover text="The destination URL where visitors will be redirected to. Use a full URL including https://." />
                         </span>
                       </label>
                       <input
@@ -453,8 +457,9 @@ export function NewRedirectionModal({
                   ) : (
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-semibold">
+                        <span className="label-text font-semibold flex items-center">
                           Redirect URLs
+                          <HelpHover text="Map specific source URLs to destination URLs. Each mapping defines which page redirects to where." />
                         </span>
                       </label>
                       <div className="space-y-2">
@@ -508,8 +513,9 @@ export function NewRedirectionModal({
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">
+                    <span className="label-text font-semibold flex items-center">
                       Page Exclusions
+                      <HelpHover text="Define exceptions to your redirection rules. Pages matching these exclusions will not be redirected, even if they match other conditions." />
                     </span>
                   </label>
                   <div className="space-y-2">
@@ -564,13 +570,17 @@ export function NewRedirectionModal({
 
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">
+                    <span className="label-text font-semibold flex items-center">
                       Additional Options
+                      <HelpHover text="Configure how URL paths and query parameters are handled during redirection." />
                     </span>
                   </label>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span>Pass page path to redirect URLs</span>
+                      <span className="flex items-center">
+                        Pass page path to redirect URLs
+                        <HelpHover text="When enabled, the current page path will be appended to the destination URL." position="left" />
+                      </span>
                       <Toggle
                         checked={location.passPath}
                         onChange={(e) =>
@@ -581,7 +591,10 @@ export function NewRedirectionModal({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Pass query string to redirect URLs</span>
+                      <span className="flex items-center">
+                        Pass query string to redirect URLs
+                        <HelpHover text="When enabled, query parameters from the current URL will be preserved and added to the destination URL." position="left" />
+                      </span>
                       <Toggle
                         checked={location.passQuery}
                         onChange={(e) =>
@@ -617,8 +630,9 @@ export function NewRedirectionModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-semibold">
+              <span className="label-text font-semibold flex items-center">
                 Geo Redirect Name
+                <HelpHover text="A descriptive name to identify this redirection rule in the admin panel." />
               </span>
             </label>
             <input
@@ -631,7 +645,10 @@ export function NewRedirectionModal({
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-semibold">Active</span>
+              <span className="label-text font-semibold flex items-center">
+                Active
+                <HelpHover text="Toggle to enable or disable this redirection rule without deleting it." />
+              </span>
             </label>
             <div className="flex items-center gap-2">
               <Toggle
@@ -644,8 +661,9 @@ export function NewRedirectionModal({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text  font-semibold">
+            <span className="label-text font-semibold flex items-center">
               Redirect Locations
+              <HelpHover text="Define different redirection rules based on visitor location. Add multiple locations for different geo-targeting scenarios." />
             </span>
           </label>
           <div className="space-y-2">
@@ -665,7 +683,10 @@ export function NewRedirectionModal({
             checked={isAdvancedOpen}
             onChange={() => setIsAdvancedOpen(!isAdvancedOpen)}
           />
-          <div className="collapse-title font-medium">Advanced Settings</div>
+          <div className="collapse-title font-medium flex items-center">
+            Advanced Settings
+            <HelpHover text="Additional configuration options for advanced redirection scenarios." />
+          </div>
           <div className="collapse-content">
             <p className="text-gray-500">
               Advanced settings will be added in a future update.
@@ -726,7 +747,10 @@ export function NewRedirectionModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Test URL</span>
+                <span className="label-text font-semibold flex items-center">
+                  Test URL
+                  <HelpHover text="Enter a URL to test how this redirection rule would affect it." />
+                </span>
               </label>
               <input
                 type="text"
@@ -738,7 +762,10 @@ export function NewRedirectionModal({
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Test Country</span>
+                <span className="label-text font-semibold flex items-center">
+                  Test Country
+                  <HelpHover text="Enter a country code (e.g., US, UK, CA) to simulate a visitor from that location." />
+                </span>
               </label>
               <input
                 type="text"
