@@ -1,10 +1,6 @@
 import { useState } from "@wordpress/element";
 import { RedirectionRule } from "../../types/types";
-import {
-  RedirectionTypeModal,
-  RedirectionType,
-} from "../components/RedirectionTypeModal";
-import { RedirectionWizard } from "../components/RedirectionWizard";
+import { NewRedirectionModal } from "../components/NewRedirectionModal";
 
 const dummyRules: RedirectionRule[] = [
   {
@@ -208,7 +204,7 @@ export function RedirectionTab(): JSX.Element {
         ))}
       </div>
 
-      <RedirectionTypeModal
+      <NewRedirectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onComplete={handleRedirectionComplete}
