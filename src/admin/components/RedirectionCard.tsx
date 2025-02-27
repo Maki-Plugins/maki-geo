@@ -765,14 +765,23 @@ export function RedirectionCard({
   }
 
   return (
-    <>
-      {/* <div className="card bg-base-100 shadow-sm rounded-none max-w-full">
-      <div className="card-body p-4"> */}
-      {/* <div className="relative py-2 mb-6">
-        <h2 className="text-2xl mb-2 text-secondary">
-          {isNew ? "New Redirection" : "Edit Redirection"}
-        </h2>
-      </div> */}
+    <div className="space-y-6">
+      <div className="relative py-2 mb-6">
+        <div className="flex justify-center mb-4">
+          <ul className="steps">
+            <li
+              className={`step ${currentStep === "settings" || currentStep === "review" ? "step-primary" : ""}`}
+            >
+              Settings
+            </li>
+            <li
+              className={`step ${currentStep === "review" ? "step-primary" : ""}`}
+            >
+              Review & Test
+            </li>
+          </ul>
+        </div>
+      </div>
 
       {currentStep === "settings" && renderSettingsStep()}
       {currentStep === "review" && renderReviewStep()}
@@ -798,8 +807,6 @@ export function RedirectionCard({
           </>
         )}
       </div>
-      {/* </div>
-    </div> */}
-    </>
+    </div>
   );
 }

@@ -8,14 +8,14 @@ export function RedirectionTab(): JSX.Element {
     string | null
   >(null);
   const [redirections, setRedirections] = useState<Redirection[]>([]);
-  const [showNewRedirectionCard, setShowNewRedirectionCard] = useState(false);
+  const [newRedirectionId, setNewRedirectionId] = useState<string | null>(null);
 
   const handleRedirectionComplete = (redirection: Redirection) => {
     setRedirections([
       ...redirections,
       { ...redirection, id: String(Date.now()) },
     ]);
-    setShowNewRedirectionCard(false);
+    setNewRedirectionId(null);
   };
 
   const handleDeleteRedirection = (redirectionId: string) => {
@@ -61,18 +61,54 @@ export function RedirectionTab(): JSX.Element {
         </div>
         <button
           className="btn btn-primary"
-          onClick={() => setShowNewRedirectionCard(!showNewRedirectionCard)}
+          onClick={() => {
+            const id = `new_${Date.now()}`;
+            setNewRedirectionId(id);
+            setExpandedRedirectionId(id);
+          }}
         >
           <Dashicon icon="plus" /> Add New Redirection
         </button>
       </div>
 
       <div className="space-y-4">
-        {showNewRedirectionCard && (
-          <RedirectionCard 
-            onComplete={handleRedirectionComplete}
-            isNew={true}
-          />
+        {newRedirectionId && (
+          <div
+            key={newRedirectionId}
+            className="card bg-base-100 shadow-sm rounded-none max-w-full"
+          >
+            <div className="card-body p-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold">New Redirection</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="btn btn-ghost btn-square btn-sm"
+                    onClick={() => setNewRedirectionId(null)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t">
+                <RedirectionCard
+                  onComplete={handleRedirectionComplete}
+                  isNew={true}
+                />
+                
+                <div className="flex justify-end mt-4">
+                  <button
+                    className="btn btn-sm btn-error"
+                    onClick={() => setNewRedirectionId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {redirections.map((redirection) => (
