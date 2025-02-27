@@ -61,6 +61,23 @@ export function NewRedirectionModal({
   const [testUrl, setTestUrl] = useState<string>("");
   const [testCountry, setTestCountry] = useState<string>("");
 
+  function resetModalState() {
+    setCurrentStep("settings");
+    setRedirectionName("");
+    setIsEnabled(true);
+    const defaultLocation = createDefaultLocation();
+    setLocations([defaultLocation]);
+    setExpandedLocationId(defaultLocation.id);
+    setIsAdvancedOpen(false);
+    setTestUrl("");
+    setTestCountry("");
+  }
+
+  const handleClose = () => {
+    resetModalState();
+    onClose();
+  };
+
   if (!isOpen) return <></>;
 
   function createDefaultLocation(): RedirectionLocation {
@@ -251,7 +268,7 @@ export function NewRedirectionModal({
       };
 
       onComplete(redirection);
-      onClose();
+      handleClose();
     }
   }
 
@@ -773,7 +790,7 @@ export function NewRedirectionModal({
               </li>
             </ul>
           </div>
-          <button className="btn btn-sm btn-circle" onClick={onClose}>
+          <button className="btn btn-sm btn-circle" onClick={handleClose}>
             ✕
           </button>
         </div>
@@ -784,7 +801,7 @@ export function NewRedirectionModal({
         <div className="flex justify-end gap-2 mt-6">
           {currentStep === "settings" ? (
             <>
-              <button className="btn btn-ghost" onClick={onClose}>
+              <button className="btn btn-ghost" onClick={handleClose}>
                 Cancel
               </button>
               <button className="btn btn-primary" onClick={handleNext}>
