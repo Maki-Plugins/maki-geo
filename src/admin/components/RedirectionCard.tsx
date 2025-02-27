@@ -27,10 +27,14 @@ export function RedirectionCard({
   initialData,
 }: RedirectionCardProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<WizardStep>("settings");
-  const [redirectionName, setRedirectionName] = useState<string>(initialData?.name || "");
-  const [isEnabled, setIsEnabled] = useState<boolean>(initialData?.isEnabled ?? true);
+  const [redirectionName, setRedirectionName] = useState<string>(
+    initialData?.name || "",
+  );
+  const [isEnabled, setIsEnabled] = useState<boolean>(
+    initialData?.isEnabled ?? true,
+  );
   const [locations, setLocations] = useState<RedirectionLocation[]>(
-    initialData?.locations || [createDefaultLocation()]
+    initialData?.locations || [createDefaultLocation()],
   );
   const [expandedLocationId, setExpandedLocationId] = useState<string | null>(
     locations[0]?.id || null,
@@ -761,53 +765,41 @@ export function RedirectionCard({
   }
 
   return (
-    <div className="card bg-base-100 shadow-sm rounded-none max-w-full">
-      <div className="card-body p-4">
-        <div className="relative py-2 mb-6">
-          <h2 className="text-2xl mb-2 text-secondary">
-            {isNew ? "New Redirection" : "Edit Redirection"}
-          </h2>
-          <div className="flex justify-center mb-4">
-            <ul className="steps">
-              <li
-                className={`step ${currentStep === "settings" || currentStep === "review" ? "step-primary" : ""}`}
-              >
-                Settings
-              </li>
-              <li
-                className={`step ${currentStep === "review" ? "step-primary" : ""}`}
-              >
-                Review & Test
-              </li>
-            </ul>
-          </div>
-        </div>
+    <>
+      {/* <div className="card bg-base-100 shadow-sm rounded-none max-w-full">
+      <div className="card-body p-4"> */}
+      {/* <div className="relative py-2 mb-6">
+        <h2 className="text-2xl mb-2 text-secondary">
+          {isNew ? "New Redirection" : "Edit Redirection"}
+        </h2>
+      </div> */}
 
-        {currentStep === "settings" && renderSettingsStep()}
-        {currentStep === "review" && renderReviewStep()}
+      {currentStep === "settings" && renderSettingsStep()}
+      {currentStep === "review" && renderReviewStep()}
 
-        <div className="flex justify-end gap-2 mt-6">
-          {currentStep === "settings" ? (
-            <>
-              <button className="btn btn-ghost" onClick={resetState}>
-                Reset
-              </button>
-              <button className="btn btn-primary" onClick={handleNext}>
-                Next Step
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="btn btn-ghost" onClick={handleBack}>
-                Back
-              </button>
-              <button className="btn btn-primary" onClick={handleNext}>
-                {isNew ? "Create Redirection" : "Update Redirection"}
-              </button>
-            </>
-          )}
-        </div>
+      <div className="flex justify-end gap-2 mt-6">
+        {currentStep === "settings" ? (
+          <>
+            <button className="btn btn-ghost" onClick={resetState}>
+              Reset
+            </button>
+            <button className="btn btn-primary" onClick={handleNext}>
+              Next Step
+            </button>
+          </>
+        ) : (
+          <>
+            <button className="btn btn-ghost" onClick={handleBack}>
+              Back
+            </button>
+            <button className="btn btn-primary" onClick={handleNext}>
+              {isNew ? "Create Redirection" : "Update Redirection"}
+            </button>
+          </>
+        )}
       </div>
-    </div>
+      {/* </div>
+    </div> */}
+    </>
   );
 }
