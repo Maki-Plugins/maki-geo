@@ -280,7 +280,10 @@ export function NewRedirectionModal({
     }
   }
 
-  function getLocationTitle(location: RedirectionLocation): string {
+  function getLocationTitle(
+    location: RedirectionLocation,
+    index: number,
+  ): string {
     // Get a summary of the conditions
     const conditionSummary =
       location.conditions.length > 0
@@ -307,18 +310,18 @@ export function NewRedirectionModal({
       title = `${firstTwo} + ${location.conditions.length - 2} more`;
     }
 
-    return `${title} - ${pageSummary}`;
+    return `Location ${index + 1}: ${title} - ${pageSummary}`;
   }
 
-  function renderLocationCard(location: RedirectionLocation) {
+  function renderLocationCard(location: RedirectionLocation, index: number) {
     const isExpanded = expandedLocationId === location.id;
 
     return (
       <div
         key={location.id}
-        className="card bg-base-100 shadow-sm rounded-none max-w-full mb-4"
+        className="card border-neutral shadow-sm rounded-none max-w-full mb-4 mt-0"
       >
-        <div className="card-body p-4">
+        <div className="card-body p-1">
           <div
             className="flex items-center gap-4 cursor-pointer"
             onClick={() =>
@@ -326,11 +329,13 @@ export function NewRedirectionModal({
             }
           >
             <div className="flex-1">
-              <h3 className="font-semibold">{getLocationTitle(location)}</h3>
+              <h3 className="font-bold text-base">
+                {getLocationTitle(location, index)}
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <button
-                className="btn btn-square btn-sm"
+                className="btn btn-ghost btn-square btn-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   setExpandedLocationId(isExpanded ? null : location.id);
@@ -355,11 +360,11 @@ export function NewRedirectionModal({
 
           {isExpanded && (
             <div className="mt-4 pt-4 border-t">
-              <div className="space-y-4">
+              <div className="space-y-16">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-medium">
-                      Geo Conditions
+                    <span className="label-text font-semibold">
+                      Location Conditions
                     </span>
                   </label>
                   <GeoConditionEditor
@@ -370,119 +375,123 @@ export function NewRedirectionModal({
                     }
                   />
                 </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      Page Targeting
-                    </span>
-                  </label>
-                  <div className="flex gap-4">
-                    <label className="label cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`pageTargeting-${location.id}`}
-                        className="radio radio-primary"
-                        checked={location.pageTargeting === "all"}
-                        onChange={() =>
-                          updateLocation(location.id, { pageTargeting: "all" })
-                        }
-                      />
-                      <span className="label-text ml-2">All pages</span>
-                    </label>
-                    <label className="label cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`pageTargeting-${location.id}`}
-                        className="radio radio-primary"
-                        checked={location.pageTargeting === "specific"}
-                        onChange={() =>
-                          updateLocation(location.id, {
-                            pageTargeting: "specific",
-                          })
-                        }
-                      />
-                      <span className="label-text ml-2">Specific pages</span>
-                    </label>
-                  </div>
-                </div>
-
-                {location.pageTargeting === "all" ? (
+                <div>
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text">Redirect URL</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={location.redirectUrl}
-                      onChange={(e) =>
-                        updateLocation(location.id, {
-                          redirectUrl: e.target.value,
-                        })
-                      }
-                      placeholder="https://example.com"
-                      className="input input-bordered input-sm w-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-medium">
-                        Redirect URLs
+                      <span className="label-text font-semibold">
+                        Page Targeting
                       </span>
                     </label>
-                    <div className="space-y-2">
-                      {location.redirectMappings.map((mapping) => (
-                        <div
-                          key={mapping.id}
-                          className="join flex items-center"
-                        >
-                          <input
-                            type="text"
-                            value={mapping.fromUrl}
-                            onChange={(e) =>
-                              updateRedirectMapping(location.id, mapping.id, {
-                                fromUrl: e.target.value,
-                              })
-                            }
-                            placeholder="From URL"
-                            className="input input-bordered input-sm w-full join-item"
-                          />
-                          <span className="join-item mx-2">→</span>
-                          <input
-                            type="text"
-                            value={mapping.toUrl}
-                            onChange={(e) =>
-                              updateRedirectMapping(location.id, mapping.id, {
-                                toUrl: e.target.value,
-                              })
-                            }
-                            placeholder="To URL"
-                            className="input input-bordered input-sm w-full join-item"
-                          />
-                          <button
-                            className="btn btn-sm btn-error btn-ghost join-item"
-                            onClick={() =>
-                              deleteRedirectMapping(location.id, mapping.id)
-                            }
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        className="btn btn-sm btn-accent"
-                        onClick={() => addRedirectMapping(location.id)}
-                      >
-                        <Dashicon icon="plus" /> Add URL Mapping
-                      </button>
+                    <div className="flex gap-4">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`pageTargeting-${location.id}`}
+                          className="radio radio-primary"
+                          checked={location.pageTargeting === "all"}
+                          onChange={() =>
+                            updateLocation(location.id, {
+                              pageTargeting: "all",
+                            })
+                          }
+                        />
+                        <span className="label-text ml-1">All pages</span>
+                      </label>
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`pageTargeting-${location.id}`}
+                          className="radio radio-primary"
+                          checked={location.pageTargeting === "specific"}
+                          onChange={() =>
+                            updateLocation(location.id, {
+                              pageTargeting: "specific",
+                            })
+                          }
+                        />
+                        <span className="label-text ml-1">Specific pages</span>
+                      </label>
                     </div>
                   </div>
-                )}
 
+                  {location.pageTargeting === "all" ? (
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text font-semibold">
+                          Redirect URL
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={location.redirectUrl}
+                        onChange={(e) =>
+                          updateLocation(location.id, {
+                            redirectUrl: e.target.value,
+                          })
+                        }
+                        placeholder="https://example.com"
+                        className="input input-bordered input-sm w-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text font-semibold">
+                          Redirect URLs
+                        </span>
+                      </label>
+                      <div className="space-y-2">
+                        {location.redirectMappings.map((mapping) => (
+                          <div
+                            key={mapping.id}
+                            className="join flex items-center"
+                          >
+                            <input
+                              type="text"
+                              value={mapping.fromUrl}
+                              onChange={(e) =>
+                                updateRedirectMapping(location.id, mapping.id, {
+                                  fromUrl: e.target.value,
+                                })
+                              }
+                              placeholder="From URL"
+                              className="input input-bordered input-sm w-full join-item"
+                            />
+                            <span className="join-item mx-2">→</span>
+                            <input
+                              type="text"
+                              value={mapping.toUrl}
+                              onChange={(e) =>
+                                updateRedirectMapping(location.id, mapping.id, {
+                                  toUrl: e.target.value,
+                                })
+                              }
+                              placeholder="To URL"
+                              className="input input-bordered input-sm w-full join-item"
+                            />
+                            <button
+                              className="btn btn-sm btn-error btn-ghost join-item"
+                              onClick={() =>
+                                deleteRedirectMapping(location.id, mapping.id)
+                              }
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          className="btn btn-sm btn-accent btn-outline"
+                          onClick={() => addRedirectMapping(location.id)}
+                        >
+                          <Dashicon icon="plus" /> Add URL Mapping
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-medium">
+                    <span className="label-text font-semibold">
                       Page Exclusions
                     </span>
                   </label>
@@ -528,7 +537,7 @@ export function NewRedirectionModal({
                       </div>
                     ))}
                     <button
-                      className="btn btn-sm btn-accent"
+                      className="btn btn-sm btn-accent btn-outline"
                       onClick={() => addExclusion(location.id)}
                     >
                       <Dashicon icon="plus" /> Add Exclusion
@@ -538,7 +547,7 @@ export function NewRedirectionModal({
 
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-medium">
+                    <span className="label-text font-semibold">
                       Additional Options
                     </span>
                   </label>
@@ -548,7 +557,9 @@ export function NewRedirectionModal({
                       <Toggle
                         checked={location.passPath}
                         onChange={(e) =>
-                          updateLocation(location.id, { passPath: e.target.checked })
+                          updateLocation(location.id, {
+                            passPath: e.target.checked,
+                          })
                         }
                       />
                     </div>
@@ -557,7 +568,9 @@ export function NewRedirectionModal({
                       <Toggle
                         checked={location.passQuery}
                         onChange={(e) =>
-                          updateLocation(location.id, { passQuery: e.target.checked })
+                          updateLocation(location.id, {
+                            passQuery: e.target.checked,
+                          })
                         }
                       />
                     </div>
@@ -587,22 +600,23 @@ export function NewRedirectionModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Geo Redirect Name</span>
+              <span className="label-text font-semibold">
+                Geo Redirect Name
+              </span>
             </label>
             <input
               type="text"
               value={redirectionName}
               onChange={(e) => setRedirectionName(e.target.value)}
-              placeholder="e.g., US/CA to English Site"
+              placeholder="US and CA to English site"
               className="input input-bordered input-sm w-full"
             />
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Status</span>
+              <span className="label-text font-semibold">Active</span>
             </label>
             <div className="flex items-center gap-2">
-              <span>Activated</span>
               <Toggle
                 checked={isEnabled}
                 onChange={(e) => setIsEnabled(e.target.checked)}
@@ -613,11 +627,16 @@ export function NewRedirectionModal({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text font-medium">Redirect Locations</span>
+            <span className="label-text  font-semibold">
+              Redirect Locations
+            </span>
           </label>
           <div className="space-y-2">
             {locations.map(renderLocationCard)}
-            <button className="btn btn-sm btn-accent" onClick={addLocation}>
+            <button
+              className="btn btn-sm btn-accent btn-outline"
+              onClick={addLocation}
+            >
               <Dashicon icon="plus" /> Add Location
             </button>
           </div>
@@ -659,7 +678,7 @@ export function NewRedirectionModal({
             {locations.map((location, index) => (
               <div key={location.id} className="ml-4 mt-2">
                 <p className="font-medium">
-                  Location {index + 1}: {getLocationTitle(location)}
+                  {getLocationTitle(location, index)}
                 </p>
                 <ul className="list-disc list-inside ml-4">
                   <li>
@@ -690,7 +709,7 @@ export function NewRedirectionModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Test URL</span>
+                <span className="label-text font-semibold">Test URL</span>
               </label>
               <input
                 type="text"
@@ -702,7 +721,7 @@ export function NewRedirectionModal({
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Test Country</span>
+                <span className="label-text font-semibold">Test Country</span>
               </label>
               <input
                 type="text"
@@ -715,7 +734,7 @@ export function NewRedirectionModal({
           </div>
           <div className="mt-4">
             <button
-              className="btn btn-sm btn-accent"
+              className="btn btn-sm btn-accent btn-outline"
               onClick={() => {
                 // This would be replaced with actual test logic
                 alert(
