@@ -37,6 +37,11 @@ Maki Geo works by requesting the user location from our location services API. Y
 
 == Screenshots ==
 
+1. Example of using Maki Geo to show a popup that redirects the user to a localized version of the website.
+2. The setup of the popup using the Geo Popup Gutenberg block.
+3. Shortcodes that show user location data.
+4. What the shortcodes look like to the user.
+5. Show/hide any content to users in specific locations by using the Geo Content block.
 
 == Frequently Asked Questions ==
 
