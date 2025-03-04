@@ -16,7 +16,7 @@ Easily personalize your website based on visitor location. Increase engagement, 
 ## Features
 **🎯 Geo targeting:** Target visitors based on continent, country, state/province, city, or IP address with precision.
 **🧠 Smart Content Display:** Show different text, images, banners, JavaScript, and popups based on visitor location.
-**📍 Location information:** Display visitor's country, state city and flag anywhere on your website.
+**📍 Location information:** Display visitor's country, state, city and flag anywhere on your website.
 **⚙️ Advanced Rule Editor:** Create complex targeting rules like "user in USA but _not_ in Texas" with our intuitive editor.
 
 ## Use cases
@@ -29,7 +29,7 @@ Easily personalize your website based on visitor location. Increase engagement, 
 * **Showing or hiding content based on user location.** Maki Geo contains Gutenberg blocks that can be set to show or hide based on a given geo location. You can fill these blocks with your custom content, like text, images or javascript.
 Alternatively, you can use the shortcode, for example: `[mgeo_content country="Canada"] Geo targeted content for Canada [/mgeo_content]`.
 
-* **Showing the user's location on your page.** These shortcodes are supported: `[mgeo_flag]`, `[mgeo_country]`, `[mgeo_region]` (for state or province) and `[mgeo_city]`.
+* **Showing the user's location on your page.** These shortcodes are supported: `[mgeo_country_flag]`, `[mgeo_country]`, `[mgeo_region]` (for state or province) and `[mgeo_city]`.
 
 ## Paid service
 
@@ -54,10 +54,10 @@ An API request is used when a new IP address is used to visit your geo targeted 
 
 == Changelog ==
 
-= 1.0 =
+= 1.0.0 =
 * Initial version of Maki Geo.
 
 == Upgrade Notice ==
 
-= 1.0 =
+= 1.0.0 =
 Initial version of Maki Geo.
