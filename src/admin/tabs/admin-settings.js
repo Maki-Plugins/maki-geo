@@ -31,32 +31,4 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Failed to verify API key. Please try again.");
       }
     });
-
-  // Delete All Rules
-  document
-    .getElementById("delete-all-rules")
-    ?.addEventListener("click", async function () {
-      if (
-        !confirm(
-          "Are you sure you want to delete all geo rules? This action cannot be undone.",
-        )
-      ) {
-        return;
-      }
-
-      try {
-        const response = await wp.apiFetch({
-          path: "maki-geo/v1/rules",
-          method: "DELETE",
-        });
-
-        if (response.success) {
-          alert("All rules have been deleted successfully.");
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error("Failed to delete rules:", error);
-        alert("Failed to delete rules. Please try again.");
-      }
-    });
 });

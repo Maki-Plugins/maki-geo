@@ -12,16 +12,8 @@
     "html": false
   },
   "attributes": {
-    "ruleType": {
-      "type": "string",
-      "default": "local"
-    },
-    "localRule": {
+    "geoRule": {
       "type": "object",
-      "default": null
-    },
-    "globalRuleId": {
-      "type": "string",
       "default": null
     },
     "popupStyle": {

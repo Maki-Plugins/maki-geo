@@ -19,7 +19,7 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import { FC } from "react";
-import { GeoCondition, GeoRule, GeoRuleBase } from "../../types/types";
+import { GeoCondition, GeoRule } from "../../types/types";
 
 interface GeoRuleEditorProps {
   rule: GeoRule;
@@ -71,12 +71,12 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
 
   const updateCondition = (
     conditionIndex: number,
-    updates: Partial<GeoRuleBase["conditions"][0]>
+    updates: Partial<GeoRule["conditions"][0]>,
   ) => {
     const newRule = {
       ...rule,
       conditions: rule.conditions.map((condition, i) =>
-        i === conditionIndex ? { ...condition, ...updates } : condition
+        i === conditionIndex ? { ...condition, ...updates } : condition,
       ),
     };
     onChange(newRule);
@@ -98,8 +98,8 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   };
 
   const renderConditionInput = (
-    condition: GeoRuleBase["conditions"][0],
-    conditionIndex: number
+    condition: GeoRule["conditions"][0],
+    conditionIndex: number,
   ) => {
     switch (condition.type) {
       case "continent":
@@ -158,25 +158,6 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
 
   return (
     <Card className="geo-rule-card">
-      <CardHeader>
-        <Flex
-          className="geo-rule-card-header"
-          direction="column"
-          align="stretch"
-          justify="space-between"
-        >
-          {showName && rule.ruleType === "global" && (
-            <>
-              <label>Name</label>
-              <TextControl
-                value={rule.name}
-                onChange={(name) => onChange({ ...rule, name })}
-                placeholder="Rule Name"
-              />
-            </>
-          )}
-        </Flex>
-      </CardHeader>
       <CardBody>
         <div className="visibility-toggle">
           <label>Content Visibility</label>
@@ -252,13 +233,14 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                         >
-                          <Flex
-                            justify="inherit"
-                            gap={2}
-                          >
-                            <div className="mgeo-geo-condition-grabber"
-                              {...provided.dragHandleProps}>⋮⋮</div>
-                            <span>When{" "}</span>
+                          <Flex justify="inherit" gap={2}>
+                            <div
+                              className="mgeo-geo-condition-grabber"
+                              {...provided.dragHandleProps}
+                            >
+                              ⋮⋮
+                            </div>
+                            <span>When </span>
                             <SelectControl
                               className="mgeo-geo-rule-select"
                               __nextHasNoMarginBottom={true}
@@ -268,7 +250,7 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
                                 ([value, label]) => ({
                                   value,
                                   label,
-                                })
+                                }),
                               )}
                               onChange={(type) =>
                                 updateCondition(conditionIndex, {
