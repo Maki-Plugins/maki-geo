@@ -1,4 +1,10 @@
 <?php
+/**
+ * API endpoints for geo redirection
+ *
+ * @package Maki_Geo
+ */
+
 if (!defined("ABSPATH")) {
     exit();
 }
@@ -44,6 +50,7 @@ add_action("rest_api_init", "mgeo_register_redirections_api");
  */
 function mgeo_handle_redirection_api($request)
 {
+    mgeo_verify_nonce();
     $current_url = isset($_SERVER["HTTP_REFERER"])
         ? $_SERVER["HTTP_REFERER"]
         : "";
@@ -81,31 +88,13 @@ function mgeo_handle_redirection_api($request)
 }
 
 /**
- * Save redirections to WordPress options
- *
- * @param array $redirections Array of redirection configurations
- * @return bool Whether the save was successful
- */
-function mgeo_save_redirections($redirections)
-{
-    // Validate redirections
-    if (!is_array($redirections)) {
-        return false;
-    }
-
-    // Save as JSON string to ensure consistent format
-    $json = wp_json_encode($redirections);
-
-    return update_option("mgeo_redirections", $json);
-}
-
-/**
  * Handle GET requests for redirections API
  *
  * @return WP_REST_Response API response with redirections
  */
 function mgeo_get_redirections_api()
 {
+    mgeo_verify_nonce();
     $redirections = mgeo_get_redirections();
     return new WP_REST_Response($redirections);
 }
@@ -118,6 +107,7 @@ function mgeo_get_redirections_api()
  */
 function mgeo_save_redirections_api($request)
 {
+    mgeo_verify_nonce();
     $redirections = $request->get_json_params();
 
     if (empty($redirections) || !is_array($redirections)) {
