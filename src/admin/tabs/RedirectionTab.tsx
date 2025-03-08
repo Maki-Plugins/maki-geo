@@ -1,7 +1,14 @@
-import { useState } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
 import { Redirection } from "../../types/types";
 import { RedirectionCard } from "../components/RedirectionCard";
 import { Dashicon } from "@wordpress/components";
+import apiFetch from "@wordpress/api-fetch";
+import { addQueryArgs } from "@wordpress/url";
+
+declare const makiGeoData: {
+  nonce: string;
+  redirections: Redirection[];
+};
 
 export function RedirectionTab(): JSX.Element {
   const [expandedRedirectionId, setExpandedRedirectionId] = useState<
@@ -9,26 +16,96 @@ export function RedirectionTab(): JSX.Element {
   >(null);
   const [redirections, setRedirections] = useState<Redirection[]>([]);
   const [newRedirectionId, setNewRedirectionId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveMessage, setSaveMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  // Load redirections from WordPress data
+  useEffect(() => {
+    if (makiGeoData && makiGeoData.redirections) {
+      setRedirections(makiGeoData.redirections);
+    }
+  }, []);
+
+  // Save redirections to the database
+  const saveRedirections = async (redirectionsToSave: Redirection[]) => {
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      const response = await apiFetch({
+        path: addQueryArgs("/wp-json/maki-geo/v1/redirections", {
+          _wpnonce: makiGeoData.nonce,
+        }),
+        method: "POST",
+         redirectionsToSave,
+      });
+
+      if (response && response.success) {
+        setSaveMessage({
+          text: "Redirections saved successfully!",
+          type: "success",
+        });
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+          setSaveMessage(null);
+        }, 3000);
+      } else {
+        setSaveMessage({
+          text: response.message || "Failed to save redirections.",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving redirections:", error);
+      setSaveMessage({
+        text: "An error occurred while saving redirections.",
+        type: "error",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleRedirectionComplete = (redirection: Redirection) => {
-    setRedirections([
+    const updatedRedirections = [
       ...redirections,
       { ...redirection, id: String(Date.now()) },
-    ]);
+    ];
+    setRedirections(updatedRedirections);
     setNewRedirectionId(null);
+    saveRedirections(updatedRedirections);
   };
 
   const handleDeleteRedirection = (redirectionId: string) => {
     if (window.confirm("Are you sure you want to delete this redirection?")) {
-      setRedirections(
-        redirections.filter((redirection) => redirection.id !== redirectionId),
+      const updatedRedirections = redirections.filter(
+        (redirection) => redirection.id !== redirectionId
       );
+      setRedirections(updatedRedirections);
+      saveRedirections(updatedRedirections);
     }
   };
 
   return (
     <div className="p-5">
       <div className="mb-5 flex justify-between items-center">
+        {saveMessage && (
+          <div
+            className={`alert ${
+              saveMessage.type === "success" ? "alert-success" : "alert-error"
+            } shadow-lg absolute top-4 right-4 w-auto max-w-md`}
+          >
+            <div>
+              <Dashicon
+                icon={saveMessage.type === "success" ? "yes" : "no"}
+              />
+              <span>{saveMessage.text}</span>
+            </div>
+          </div>
+        )}
         <div>
           <h2 className="text-2xl mb-2 text-secondary">Geo redirection</h2>
           <p className="text-gray-600">
@@ -140,14 +217,14 @@ export function RedirectionTab(): JSX.Element {
                 <div className="mt-4 pt-4 border-t">
                   <RedirectionCard
                     onComplete={(updatedRedirection) => {
-                      setRedirections(
-                        redirections.map((r) =>
-                          r.id === redirection.id
-                            ? { ...updatedRedirection, id: redirection.id }
-                            : r,
-                        ),
+                      const updatedRedirections = redirections.map((r) =>
+                        r.id === redirection.id
+                          ? { ...updatedRedirection, id: redirection.id }
+                          : r
                       );
+                      setRedirections(updatedRedirections);
                       setExpandedRedirectionId(null);
+                      saveRedirections(updatedRedirections);
                     }}
                     isNew={false}
                     initialData={redirection}

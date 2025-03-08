@@ -274,6 +274,48 @@ function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
     return $redirect_url;
 }
 
+/**
+ * Save redirections to the database
+ *
+ * @param array $redirections Array of redirection configurations
+ * @return bool Whether the save was successful
+ */
+function mgeo_save_redirections($redirections)
+{
+    // Ensure we have an array
+    if (!is_array($redirections)) {
+        return false;
+    }
+
+    // Update the option
+    return update_option("mgeo_redirections", $redirections);
+}
+
+/**
+ * Sanitize redirections data before saving
+ *
+ * @param mixed $redirections Redirections data to sanitize
+ * @return array Sanitized redirections data
+ */
+function mgeo_sanitize_redirections($redirections)
+{
+    // If it's a JSON string, decode it
+    if (is_string($redirections)) {
+        $decoded = json_decode($redirections, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $redirections = $decoded;
+        }
+    }
+
+    // Ensure we have an array
+    if (!is_array($redirections)) {
+        return [];
+    }
+
+    // Return the sanitized array
+    return $redirections;
+}
+
 // Hook into WordPress to initialize geo redirection
 add_action("template_redirect", "mgeo_init_geo_redirection", 1);
 

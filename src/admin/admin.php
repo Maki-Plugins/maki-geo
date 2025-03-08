@@ -46,6 +46,11 @@ function mgeo_register_settings()
         "sanitize_callback" => "mgeo_sanitize_geo_rules",
         "show_in_rest" => true,
     ]);
+
+    $registry->register_setting("mgeo_redirections", [
+        "sanitize_callback" => "mgeo_sanitize_redirections",
+        "show_in_rest" => true,
+    ]);
 }
 
 function mgeo_add_admin_menu()
@@ -93,6 +98,7 @@ function mgeo_enqueue_admin_scripts($hook)
             "monthlyRequests" => intval(get_option("mgeo_monthly_requests", 0)),
             "requestLimit" => intval(get_option("mgeo_request_limit", 1000)),
         ],
+        "redirections" => mgeo_get_redirections(),
     ]);
 }
 
