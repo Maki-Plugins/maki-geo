@@ -48,7 +48,7 @@ function mgeo_content_shortcode($atts, $content = "")
     }
 
     // Evaluate the rule and return content accordingly
-    if (mgeo_evaluate_rule($rule, $location_data)) {
+    if (mgeo_evaluate_geo_content($rule, $location_data)) {
         return sprintf("<div>%s</div>", do_shortcode($content));
     }
 
