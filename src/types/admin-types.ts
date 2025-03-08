@@ -1,7 +1,5 @@
-import { GlobalGeoRule } from './types';
-
 export interface AdminSettings {
-  clientServerMode: 'server' | 'client';
+  clientServerMode: "server" | "client";
   apiKey: string;
   monthlyRequests: number;
   requestLimit: number;

@@ -3,7 +3,6 @@ import { useState } from "@wordpress/element";
 import { Dashicon } from "@wordpress/components";
 import makiGeoLogo from "../assets/maki-geo-logo.svg";
 import { AdminTabsProps } from "../types/admin-types";
-import { GeoRulesTab } from "./tabs/GeoRulesTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { RedirectionTab } from "./tabs/RedirectionTab";
 import "../styles/tailwind.css";
