@@ -1,10 +1,7 @@
-import { GeoRuleBase, GlobalGeoRule, LocationData } from "../types/types";
+import { GeoRule, LocationData } from "../types/types";
 
 declare global {
   interface Window {
-    makiGeoData?: {
-      globalRules: GlobalGeoRule[];
-    };
     wp: {
       apiFetch: (options: { path: string }) => Promise<LocationData>;
     };
@@ -20,29 +17,18 @@ async function initGeoTargeting(): Promise<void> {
 
     const blocksClass = "mgeo-geo-target-block";
 
-    const blocks = document.querySelectorAll<HTMLElement>(
-      `.${blocksClass}`
-    );
-    const globalRules = window.makiGeoData?.globalRules || [];
+    const blocks = document.querySelectorAll<HTMLElement>(`.${blocksClass}`);
 
     blocks.forEach((block) => {
-      const ruleType = block.dataset.ruletype;
-      let rule: GeoRuleBase | null = null;
-
-      if (ruleType === "local") {
-        rule = JSON.parse(block.dataset.rule || "null");
-      } else if (ruleType === "global") {
-        const globalRuleId = JSON.parse(block.dataset.rule || "null");
-        rule = globalRules.find((r) => r.id === globalRuleId) || null;
-      }
+      let rule: GeoRule | null = null;
+      rule = JSON.parse(block.dataset.rule || "null");
 
       const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
 
-
       if (shouldShow) {
-        block.style.display = 'block';
+        block.style.display = "block";
       } else {
-        block.style.display = 'none';
+        block.style.display = "none";
       }
     });
   } catch (error) {
@@ -52,14 +38,14 @@ async function initGeoTargeting(): Promise<void> {
 
 /**
  * Evaluates the given rule and location and returns if the content that is governed by this rule should be shown for this location.
- * 
+ *
  * @param rule The geo rule to evaluate
  * @param locationData The location to evaluate and see if it fits the geo rule
  * @returns Boolean value indicating if the content should be shown (true) or hidden (false)
  */
 export function evaluateGeoRule(
-  rule: GeoRuleBase,
-  locationData: LocationData
+  rule: GeoRule,
+  locationData: LocationData,
 ): boolean {
   // console.log(`Rules: ${JSON.stringify(rule)}`);
   // console.log(`Location data: ${JSON.stringify(locationData)}`);
@@ -77,14 +63,20 @@ export function evaluateGeoRule(
     if (condition.operator === "is") {
       if (condition.type === "country") {
         const locationCountryCode = locationData.country_code.toLowerCase();
-        return locationValue === conditionValue || locationCountryCode === conditionValue;
+        return (
+          locationValue === conditionValue ||
+          locationCountryCode === conditionValue
+        );
       }
       return locationValue === conditionValue;
     } else {
       // "is not"
       if (condition.type === "country") {
         const locationCountryCode = locationData.country_code.toLowerCase();
-        return locationValue !== conditionValue && locationCountryCode !== conditionValue;
+        return (
+          locationValue !== conditionValue &&
+          locationCountryCode !== conditionValue
+        );
       }
       return locationValue !== conditionValue;
     }

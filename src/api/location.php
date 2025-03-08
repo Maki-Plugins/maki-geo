@@ -3,17 +3,13 @@ if (!defined("ABSPATH")) {
     exit();
 }
 
-add_action(
-    "rest_api_init", function () {
-        register_rest_route(
-            "maki-geo/v1", "/location", [
-            "methods" => "GET",
-            "callback" => "mgeo_get_geolocation_data",
-            "permission_callback" => "__return_true",
-            ]
-        );
-    }
-);
+add_action("rest_api_init", function () {
+    register_rest_route("maki-geo/v1", "/location", [
+        "methods" => "GET",
+        "callback" => "mgeo_get_geolocation_data",
+        "permission_callback" => "__return_true",
+    ]);
+});
 
 /**
  * Gets the location of the requestor based on IP geolocation.

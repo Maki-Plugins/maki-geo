@@ -16,13 +16,8 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
       icon: <Dashicon icon="admin-generic" />,
     },
     {
-      id: "geo-rules",
-      label: "Global Geo Rules",
-      icon: <Dashicon icon="list-view" />,
-    },
-    {
       id: "redirection",
-      label: "Geo Redirection",
+      label: "Geo redirection",
       icon: <Dashicon icon="randomize" />,
     },
   ];
@@ -30,7 +25,7 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
   return (
     <div className="flex flex-col">
       <div className="">
-        <nav className="flex gap-2 items-end max-w-2xl" aria-label="Tabs">
+        <nav className="flex gap-2 items-end max-w-xl" aria-label="Tabs">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -54,9 +49,6 @@ function AdminTabs({ activeTab, onTabChange }: AdminTabsProps): JSX.Element {
       <div className="bg-white hard-shadow">
         <div className={activeTab === "settings" ? "block" : "hidden"}>
           <SettingsTab />
-        </div>
-        <div className={activeTab === "geo-rules" ? "block" : "hidden"}>
-          <GeoRulesTab />
         </div>
         <div className={activeTab === "redirection" ? "block" : "hidden"}>
           <RedirectionTab />

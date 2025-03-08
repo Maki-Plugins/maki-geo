@@ -59,31 +59,6 @@ export function SettingsTab(): JSX.Element {
     }
   };
 
-  const handleDeleteAllRules = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete all geo rules? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await apiFetch({
-        path: "maki-geo/v1/rules",
-        method: "DELETE",
-      });
-
-      if (response.success) {
-        alert("All rules have been deleted successfully.");
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error("Failed to delete rules:", error);
-      alert("Failed to delete rules. Please try again.");
-    }
-  };
-
   const saveSettings = async () => {
     setIsSaving(true);
     try {
@@ -112,13 +87,13 @@ export function SettingsTab(): JSX.Element {
     <div className="mgeo-settings-tab">
       <div className="mb-5 grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-5">
         <div className="p-5">
-          <h2 className="text-2xl mb-2 text-secondary">General Settings</h2>
+          <h2 className="text-2xl mb-2 text-secondary">General settings</h2>
           <p className="mb-3">
             Change the general Maki Geo settings for this website.
           </p>
           <div className="divider before:h-2 after:h-2"></div>
           <SettingRow
-            title="Geo Targeting Method"
+            title="Geo targeting method"
             description={
               <>
                 <b>Server-side:</b> Processes geo location on the server before
@@ -143,13 +118,13 @@ export function SettingsTab(): JSX.Element {
                   })
                 }
               >
-                <option label="Server-side (Default)">server</option>
+                <option label="Server-side (default)">server</option>
                 <option label="Client-side">client</option>
               </select>
             }
           />
           <SettingRow
-            title="API Key"
+            title="API key"
             description={
               <>
                 Enter your API key to increase your monthly request limit.{" "}
@@ -195,7 +170,7 @@ export function SettingsTab(): JSX.Element {
                 </>
               ) : (
                 <>
-                  <Dashicon icon="saved" /> Save Settings
+                  <Dashicon icon="saved" /> Save settings
                 </>
               )}
             </button>
@@ -205,22 +180,12 @@ export function SettingsTab(): JSX.Element {
               </p>
             )}
           </div>
-          <div className="divider before:h-2 after:h-2 my-5"></div>
-          <h3 className="text-lg font-semibold mb-5">Danger Zone</h3>
-          <Button
-            className="hover:bg-gray-100"
-            variant="secondary"
-            isDestructive
-            onClick={handleDeleteAllRules}
-          >
-            Delete All Global Geo Rules
-          </Button>
         </div>
         <div className=" p-5">
           <h2 className="text-2xl mb-2 text-secondary">Statistics</h2>
           <div className="stats w-full rounded-none">
             <div className="stat place-items-center text-accent">
-              <div className="stat-title">Location API Requests this month</div>
+              <div className="stat-title">Location API requests this month</div>
               <div className="stat-value">{settings.monthlyRequests}</div>
               <div className="stat-desc">
                 Limit: {settings.requestLimit} (

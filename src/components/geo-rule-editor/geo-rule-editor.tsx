@@ -1,15 +1,12 @@
 import {
-  TextControl,
   Button,
   Card,
-  CardHeader,
   CardBody,
-  Flex,
   ButtonGroup,
   Dashicon,
 } from "@wordpress/components";
 import { FC } from "react";
-import { GeoRule, GeoRuleBase } from "../../types/types";
+import { GeoRule } from "../../types/types";
 import { GeoConditionEditor } from "../geo-condition-editor/geo-condition-editor";
 
 interface GeoRuleEditorProps {
@@ -24,8 +21,8 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
   showName = false,
 }) => {
   const updateConditions = (
-    conditions: GeoRuleBase["conditions"],
-    operator: GeoRuleBase["operator"],
+    conditions: GeoRule["conditions"],
+    operator: GeoRule["operator"],
   ) => {
     const newRule = {
       ...rule,
@@ -37,25 +34,6 @@ export const GeoRuleEditor: FC<GeoRuleEditorProps> = ({
 
   return (
     <Card className="geo-rule-card">
-      <CardHeader>
-        <Flex
-          className="geo-rule-card-header"
-          direction="column"
-          align="stretch"
-          justify="space-between"
-        >
-          {showName && rule.ruleType === "global" && (
-            <>
-              <label>Name</label>
-              <TextControl
-                value={rule.name}
-                onChange={(name) => onChange({ ...rule, name })}
-                placeholder="Rule Name"
-              />
-            </>
-          )}
-        </Flex>
-      </CardHeader>
       <CardBody>
         <div className="visibility-toggle">
           <label>Content Visibility</label>

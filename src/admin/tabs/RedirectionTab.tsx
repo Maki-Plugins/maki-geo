@@ -30,7 +30,7 @@ export function RedirectionTab(): JSX.Element {
     <div className="p-5">
       <div className="mb-5 flex justify-between items-center">
         <div>
-          <h2 className="text-2xl mb-2 text-secondary">Geo Redirection</h2>
+          <h2 className="text-2xl mb-2 text-secondary">Geo redirection</h2>
           <p className="text-gray-600">
             Manage your geo-based URL redirections
           </p>
@@ -43,7 +43,7 @@ export function RedirectionTab(): JSX.Element {
             setExpandedRedirectionId(id);
           }}
         >
-          <Dashicon icon="plus" /> Add New Redirection
+          <Dashicon icon="plus" /> Add new redirection
         </button>
       </div>
 
@@ -56,7 +56,7 @@ export function RedirectionTab(): JSX.Element {
             <div className="card-body p-1">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-base">New Redirection</h3>
+                  <h3 className="font-semibold text-base">New redirection</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <button

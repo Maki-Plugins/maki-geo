@@ -15,7 +15,7 @@ import { GeoRulesPanel } from "../../components/geo-rules-panel/geo-rules-panel"
 import metadata from "./block.json";
 import "./geo-popup.css";
 import "./style.css";
-import { LocalGeoRule } from "types/types";
+import { GeoRule } from "types/types";
 
 interface PopupStyle {
   width: string;
@@ -28,9 +28,7 @@ interface PopupAttributes {
   popupStyle: PopupStyle;
   triggerType: "immediate" | "delayed" | "exit";
   triggerDelay: number;
-  ruleType: "local" | "global";
-  localRule: LocalGeoRule | null;
-  globalRuleId: string | null;
+  geoRule: GeoRule | null;
 }
 
 interface EditProps {
@@ -45,14 +43,7 @@ interface SaveProps {
 //@ts-ignore
 registerBlockType<PopupAttributes>(metadata.name, {
   edit: ({ attributes, setAttributes }: EditProps) => {
-    const {
-      popupStyle,
-      triggerType,
-      triggerDelay,
-      ruleType,
-      localRule,
-      globalRuleId,
-    } = attributes;
+    const { popupStyle, triggerType, triggerDelay, geoRule } = attributes;
 
     const blockProps = useBlockProps({
       className: "geo-popup-editor",
@@ -71,12 +62,8 @@ registerBlockType<PopupAttributes>(metadata.name, {
       <>
         <InspectorControls>
           <GeoRulesPanel
-            ruleType={ruleType}
-            localRule={localRule}
-            globalRuleId={globalRuleId}
-            onRuleTypeChange={(type) => setAttributes({ ruleType: type })}
-            onLocalRuleChange={(rule) => setAttributes({ localRule: rule })}
-            onGlobalRuleIdChange={(id) => setAttributes({ globalRuleId: id })}
+            geoRule={geoRule}
+            onRuleChange={(rule) => setAttributes({ geoRule: rule })}
           />
           <PanelBody title="Popup Settings">
             <SelectControl
@@ -137,14 +124,7 @@ registerBlockType<PopupAttributes>(metadata.name, {
         </InspectorControls>
 
         <div {...blockProps}>
-          <div className="geo-target-block__label">
-            Maki Geo Targeted Popup{" "}
-            {
-              <span className="geo-target-type">
-                ({ruleType === "global" ? "Global Rule" : "Local Rule"})
-              </span>
-            }
-          </div>
+          <div className="geo-target-block__label">Maki Geo Targeted Popup</div>
           <div className="geo-popup-editor__content" style={popupStyle}>
             <InnerBlocks />
           </div>
@@ -155,47 +135,20 @@ registerBlockType<PopupAttributes>(metadata.name, {
 
   save: ({ attributes }: SaveProps) => {
     const blockProps = useBlockProps.save();
-    const {
-      localRule,
-      globalRuleId,
-      ruleType,
-      popupStyle,
-      triggerType,
-      triggerDelay
-    } = attributes;
-
-    if (ruleType === "global" && globalRuleId) {
-      return (
-        <div {...blockProps}>
-          {`[mgeo_content rule="${globalRuleId}"]`}
-          <div className="geo-popup-overlay">
-            <div
-              className="geo-popup-container"
-              data-trigger={triggerType}
-              data-delay={triggerDelay}
-              style={popupStyle}
-            >
-              <button className="geo-popup-close" aria-label="Close popup">×</button>
-              <InnerBlocks.Content />
-            </div>
-          </div>
-          {`[/mgeo_content]`}
-        </div>
-      );
-    }
+    const { geoRule, popupStyle, triggerType, triggerDelay } = attributes;
 
     const parts: string[] = [];
-    if (localRule) {
-      localRule.conditions.forEach(condition => {
+    if (geoRule) {
+      geoRule.conditions.forEach((condition) => {
         const not = condition.operator === "is not" ? "!" : "";
         parts.push(`${condition.type}="${not}${condition.value}"`);
       });
 
-      if (localRule.operator === "OR") {
+      if (geoRule.operator === "OR") {
         parts.push('match="any"');
       }
 
-      parts.push(`action="${localRule.action}"`);
+      parts.push(`action="${geoRule.action}"`);
     }
 
     return (
@@ -208,7 +161,9 @@ registerBlockType<PopupAttributes>(metadata.name, {
             data-delay={triggerDelay}
             style={popupStyle}
           >
-            <button className="geo-popup-close" aria-label="Close popup">×</button>
+            <button className="geo-popup-close" aria-label="Close popup">
+              ×
+            </button>
             <InnerBlocks.Content />
           </div>
         </div>

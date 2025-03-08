@@ -1,4 +1,6 @@
-export interface GeoRuleBase {
+import { AdminSettings } from "./admin-types";
+
+export interface GeoRule {
   conditions: GeoCondition[];
   operator: "AND" | "OR";
   action: "show" | "hide";
@@ -9,18 +11,6 @@ export interface GeoCondition {
   value: string;
   operator: "is" | "is not";
 }
-
-export interface GlobalGeoRule extends GeoRuleBase {
-  id: string;
-  name: string;
-  ruleType: "global";
-}
-
-export interface LocalGeoRule extends GeoRuleBase {
-  ruleType: "local";
-}
-
-export type GeoRule = GlobalGeoRule | LocalGeoRule;
 
 export interface Redirection {
   id: string;
@@ -61,9 +51,7 @@ export interface PageExclusion {
 }
 
 export interface BlockAttributes {
-  ruleType: "local" | "global";
-  localRule: LocalGeoRule | null;
-  globalRuleId: string | null;
+  geoRule: GeoRule;
 }
 
 export interface LocationData {
@@ -79,7 +67,6 @@ export interface LocationData {
 declare global {
   interface Window {
     makiGeoData?: {
-      globalRules: GlobalGeoRule[];
       nonce: string;
       settings: AdminSettings;
     };

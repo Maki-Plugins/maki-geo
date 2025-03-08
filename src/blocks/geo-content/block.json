@@ -9,16 +9,8 @@
   "description": "Show or hide content based on user geo location.",
   "example": {},
   "attributes": {
-    "ruleType": {
-      "type": "string",
-      "default": "local"
-    },
-    "localRule": {
+    "geoRule": {
       "type": "object",
-      "default": null
-    },
-    "globalRuleId": {
-      "type": "string",
       "default": null
     }
   },
