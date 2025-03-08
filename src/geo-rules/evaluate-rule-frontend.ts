@@ -10,27 +10,28 @@ declare global {
 
 async function initGeoTargeting(): Promise<void> {
   try {
-    const response = await window.wp.apiFetch({
-      path: "maki-geo/v1/location",
-    });
-    // console.log(`API response: ${JSON.stringify(response)}`);
-
     const blocksClass = "mgeo-geo-target-block";
-
     const blocks = document.querySelectorAll<HTMLElement>(`.${blocksClass}`);
 
-    blocks.forEach((block) => {
-      let rule: GeoRule | null = null;
-      rule = JSON.parse(block.dataset.rule || "null");
+    if (blocks.length > 0) {
+      const response = await window.wp.apiFetch({
+        path: "maki-geo/v1/location",
+      });
+      // console.log(`API response: ${JSON.stringify(response)}`);
 
-      const shouldShow = rule ? evaluateGeoRule(rule, response) : true;
+      blocks.forEach((block) => {
+        let rule: GeoRule | null = null;
+        rule = JSON.parse(block.dataset.rule || "null");
 
-      if (shouldShow) {
-        block.style.display = "block";
-      } else {
-        block.style.display = "none";
-      }
-    });
+        const shouldShow = rule ? evaluateGeoContent(rule, response) : true;
+
+        if (shouldShow) {
+          block.style.display = "block";
+        } else {
+          block.style.display = "none";
+        }
+      });
+    }
   } catch (error) {
     console.error("Geo targeting error:", error);
   }
@@ -43,20 +44,39 @@ async function initGeoTargeting(): Promise<void> {
  * @param locationData The location to evaluate and see if it fits the geo rule
  * @returns Boolean value indicating if the content should be shown (true) or hidden (false)
  */
-export function evaluateGeoRule(
+export function evaluateGeoContent(
   rule: GeoRule,
   locationData: LocationData,
 ): boolean {
   // console.log(`Rules: ${JSON.stringify(rule)}`);
   // console.log(`Location data: ${JSON.stringify(locationData)}`);
 
-  // Apply rule action if there are no conditions
-  if (!rule.conditions.length) {
+  // Evaluate each condition within the rule
+  let ruleResult: boolean = evaluateGeoConditions(
+    rule.conditions,
+    rule.operator,
+    locationData,
+  );
+
+  // Apply rule action
+  if (ruleResult) {
     return rule.action === "show";
   }
+  // If no rules match, do the opposite
+  return rule.action === "hide";
+}
 
-  // Evaluate each condition within the rule
-  const conditionResults = rule.conditions.map((condition) => {
+function evaluateGeoConditions(
+  conditions: GeoRule["conditions"],
+  operator: GeoRule["operator"],
+  locationData: LocationData,
+): boolean {
+  // Apply rule action if there are no conditions
+  if (!conditions.length) {
+    return true;
+  }
+
+  const conditionResults = conditions.map((condition) => {
     const locationValue = locationData[condition.type].toLowerCase();
     const conditionValue = condition.value.toLowerCase();
 
@@ -84,20 +104,14 @@ export function evaluateGeoRule(
 
   // Combine conditions based on operator
   let ruleResult: boolean;
-  if (rule.operator === "AND") {
+  if (operator === "AND") {
     ruleResult = conditionResults.every((result) => result);
   } else {
     // "OR"
     ruleResult = conditionResults.some((result) => result);
   }
 
-  // Apply rule action
-  if (ruleResult) {
-    return rule.action === "show";
-  }
-
-  // If no rules match, do the opposite
-  return rule.action === "hide";
+  return ruleResult;
 }
 
 document.addEventListener("DOMContentLoaded", initGeoTargeting);
