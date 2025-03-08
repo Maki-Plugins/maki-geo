@@ -20,21 +20,15 @@ function mgeo_init_geo_redirection()
     }
 
     // Get client/server mode setting
-    $client_server_mode = get_option('mgeo_client_server_mode', 'server');
+    $client_server_mode = get_option("mgeo_client_server_mode", "server");
 
     // Only process server-side redirections in server mode
-    if ($client_server_mode !== 'server') {
+    if ($client_server_mode !== "server") {
         return;
     }
 
     // Get current URL
     $current_url = mgeo_get_current_url();
-
-    // Get geo location data
-    $location_data = mgeo_get_geolocation_data();
-    if (empty($location_data)) {
-        return;
-    }
 
     // Get all redirections
     $redirections = mgeo_get_redirections();
@@ -42,13 +36,23 @@ function mgeo_init_geo_redirection()
         return;
     }
 
+    // Get geo location data
+    $location_data = mgeo_get_geolocation_data();
+    if (empty($location_data)) {
+        return;
+    }
+
     // Find matching redirection
-    $redirect_url = mgeo_find_matching_redirection($redirections, $location_data, $current_url);
+    $redirect_url = mgeo_find_matching_redirection(
+        $redirections,
+        $location_data,
+        $current_url
+    );
 
     // Perform redirection if a match was found
     if (!empty($redirect_url)) {
         wp_redirect($redirect_url, 302);
-        exit;
+        exit();
     }
 }
 
@@ -59,8 +63,8 @@ function mgeo_init_geo_redirection()
  */
 function mgeo_get_redirections()
 {
-    $redirections = get_option('mgeo_redirections', []);
-    
+    $redirections = get_option("mgeo_redirections", []);
+
     // If stored as JSON string, decode it
     if (is_string($redirections) && !empty($redirections)) {
         $decoded = json_decode($redirections, true);
@@ -68,7 +72,7 @@ function mgeo_get_redirections()
             $redirections = $decoded;
         }
     }
-    
+
     return is_array($redirections) ? $redirections : [];
 }
 
@@ -79,11 +83,14 @@ function mgeo_get_redirections()
  */
 function mgeo_get_current_url()
 {
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'];
-    $uri = $_SERVER['REQUEST_URI'];
-    
-    return $protocol . '://' . $host . $uri;
+    $protocol =
+        isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on"
+            ? "https"
+            : "http";
+    $host = $_SERVER["HTTP_HOST"];
+    $uri = $_SERVER["REQUEST_URI"];
+
+    return $protocol . "://" . $host . $uri;
 }
 
 /**
@@ -94,23 +101,26 @@ function mgeo_get_current_url()
  * @param string $current_url Current URL
  * @return string|null Redirect URL if a match is found, null otherwise
  */
-function mgeo_find_matching_redirection($redirections, $location_data, $current_url)
-{
+function mgeo_find_matching_redirection(
+    $redirections,
+    $location_data,
+    $current_url
+) {
     // Parse the current URL
     $url_parts = parse_url($current_url);
-    $path = isset($url_parts['path']) ? $url_parts['path'] : '/';
-    $query = isset($url_parts['query']) ? $url_parts['query'] : '';
-    $hash = isset($url_parts['fragment']) ? $url_parts['fragment'] : '';
+    $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
+    $query = isset($url_parts["query"]) ? $url_parts["query"] : "";
+    $hash = isset($url_parts["fragment"]) ? $url_parts["fragment"] : "";
 
     // Loop through all redirections
     foreach ($redirections as $redirection) {
         // Skip disabled redirections
-        if (!isset($redirection['isEnabled']) || !$redirection['isEnabled']) {
+        if (!isset($redirection["isEnabled"]) || !$redirection["isEnabled"]) {
             continue;
         }
 
         // Check each location within this redirection
-        foreach ($redirection['locations'] as $location) {
+        foreach ($redirection["locations"] as $location) {
             // Check if location conditions match
             if (!mgeo_location_conditions_match($location, $location_data)) {
                 continue;
@@ -122,14 +132,26 @@ function mgeo_find_matching_redirection($redirections, $location_data, $current_
             }
 
             // Handle different page targeting types
-            if ($location['pageTargetingType'] === 'all') {
+            if ($location["pageTargetingType"] === "all") {
                 // All pages redirection
-                return mgeo_build_redirect_url($location['redirectUrl'], $path, $query, $hash, $location);
-            } else if ($location['pageTargetingType'] === 'specific') {
+                return mgeo_build_redirect_url(
+                    $location["redirectUrl"],
+                    $path,
+                    $query,
+                    $hash,
+                    $location
+                );
+            } elseif ($location["pageTargetingType"] === "specific") {
                 // Specific page mappings
-                foreach ($location['redirectMappings'] as $mapping) {
-                    if (mgeo_url_matches_mapping($path, $mapping['fromUrl'])) {
-                        return mgeo_build_redirect_url($mapping['toUrl'], $path, $query, $hash, $location);
+                foreach ($location["redirectMappings"] as $mapping) {
+                    if (mgeo_url_matches_mapping($path, $mapping["fromUrl"])) {
+                        return mgeo_build_redirect_url(
+                            $mapping["toUrl"],
+                            $path,
+                            $query,
+                            $hash,
+                            $location
+                        );
                     }
                 }
             }
@@ -149,8 +171,8 @@ function mgeo_find_matching_redirection($redirections, $location_data, $current_
 function mgeo_location_conditions_match($location, $location_data)
 {
     return mgeo_evaluate_geo_conditions(
-        $location['conditions'],
-        $location['operator'],
+        $location["conditions"],
+        $location["operator"],
         $location_data
     );
 }
@@ -166,40 +188,40 @@ function mgeo_location_conditions_match($location, $location_data)
  */
 function mgeo_is_url_excluded($location, $path, $query, $hash)
 {
-    if (empty($location['exclusions'])) {
+    if (empty($location["exclusions"])) {
         return false;
     }
 
-    foreach ($location['exclusions'] as $exclusion) {
-        $value = $exclusion['value'];
-        
-        switch ($exclusion['type']) {
-            case 'url_equals':
+    foreach ($location["exclusions"] as $exclusion) {
+        $value = $exclusion["value"];
+
+        switch ($exclusion["type"]) {
+            case "url_equals":
                 if ($path === $value) {
                     return true;
                 }
                 break;
-                
-            case 'url_contains':
+
+            case "url_contains":
                 if (strpos($path, $value) !== false) {
                     return true;
                 }
                 break;
-                
-            case 'query_contains':
+
+            case "query_contains":
                 if (strpos($query, $value) !== false) {
                     return true;
                 }
                 break;
-                
-            case 'hash_contains':
+
+            case "hash_contains":
                 if (strpos($hash, $value) !== false) {
                     return true;
                 }
                 break;
         }
     }
-    
+
     return false;
 }
 
@@ -229,82 +251,31 @@ function mgeo_url_matches_mapping($path, $pattern)
  */
 function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
 {
-    $redirect_url = rtrim($base_url, '/');
-    
+    $redirect_url = rtrim($base_url, "/");
+
     // Add path if configured
-    if (!empty($location['passPath'])) {
+    if (!empty($location["passPath"])) {
         // For specific page mappings, don't add the path as it's already handled in the mapping
-        if ($location['pageTargetingType'] === 'all') {
+        if ($location["pageTargetingType"] === "all") {
             $redirect_url .= $path;
         }
     }
-    
+
     // Add query string if configured
-    if (!empty($location['passQuery']) && !empty($query)) {
-        $redirect_url .= '?' . $query;
+    if (!empty($location["passQuery"]) && !empty($query)) {
+        $redirect_url .= "?" . $query;
     }
-    
+
     // Always pass hash fragment if present
     if (!empty($hash)) {
-        $redirect_url .= '#' . $hash;
+        $redirect_url .= "#" . $hash;
     }
-    
+
     return $redirect_url;
 }
 
 // Hook into WordPress to initialize geo redirection
-add_action('template_redirect', 'mgeo_init_geo_redirection', 1);
-
-/**
- * Register REST API endpoint for client-side redirection
- */
-function mgeo_register_redirection_api()
-{
-    register_rest_route('maki-geo/v1', '/redirection', [
-        'methods' => 'GET',
-        'callback' => 'mgeo_handle_redirection_api',
-        'permission_callback' => '__return_true',
-    ]);
-}
-add_action('rest_api_init', 'mgeo_register_redirection_api');
-
-/**
- * Handle client-side redirection API requests
- *
- * @param WP_REST_Request $request API request object
- * @return WP_REST_Response API response
- */
-function mgeo_handle_redirection_api($request)
-{
-    $current_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-    if (empty($current_url)) {
-        return new WP_REST_Response(['redirect' => false]);
-    }
-    
-    // Get geo location data
-    $location_data = mgeo_get_geolocation_data();
-    if (empty($location_data)) {
-        return new WP_REST_Response(['redirect' => false]);
-    }
-    
-    // Get all redirections
-    $redirections = mgeo_get_redirections();
-    if (empty($redirections)) {
-        return new WP_REST_Response(['redirect' => false]);
-    }
-    
-    // Find matching redirection
-    $redirect_url = mgeo_find_matching_redirection($redirections, $location_data, $current_url);
-    
-    if (!empty($redirect_url)) {
-        return new WP_REST_Response([
-            'redirect' => true,
-            'url' => $redirect_url
-        ]);
-    }
-    
-    return new WP_REST_Response(['redirect' => false]);
-}
+add_action("template_redirect", "mgeo_init_geo_redirection", 1);
 
 /**
  * Add client-side redirection script if needed
@@ -315,107 +286,28 @@ function mgeo_add_client_side_redirection()
     if (is_admin()) {
         return;
     }
-    
+
     // Get client/server mode setting
-    $client_server_mode = get_option('mgeo_client_server_mode', 'server');
-    
+    $client_server_mode = get_option("mgeo_client_server_mode", "server");
+
     // Only add script in client mode
-    if ($client_server_mode !== 'client') {
+    if ($client_server_mode !== "client") {
         return;
     }
-    
+
     // Check if there are any redirections configured
     $redirections = mgeo_get_redirections();
     if (empty($redirections)) {
         return;
     }
-    
+
     // Enqueue the client-side redirection script
     wp_enqueue_script(
-        'mgeo-client-redirection',
-        plugins_url('assets/js/client-redirection.js', dirname(__FILE__)),
-        ['wp-api-fetch'],
-        '1.0.0',
+        "mgeo-client-redirection",
+        plugins_url("assets/js/client-redirection.js", dirname(__FILE__)),
+        ["wp-api-fetch"],
+        "1.0.0",
         true
     );
 }
-add_action('wp_enqueue_scripts', 'mgeo_add_client_side_redirection');
-
-/**
- * Save redirections to WordPress options
- *
- * @param array $redirections Array of redirection configurations
- * @return bool Whether the save was successful
- */
-function mgeo_save_redirections($redirections)
-{
-    // Validate redirections
-    if (!is_array($redirections)) {
-        return false;
-    }
-    
-    // Save as JSON string to ensure consistent format
-    $json = wp_json_encode($redirections);
-    
-    return update_option('mgeo_redirections', $json);
-}
-
-/**
- * Register REST API endpoint for managing redirections
- */
-function mgeo_register_redirections_api()
-{
-    register_rest_route('maki-geo/v1', '/redirections', [
-        [
-            'methods' => 'GET',
-            'callback' => 'mgeo_get_redirections_api',
-            'permission_callback' => 'mgeo_can_manage_rules',
-        ],
-        [
-            'methods' => 'POST',
-            'callback' => 'mgeo_save_redirections_api',
-            'permission_callback' => 'mgeo_can_manage_rules',
-        ],
-    ]);
-}
-add_action('rest_api_init', 'mgeo_register_redirections_api');
-
-/**
- * Handle GET requests for redirections API
- *
- * @return WP_REST_Response API response with redirections
- */
-function mgeo_get_redirections_api()
-{
-    $redirections = mgeo_get_redirections();
-    return new WP_REST_Response($redirections);
-}
-
-/**
- * Handle POST requests for redirections API
- *
- * @param WP_REST_Request $request API request object
- * @return WP_REST_Response API response
- */
-function mgeo_save_redirections_api($request)
-{
-    $redirections = $request->get_json_params();
-    
-    if (empty($redirections) || !is_array($redirections)) {
-        return new WP_REST_Response(
-            ['success' => false, 'message' => 'Invalid redirections data'],
-            400
-        );
-    }
-    
-    $success = mgeo_save_redirections($redirections);
-    
-    if ($success) {
-        return new WP_REST_Response(['success' => true]);
-    } else {
-        return new WP_REST_Response(
-            ['success' => false, 'message' => 'Failed to save redirections'],
-            500
-        );
-    }
-}
+add_action("wp_enqueue_scripts", "mgeo_add_client_side_redirection");
