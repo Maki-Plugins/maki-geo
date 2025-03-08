@@ -54,7 +54,7 @@ For showing the country, state/province, city or flag of a user, we have easy sh
 
 All features of the plugin are free to use by themselves, but the location API is limited to 1000 requests per month for free users. You can upgrade your license on [our website](https://makiplugins.com).
 
-An API request is used when a new IP address is used to visit your geo targeted content. We cache the IP so multiple requests by the same IP in a short timespan don't count as mutliple requests. Maki Geo doesn't consume a request on pages without geo targeted content.
+An API request is used when a new IP address is used to visit your geo targeted content. We cache the IP so multiple requests by the same IP in a short timespan don't count as multiple requests. Maki Geo doesn't consume a request on pages without geo targeted content.
 
 
 == Changelog ==
