@@ -1,4 +1,4 @@
-import { evaluateGeoContent } from "./evaluate-rule-frontend";
+import { evaluateGeoContent } from "./evaluate-conditions-frontend";
 import { GeoRule, LocationData } from "../types/types";
 
 describe("evaluateGeoRules", () => {

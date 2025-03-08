@@ -13,7 +13,7 @@ module.exports = {
     admin: path.resolve(__dirname, "src/admin/admin.tsx"),
     "geo-content-frontend": path.resolve(
       __dirname,
-      "src/geo-rules/evaluate-rule-frontend.ts",
+      "src/geo-conditions/evaluate-conditions-frontend.ts",
     ),
   },
   output: {

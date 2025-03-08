@@ -81,7 +81,7 @@ require_once "api/city-search.php";
 require_once "api/location.php";
 require_once "api/verify-key.php";
 require_once "blocks/setup.php";
-require_once "geo-rules/evaluate-rule-backend.php";
+require_once "geo-conditions/evaluate-conditions-backend.php";
 require_once "shortcodes/geo-content-shortcode.php";
 require_once "shortcodes/print-geo-shortcodes.php";
 require_once "settings-registry.php";
