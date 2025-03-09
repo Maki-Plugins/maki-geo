@@ -36,9 +36,12 @@ function mgeo_init_geo_redirection()
         return;
     }
 
-    // TODO: Make sure the current URL is part of a redirect before geo location is retrieved from API
+    // Check if the current URL has any potential redirections before making an API call
+    if (!mgeo_url_has_potential_redirections($redirections, $current_url)) {
+        return;
+    }
 
-    // Get geo location data
+    // Get geo location data - only called if there are potential redirections for this URL
     $location_data = mgeo_get_geolocation_data();
     if (empty($location_data)) {
         return;
@@ -93,6 +96,53 @@ function mgeo_get_current_url()
     $uri = $_SERVER["REQUEST_URI"];
 
     return $protocol . "://" . $host . $uri;
+}
+
+/**
+ * Check if the current URL has any potential redirections
+ * 
+ * @param array $redirections Array of redirection configurations
+ * @param string $current_url Current URL
+ * @return bool Whether the URL has any potential redirections
+ */
+function mgeo_url_has_potential_redirections($redirections, $current_url)
+{
+    // Parse the current URL
+    $url_parts = parse_url($current_url);
+    $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
+    $query = isset($url_parts["query"]) ? $url_parts["query"] : "";
+    $hash = isset($url_parts["fragment"]) ? $url_parts["fragment"] : "";
+
+    // Loop through all redirections
+    foreach ($redirections as $redirection) {
+        // Skip disabled redirections
+        if (!isset($redirection["isEnabled"]) || !$redirection["isEnabled"]) {
+            continue;
+        }
+
+        // Check each location within this redirection
+        foreach ($redirection["locations"] as $location) {
+            // Check if URL is excluded
+            if (mgeo_is_url_excluded($location, $path, $query, $hash)) {
+                continue;
+            }
+
+            // Handle different page targeting types
+            if ($location["pageTargetingType"] === "all") {
+                // All pages redirection - this URL is potentially redirectable
+                return true;
+            } elseif ($location["pageTargetingType"] === "specific") {
+                // Specific page mappings - check if this URL matches any mapping
+                foreach ($location["redirectMappings"] as $mapping) {
+                    if (mgeo_url_matches_mapping($current_url, $mapping["fromUrl"])) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -236,16 +286,23 @@ function mgeo_is_url_excluded($location, $path, $query, $hash)
 }
 
 /**
- * Check if a URL path matches a mapping pattern
+ * Check if a URL matches a mapping pattern
  *
- * @param string $path Current URL path
+ * @param string $url Current URL
  * @param string $pattern Mapping pattern to match against
- * @return bool Whether the path matches the pattern
+ * @return bool Whether the URL matches the pattern
  */
-function mgeo_url_matches_mapping($path, $pattern)
+function mgeo_url_matches_mapping($url, $pattern)
 {
-    // Simple exact matching for now
-    // Could be extended with wildcard or regex support in the future
+    // If pattern is a full URL (contains http:// or https://)
+    if (strpos($pattern, 'http://') === 0 || strpos($pattern, 'https://') === 0) {
+        return $url === $pattern;
+    }
+    
+    // Otherwise, treat pattern as a path and compare with the path of the URL
+    $url_parts = parse_url($url);
+    $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
+    
     return $path === $pattern;
 }
 

@@ -611,4 +611,181 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             $result
         );
     }
+
+    public function test_should_check_url_has_potential_redirections()
+    {
+        // This test verifies that we don't waste API calls when there are redirections
+        // but none that match the current page
+
+        // Create redirections that only target specific pages
+        $specificPageRedirections = [
+            [
+                "id" => "red_135",
+                "name" => "Specific Pages Only",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_469",
+                        "conditions" => [
+                            [
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "specific",
+                        "redirectUrl" => "",
+                        "redirectMappings" => [
+                            [
+                                "id" => "map_125",
+                                "fromUrl" => "https://example.com/products/",
+                                "toUrl" => "https://us.example.com/products/",
+                            ],
+                            [
+                                "id" => "map_126",
+                                "fromUrl" => "https://example.com/about/",
+                                "toUrl" => "https://us.example.com/about-us/",
+                            ],
+                        ],
+                        "exclusions" => [],
+                        "passPath" => false,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+        ];
+
+        // It should return false for a URL that doesn't match any of the specific pages
+        $result = mgeo_url_has_potential_redirections(
+            $specificPageRedirections,
+            "https://example.com/contact/"
+        );
+        $this->assertFalse($result);
+
+        // It should return true for a URL that matches one of the specific pages
+        $result = mgeo_url_has_potential_redirections(
+            $specificPageRedirections,
+            "https://example.com/products/"
+        );
+        $this->assertTrue($result);
+
+        // Test with "all pages" redirection type
+        $allPagesRedirections = [
+            [
+                "id" => "red_136",
+                "name" => "All Pages",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_470",
+                        "conditions" => [
+                            [
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "all",
+                        "redirectUrl" => "https://us.example.com/",
+                        "redirectMappings" => [],
+                        "exclusions" => [],
+                        "passPath" => true,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+        ];
+
+        // Any URL should have potential redirections with "all pages" type
+        $result = mgeo_url_has_potential_redirections(
+            $allPagesRedirections,
+            "https://example.com/any-page/"
+        );
+        $this->assertTrue($result);
+
+        // Test with disabled redirections
+        $disabledRedirections = [
+            [
+                "id" => "red_137",
+                "name" => "Disabled Redirection",
+                "isEnabled" => false,
+                "locations" => [
+                    [
+                        "id" => "loc_471",
+                        "conditions" => [
+                            [
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "all",
+                        "redirectUrl" => "https://us.example.com/",
+                        "redirectMappings" => [],
+                        "exclusions" => [],
+                        "passPath" => true,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+        ];
+
+        // Disabled redirections should not count as potential redirections
+        $result = mgeo_url_has_potential_redirections(
+            $disabledRedirections,
+            "https://example.com/any-page/"
+        );
+        $this->assertFalse($result);
+
+        // Test with URL exclusions
+        $exclusionRedirections = [
+            [
+                "id" => "red_138",
+                "name" => "With Exclusions",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_472",
+                        "conditions" => [
+                            [
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "all",
+                        "redirectUrl" => "https://us.example.com/",
+                        "redirectMappings" => [],
+                        "exclusions" => [
+                            [
+                                "id" => "excl_127",
+                                "type" => "url_equals",
+                                "value" => "/excluded-page/",
+                            ],
+                        ],
+                        "passPath" => true,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+        ];
+
+        // Excluded URLs should not have potential redirections
+        $result = mgeo_url_has_potential_redirections(
+            $exclusionRedirections,
+            "https://example.com/excluded-page/"
+        );
+        $this->assertFalse($result);
+
+        // Non-excluded URLs should have potential redirections
+        $result = mgeo_url_has_potential_redirections(
+            $exclusionRedirections,
+            "https://example.com/normal-page/"
+        );
+        $this->assertTrue($result);
+    }
 }
