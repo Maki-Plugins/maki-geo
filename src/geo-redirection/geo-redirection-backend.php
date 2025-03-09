@@ -36,6 +36,8 @@ function mgeo_init_geo_redirection()
         return;
     }
 
+    // TODO: Make sure the current URL is part of a redirect before geo location is retrieved from API
+
     // Get geo location data
     $location_data = mgeo_get_geolocation_data();
     if (empty($location_data)) {
@@ -108,9 +110,12 @@ function mgeo_find_matching_redirection(
 ) {
     // Parse the current URL
     $url_parts = parse_url($current_url);
+    $scheme = isset($url_parts["scheme"]) ? $url_parts["scheme"] : "https";
+    $host = isset($url_parts["host"]) ? $url_parts["host"] : "";
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
     $query = isset($url_parts["query"]) ? $url_parts["query"] : "";
     $hash = isset($url_parts["fragment"]) ? $url_parts["fragment"] : "";
+    $url_without_query = $scheme . "://" . $host . $path;
 
     // Loop through all redirections
     foreach ($redirections as $redirection) {
@@ -144,7 +149,12 @@ function mgeo_find_matching_redirection(
             } elseif ($location["pageTargetingType"] === "specific") {
                 // Specific page mappings
                 foreach ($location["redirectMappings"] as $mapping) {
-                    if (mgeo_url_matches_mapping($path, $mapping["fromUrl"])) {
+                    if (
+                        mgeo_url_matches_mapping(
+                            $url_without_query,
+                            $mapping["fromUrl"]
+                        )
+                    ) {
                         return mgeo_build_redirect_url(
                             $mapping["toUrl"],
                             $path,
