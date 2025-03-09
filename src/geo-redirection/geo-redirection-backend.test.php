@@ -35,8 +35,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -44,9 +44,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
+                        "passQuery" => true,
+                    ],
+                ],
             ],
             [
                 "id" => "red_124",
@@ -59,8 +59,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "continent",
                                 "value" => "Europe",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -68,9 +68,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
+                        "passQuery" => true,
+                    ],
+                ],
             ],
             [
                 "id" => "red_125",
@@ -82,9 +82,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "conditions" => [
                             [
                                 "type" => "country",
-                                "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "value" => "CA",
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -92,10 +92,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -115,7 +115,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
     {
         // Change location to match only the disabled redirection
         $locationData = array_merge($this->mockLocationData, [
-            "continent" => "Other", // This will not match the Europe redirection
+            "country" => "Canada",
+            "country_code" => "CA",
         ]);
 
         // Only the disabled US redirection should match, but it should be ignored
@@ -143,8 +144,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "specific",
@@ -153,20 +154,21 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "id" => "map_123",
                                 "fromUrl" => "/products/",
-                                "toUrl" => "https://us-store.example.com/products/"
+                                "toUrl" =>
+                                    "https://us-store.example.com/products/",
                             ],
                             [
                                 "id" => "map_124",
                                 "fromUrl" => "/about/",
-                                "toUrl" => "https://us.example.com/about-us/"
-                            ]
+                                "toUrl" => "https://us.example.com/about-us/",
+                            ],
                         ],
                         "exclusions" => [],
                         "passPath" => false,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test matching URL
@@ -201,8 +203,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -212,24 +214,24 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "id" => "excl_123",
                                 "type" => "url_equals",
-                                "value" => "/no-redirect/"
+                                "value" => "/no-redirect/",
                             ],
                             [
                                 "id" => "excl_124",
                                 "type" => "url_contains",
-                                "value" => "admin"
+                                "value" => "admin",
                             ],
                             [
                                 "id" => "excl_125",
                                 "type" => "query_contains",
-                                "value" => "no_redirect=1"
-                            ]
+                                "value" => "no_redirect=1",
+                            ],
                         ],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test URL that should be excluded by exact match
@@ -280,8 +282,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -289,9 +291,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => false,
-                        "passQuery" => false
-                    ]
-                ]
+                        "passQuery" => false,
+                    ],
+                ],
             ],
             [
                 "id" => "red_129",
@@ -304,8 +306,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "CA",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -313,9 +315,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => false
-                    ]
-                ]
+                        "passQuery" => false,
+                    ],
+                ],
             ],
             [
                 "id" => "red_130",
@@ -328,8 +330,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "region",
                                 "value" => "California",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -337,10 +339,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test no path, no query
@@ -352,7 +354,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         $this->assertEquals("https://us.example.com/", $result);
 
         // Test path, no query
-        $canadaLocation = array_merge($this->mockLocationData, ["country" => "Canada", "country_code" => "CA"]);
+        $canadaLocation = array_merge($this->mockLocationData, [
+            "country" => "Canada",
+            "country_code" => "CA",
+        ]);
         $result = mgeo_find_matching_redirection(
             [$redirectionsWithOptions[1]],
             $canadaLocation,
@@ -366,7 +371,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             $this->mockLocationData,
             "https://example.com/products/?color=red"
         );
-        $this->assertEquals("https://ca.example.com/products/?color=red", $result);
+        $this->assertEquals(
+            "https://ca.example.com/products/?color=red",
+            $result
+        );
     }
 
     public function test_should_handle_complex_conditions()
@@ -384,13 +392,13 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
+                                "operator" => "is",
                             ],
                             [
                                 "type" => "region",
                                 "value" => "California",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "AND",
                         "pageTargetingType" => "all",
@@ -398,9 +406,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
+                        "passQuery" => true,
+                    ],
+                ],
             ],
             [
                 "id" => "red_132",
@@ -413,13 +421,13 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "UK",
-                                "operator" => "is"
+                                "operator" => "is",
                             ],
                             [
                                 "type" => "country",
                                 "value" => "AU",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -427,10 +435,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test AND conditions - should match
@@ -439,10 +447,15 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             $this->mockLocationData,
             "https://example.com/products/"
         );
-        $this->assertEquals("https://california.example.com/products/", $result);
+        $this->assertEquals(
+            "https://california.example.com/products/",
+            $result
+        );
 
         // Test AND conditions - should not match
-        $texasLocation = array_merge($this->mockLocationData, ["region" => "Texas"]);
+        $texasLocation = array_merge($this->mockLocationData, [
+            "region" => "Texas",
+        ]);
         $result = mgeo_find_matching_redirection(
             [$complexRedirections[0]],
             $texasLocation,
@@ -451,7 +464,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         $this->assertNull($result);
 
         // Test OR conditions - should match first condition
-        $ukLocation = array_merge($this->mockLocationData, ["country" => "United Kingdom", "country_code" => "UK"]);
+        $ukLocation = array_merge($this->mockLocationData, [
+            "country" => "United Kingdom",
+            "country_code" => "UK",
+        ]);
         $result = mgeo_find_matching_redirection(
             [$complexRedirections[1]],
             $ukLocation,
@@ -460,7 +476,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         $this->assertEquals("https://english.example.com/products/", $result);
 
         // Test OR conditions - should match second condition
-        $auLocation = array_merge($this->mockLocationData, ["country" => "Australia", "country_code" => "AU"]);
+        $auLocation = array_merge($this->mockLocationData, [
+            "country" => "Australia",
+            "country_code" => "AU",
+        ]);
         $result = mgeo_find_matching_redirection(
             [$complexRedirections[1]],
             $auLocation,
@@ -484,8 +503,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -493,7 +512,7 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
+                        "passQuery" => true,
                     ],
                     [
                         "id" => "loc_467",
@@ -501,8 +520,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "CA",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -510,10 +529,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test first location
@@ -525,7 +544,10 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         $this->assertEquals("https://us.example.com/products/", $result);
 
         // Test second location
-        $canadaLocation = array_merge($this->mockLocationData, ["country" => "Canada", "country_code" => "CA"]);
+        $canadaLocation = array_merge($this->mockLocationData, [
+            "country" => "Canada",
+            "country_code" => "CA",
+        ]);
         $result = mgeo_find_matching_redirection(
             $multiLocationRedirection,
             $canadaLocation,
@@ -549,8 +571,8 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "type" => "country",
                                 "value" => "US",
-                                "operator" => "is"
-                            ]
+                                "operator" => "is",
+                            ],
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
@@ -560,14 +582,14 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
                             [
                                 "id" => "excl_126",
                                 "type" => "hash_contains",
-                                "value" => "no-redirect"
-                            ]
+                                "value" => "no-redirect",
+                            ],
                         ],
                         "passPath" => true,
-                        "passQuery" => true
-                    ]
-                ]
-            ]
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
         ];
 
         // Test URL with hash that should be excluded
@@ -584,6 +606,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             $this->mockLocationData,
             "https://example.com/products/#section1"
         );
-        $this->assertEquals("https://us.example.com/products/#section1", $result);
+        $this->assertEquals(
+            "https://us.example.com/products/#section1",
+            $result
+        );
     }
 }
