@@ -15,6 +15,10 @@ module.exports = {
       __dirname,
       "src/geo-conditions/evaluate-conditions-frontend.ts",
     ),
+    "geo-redirection-frontend": path.resolve(
+      __dirname,
+      "src/geo-redirection/geo-redirection-frontend.ts",
+    ),
   },
   output: {
     path: path.resolve(__dirname, "build"),

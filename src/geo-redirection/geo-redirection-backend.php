@@ -27,15 +27,14 @@ function mgeo_init_geo_redirection()
         return;
     }
 
-    // Get current URL
-    $current_url = mgeo_get_current_url();
-
     // Get all redirections
     $redirections = mgeo_get_redirections();
     if (empty($redirections)) {
         return;
     }
 
+    // Get current URL
+    $current_url = mgeo_get_current_url();
     // Check if the current URL has any potential redirections before making an API call
     if (!mgeo_url_has_potential_redirections($redirections, $current_url)) {
         return;
@@ -100,7 +99,7 @@ function mgeo_get_current_url()
 
 /**
  * Check if the current URL has any potential redirections
- * 
+ *
  * @param array $redirections Array of redirection configurations
  * @param string $current_url Current URL
  * @return bool Whether the URL has any potential redirections
@@ -109,9 +108,12 @@ function mgeo_url_has_potential_redirections($redirections, $current_url)
 {
     // Parse the current URL
     $url_parts = parse_url($current_url);
+    $scheme = isset($url_parts["scheme"]) ? $url_parts["scheme"] : "https";
+    $host = isset($url_parts["host"]) ? $url_parts["host"] : "";
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
     $query = isset($url_parts["query"]) ? $url_parts["query"] : "";
     $hash = isset($url_parts["fragment"]) ? $url_parts["fragment"] : "";
+    $url_without_query = $scheme . "://" . $host . $path;
 
     // Loop through all redirections
     foreach ($redirections as $redirection) {
@@ -134,7 +136,12 @@ function mgeo_url_has_potential_redirections($redirections, $current_url)
             } elseif ($location["pageTargetingType"] === "specific") {
                 // Specific page mappings - check if this URL matches any mapping
                 foreach ($location["redirectMappings"] as $mapping) {
-                    if (mgeo_url_matches_mapping($current_url, $mapping["fromUrl"])) {
+                    if (
+                        mgeo_url_matches_mapping(
+                            $url_without_query,
+                            $mapping["fromUrl"]
+                        )
+                    ) {
                         return true;
                     }
                 }
@@ -295,14 +302,17 @@ function mgeo_is_url_excluded($location, $path, $query, $hash)
 function mgeo_url_matches_mapping($url, $pattern)
 {
     // If pattern is a full URL (contains http:// or https://)
-    if (strpos($pattern, 'http://') === 0 || strpos($pattern, 'https://') === 0) {
+    if (
+        strpos($pattern, "http://") === 0 ||
+        strpos($pattern, "https://") === 0
+    ) {
         return $url === $pattern;
     }
-    
+
     // Otherwise, treat pattern as a path and compare with the path of the URL
     $url_parts = parse_url($url);
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
-    
+
     return $path === $pattern;
 }
 
@@ -341,82 +351,5 @@ function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
     return $redirect_url;
 }
 
-/**
- * Save redirections to the database
- *
- * @param array $redirections Array of redirection configurations
- * @return bool Whether the save was successful
- */
-function mgeo_save_redirections($redirections)
-{
-    // Ensure we have an array
-    if (!is_array($redirections)) {
-        return false;
-    }
-
-    // Update the option
-    return update_option("mgeo_redirections", $redirections);
-}
-
-/**
- * Sanitize redirections data before saving
- *
- * @param mixed $redirections Redirections data to sanitize
- * @return array Sanitized redirections data
- */
-function mgeo_sanitize_redirections($redirections)
-{
-    // If it's a JSON string, decode it
-    if (is_string($redirections)) {
-        $decoded = json_decode($redirections, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $redirections = $decoded;
-        }
-    }
-
-    // Ensure we have an array
-    if (!is_array($redirections)) {
-        return [];
-    }
-
-    // Return the sanitized array
-    return $redirections;
-}
-
 // Hook into WordPress to initialize geo redirection
 add_action("template_redirect", "mgeo_init_geo_redirection", 1);
-
-/**
- * Add client-side redirection script if needed
- */
-function mgeo_add_client_side_redirection()
-{
-    // Only run on frontend, not in admin
-    if (is_admin()) {
-        return;
-    }
-
-    // Get client/server mode setting
-    $client_server_mode = get_option("mgeo_client_server_mode", "server");
-
-    // Only add script in client mode
-    if ($client_server_mode !== "client") {
-        return;
-    }
-
-    // Check if there are any redirections configured
-    $redirections = mgeo_get_redirections();
-    if (empty($redirections)) {
-        return;
-    }
-
-    // Enqueue the client-side redirection script
-    wp_enqueue_script(
-        "mgeo-client-redirection",
-        plugins_url("assets/js/client-redirection.js", dirname(__FILE__)),
-        ["wp-api-fetch"],
-        "1.0.0",
-        true
-    );
-}
-add_action("wp_enqueue_scripts", "mgeo_add_client_side_redirection");

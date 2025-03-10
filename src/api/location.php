@@ -13,7 +13,7 @@ add_action("rest_api_init", function () {
 
 /**
  * Gets the location of the requestor based on IP geolocation.
- * 
+ *
  * Returns a type like:
  * type LocationData = {
  *  continent: string;
@@ -40,6 +40,7 @@ function mgeo_get_geolocation_data()
 
     $ipDetection = new mgeo_IpDetection();
     $ip = $ipDetection->getRequestIP();
+    $ip = "86.94.131.20"; // DEBUG
     $cached_data = get_transient("mgeo_geo_location_{$ip}");
     if ($cached_data) {
         return $cached_data;

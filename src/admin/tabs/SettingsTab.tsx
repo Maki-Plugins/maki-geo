@@ -1,5 +1,5 @@
 import { useState } from "@wordpress/element";
-import { Button, Dashicon } from "@wordpress/components";
+import { Dashicon } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch";
 import { AdminSettings, ApiKeyResponse } from "../../types/admin-types";
 import { MGEO_MAKI_PLUGINS_URL } from "../../constants";

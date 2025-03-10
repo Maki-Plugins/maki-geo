@@ -36,11 +36,9 @@ export function RedirectionTab(): JSX.Element {
 
     try {
       const response = await apiFetch({
-        path: addQueryArgs("/wp-json/maki-geo/v1/redirections", {
-          _wpnonce: makiGeoData.nonce,
-        }),
+        path: "maki-geo/v1/redirections",
         method: "POST",
-         redirectionsToSave,
+        data: redirectionsToSave,
       });
 
       if (response && response.success) {
@@ -82,7 +80,7 @@ export function RedirectionTab(): JSX.Element {
   const handleDeleteRedirection = (redirectionId: string) => {
     if (window.confirm("Are you sure you want to delete this redirection?")) {
       const updatedRedirections = redirections.filter(
-        (redirection) => redirection.id !== redirectionId
+        (redirection) => redirection.id !== redirectionId,
       );
       setRedirections(updatedRedirections);
       saveRedirections(updatedRedirections);
@@ -99,9 +97,7 @@ export function RedirectionTab(): JSX.Element {
             } shadow-lg absolute top-4 right-4 w-auto max-w-md`}
           >
             <div>
-              <Dashicon
-                icon={saveMessage.type === "success" ? "yes" : "no"}
-              />
+              <Dashicon icon={saveMessage.type === "success" ? "yes" : "no"} />
               <span>{saveMessage.text}</span>
             </div>
           </div>
@@ -220,7 +216,7 @@ export function RedirectionTab(): JSX.Element {
                       const updatedRedirections = redirections.map((r) =>
                         r.id === redirection.id
                           ? { ...updatedRedirection, id: redirection.id }
-                          : r
+                          : r,
                       );
                       setRedirections(updatedRedirections);
                       setExpandedRedirectionId(null);

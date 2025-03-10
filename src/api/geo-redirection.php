@@ -128,3 +128,46 @@ function mgeo_save_redirections_api($request)
         );
     }
 }
+
+/**
+ * Save redirections to the database
+ *
+ * @param array $redirections Array of redirection configurations
+ * @return bool Whether the save was successful
+ */
+function mgeo_save_redirections($redirections)
+{
+    // Ensure we have an array
+    if (!is_array($redirections)) {
+        return false;
+    }
+
+    // Update the option
+    // TODO: Check if the user is allowed to update this
+    return update_option("mgeo_redirections", $redirections);
+}
+
+/**
+ * Sanitize redirections data before saving
+ *
+ * @param mixed $redirections Redirections data to sanitize
+ * @return array Sanitized redirections data
+ */
+function mgeo_sanitize_redirections($redirections)
+{
+    // If it's a JSON string, decode it
+    if (is_string($redirections)) {
+        $decoded = json_decode($redirections, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $redirections = $decoded;
+        }
+    }
+
+    // Ensure we have an array
+    if (!is_array($redirections)) {
+        return [];
+    }
+
+    // Return the sanitized array
+    return $redirections;
+}
