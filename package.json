@@ -20,6 +20,8 @@
     "test": "npm run php-test && npm run js-test",
     "js-test": "jest",
     "js-test:watch": "jest --watch",
+    "playwright-test": "wp-scripts test-playwright",
+    "playwright-test:debug": "wp-scripts test-playwright --debug",
     "php-test": "wp-env run tests-cli --env-cwd=wp-content/plugins/maki-geo ./vendor/bin/phpunit",
     "zip": "npm run build && rimraf maki-geo maki-geo.zip && mkdir maki-geo && xcopy /E /I src maki-geo\\src /EXCLUDE:scripts\\exclude-from-zip.txt && xcopy /E /I build maki-geo\\build && copy maki-geo.php maki-geo\\ && copy readme.txt maki-geo\\ && 7z a -tzip maki-geo.zip ./maki-geo/* && rimraf maki-geo"
   },

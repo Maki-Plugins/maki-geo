@@ -172,6 +172,7 @@ export function RedirectionTab(): JSX.Element {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    data-testid="mgeo_edit_redirection"
                     className="btn btn-sm flex flex-row gap-1"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -198,6 +199,7 @@ export function RedirectionTab(): JSX.Element {
                     </svg>
                   </button>
                   <button
+                    data-testid="mgeo_delete_redirection"
                     className="btn btn-error btn-sm"
                     onClick={(e) => {
                       e.stopPropagation();

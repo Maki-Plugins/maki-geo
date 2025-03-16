@@ -374,13 +374,14 @@ export function RedirectionCard({
 
                   {location.pageTargetingType === "all" ? (
                     <div className="form-control">
-                      <label className="label">
+                      <label className="label" htmlFor="mgeo_redirect_url">
                         <span className="label-text font-semibold flex items-center">
                           Redirect URL
                           <HelpHover text="The destination URL where visitors will be redirected to. Use a full URL including https://." />
                         </span>
                       </label>
                       <input
+                        id="mgeo_redirect_url"
                         type="text"
                         value={location.redirectUrl}
                         onChange={(e) =>
@@ -567,13 +568,14 @@ export function RedirectionCard({
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
-            <label className="label">
+            <label className="label" htmlFor="mgeo_redirect_name">
               <span className="label-text font-semibold flex items-center">
                 Geo Redirect Name
                 <HelpHover text="A descriptive name to identify this redirection rule in the admin panel." />
               </span>
             </label>
             <input
+              id="mgeo_redirect_name"
               type="text"
               value={redirectionName}
               onChange={(e) => setRedirectionName(e.target.value)}
@@ -684,13 +686,14 @@ export function RedirectionCard({
           <h3 className="text-lg font-semibold mb-2">Test Redirection</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="mgeo_test_url">
                 <span className="label-text font-semibold flex items-center">
                   Test URL
                   <HelpHover text="Enter a URL to test how this redirection rule would affect it." />
                 </span>
               </label>
               <input
+                id="mgeo_test_url"
                 type="text"
                 value={testUrl}
                 onChange={(e) => setTestUrl(e.target.value)}
