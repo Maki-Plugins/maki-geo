@@ -40,8 +40,6 @@ export function RedirectionCard({
     locations[0]?.id || null,
   );
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
-  const [testUrl, setTestUrl] = useState<string>("");
-  const [testCountry, setTestCountry] = useState<string>("");
 
   function createDefaultLocation(): RedirectionLocation {
     return {
@@ -677,55 +675,6 @@ export function RedirectionCard({
                 </ul>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="bg-base-200 p-4 rounded-none">
-          <h3 className="text-lg font-semibold mb-2">Test Redirection</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold flex items-center">
-                  Test URL
-                  <HelpHover text="Enter a URL to test how this redirection rule would affect it." />
-                </span>
-              </label>
-              <input
-                type="text"
-                value={testUrl}
-                onChange={(e) => setTestUrl(e.target.value)}
-                placeholder="https://example.com/page"
-                className="input input-bordered input-sm w-full"
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold flex items-center">
-                  Test Country
-                  <HelpHover text="Enter a country code (e.g., US, UK, CA) to simulate a visitor from that location." />
-                </span>
-              </label>
-              <input
-                type="text"
-                value={testCountry}
-                onChange={(e) => setTestCountry(e.target.value)}
-                placeholder="US"
-                className="input input-bordered input-sm w-full"
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <button
-              className="btn btn-sm btn-accent btn-outline"
-              onClick={() => {
-                // This would be replaced with actual test logic
-                alert(
-                  `Testing redirection for URL: ${testUrl} from country: ${testCountry}`,
-                );
-              }}
-            >
-              Test Redirection
-            </button>
           </div>
         </div>
       </div>
