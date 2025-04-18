@@ -1,29 +1,29 @@
 <?php
 
-if (!defined('ABSPATH')) {
-    exit;
+if (!defined("ABSPATH")) {
+    exit();
 }
 
 function mgeo_get_location_data()
 {
     static $location_data = null;
-    
+
     if ($location_data === null) {
         $location_data = mgeo_get_geolocation_data();
     }
-    
+
     return $location_data;
 }
 
 function mgeo_shortcode_handler($atts, $content, $tag)
 {
-    $defaults = array(
-        'default' => 'Unknown'
-    );
-    
+    $defaults = [
+        "default" => "Unknown",
+    ];
+
     $atts = shortcode_atts($defaults, $atts, $tag);
-    $field = str_replace('mgeo_', '', $tag);
-    $default_value = esc_attr($atts['default']);
+    $field = str_replace("mgeo_", "", $tag);
+    $default_value = esc_attr($atts["default"]);
 
     // Check targeting method
     $method = get_option("mgeo_client_server_mode", "server");
@@ -40,7 +40,11 @@ function mgeo_shortcode_handler($atts, $content, $tag)
     } else {
         // Server-side: Process immediately
         $location_data = mgeo_get_location_data();
-        if (!$location_data || !isset($location_data[$field]) || $location_data[$field] == "Unknown") {
+        if (
+            !$location_data ||
+            !isset($location_data[$field]) ||
+            $location_data[$field] == "Unknown"
+        ) {
             return $default_value;
         }
         return esc_html($location_data[$field]);
@@ -49,16 +53,16 @@ function mgeo_shortcode_handler($atts, $content, $tag)
 
 function mgeo_country_flag_shortcode($atts)
 {
-    $defaults = array(
-        'size' => '24px'
-    );
-    
-    $atts = shortcode_atts($defaults, $atts, $tag);
-    $size = esc_attr($atts['size']);
+    $defaults = [
+        "size" => "24px",
+    ];
+
+    $atts = shortcode_atts($defaults, $atts);
+    $size = esc_attr($atts["size"]);
 
     // Ensure size has a unit for server-side rendering
     if (is_numeric($size)) {
-        $size .= 'px';
+        $size .= "px";
     }
 
     // Check targeting method
@@ -69,31 +73,38 @@ function mgeo_country_flag_shortcode($atts)
         // The actual script enqueueing is handled in src/geo-printing/geo-printing-frontend.php
         return sprintf(
             '<span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="%s" style="visibility: hidden;"></span>',
-            esc_attr($atts['size']) // Pass original size value
+            esc_attr($atts["size"]) // Pass original size value
         );
     } else {
         // Server-side: Process immediately
         $location_data = mgeo_get_location_data();
-        if (!$location_data || empty($location_data['country_code']) || $location_data['country_code'] == "Unknown") {
-            return ''; // Return empty string if no country code
+        if (
+            !$location_data ||
+            empty($location_data["country_code"]) ||
+            $location_data["country_code"] == "Unknown"
+        ) {
+            return ""; // Return empty string if no country code
         }
 
-        $country_code = strtolower($location_data['country_code']);
-        $flag_path = plugin_dir_url(dirname(__DIR__)) . 'src/assets/flags/' . $country_code . '.svg';
+        $country_code = strtolower($location_data["country_code"]);
+        $flag_path =
+            plugin_dir_url(dirname(__DIR__)) .
+            "src/assets/flags/" .
+            $country_code .
+            ".svg";
 
         return sprintf(
             '<img src="%s" alt="%s flag" class="mgeo-country-flag" style="width: %s; height: auto;" />',
             esc_url($flag_path),
-            esc_attr($location_data['country']),
+            esc_attr($location_data["country"]),
             esc_attr($size) // Use sanitized size with unit
         );
     }
 }
 
-
 // Register shortcodes
-add_shortcode('mgeo_continent', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_country', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_region', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_city', 'mgeo_shortcode_handler');
-add_shortcode('mgeo_country_flag', 'mgeo_country_flag_shortcode');
+add_shortcode("mgeo_continent", "mgeo_shortcode_handler");
+add_shortcode("mgeo_country", "mgeo_shortcode_handler");
+add_shortcode("mgeo_region", "mgeo_shortcode_handler");
+add_shortcode("mgeo_city", "mgeo_shortcode_handler");
+add_shortcode("mgeo_country_flag", "mgeo_country_flag_shortcode");
