@@ -83,7 +83,7 @@ export function RedirectionTab(): JSX.Element {
         (redirection) => redirection.id !== redirectionId,
       );
       setRedirections(updatedRedirections);
-      saveRedirections(updatedRedirections);
+      // saveRedirections(updatedRedirections); // Removed auto-save on delete
     }
   };
 
@@ -222,7 +222,7 @@ export function RedirectionTab(): JSX.Element {
                       );
                       setRedirections(updatedRedirections);
                       setExpandedRedirectionId(null);
-                      saveRedirections(updatedRedirections);
+                      // saveRedirections(updatedRedirections); // Removed auto-save on edit complete
                     }}
                     isNew={false}
                     initialData={redirection}
