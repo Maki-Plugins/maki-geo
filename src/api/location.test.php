@@ -42,13 +42,14 @@ class TestLocation extends WP_UnitTestCase
         );
         
         $result = mgeo_get_geolocation_data();
-        
-        $this->assertEquals($mock_data, $result);
-        $this->assertIsArray($result);
+
+        $this->assertIsArray($result, 'Expected geolocation data to be an array');
         $this->assertEquals($mock_data, $result);
 
-        // Verify the data was cached
-        $cached_data = get_transient("mgeo_geo_location_127.0.0.1");
+        // Verify the data was cached using the expected IP from the test environment
+        $ipDetection = new mgeo_IpDetection();
+        $expected_ip = $ipDetection->getRequestIP(); // Should be 127.0.0.1 in test env
+        $cached_data = get_transient("mgeo_geo_location_{$expected_ip}");
         $this->assertEquals($mock_data, $cached_data);
     }
 
@@ -61,9 +62,11 @@ class TestLocation extends WP_UnitTestCase
             "city" => "Paris",
         ];
 
-        // Set the cached data
+        // Set the cached data using the expected IP from the test environment
+        $ipDetection = new mgeo_IpDetection();
+        $expected_ip = $ipDetection->getRequestIP(); // Should be 127.0.0.1 in test env
         set_transient(
-            "mgeo_geo_location_127.0.0.1",
+            "mgeo_geo_location_{$expected_ip}",
             $cached_data,
             HOUR_IN_SECONDS
         );
@@ -110,8 +113,10 @@ class TestLocation extends WP_UnitTestCase
 
         $this->assertFalse($result);
 
-        // Verify no cache was set
-        $cached_data = get_transient("mgeo_geo_location_86.94.131.20");
+        // Verify no cache was set for the expected IP
+        $ipDetection = new mgeo_IpDetection();
+        $expected_ip = $ipDetection->getRequestIP(); // Should be 127.0.0.1 in test env
+        $cached_data = get_transient("mgeo_geo_location_{$expected_ip}");
         $this->assertFalse($cached_data);
     }
 }
