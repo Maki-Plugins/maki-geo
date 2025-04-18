@@ -359,7 +359,8 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
         $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
-        $this->assertEquals("https://us.example.com/", $result);
+        // This should match red_130 (California) first, which passes path and query
+        $this->assertEquals("https://ca.example.com/products/?color=red", $result); 
 
         // Test path, no query (Matches red_129)
         // Set mock location data for Canada/Ontario
