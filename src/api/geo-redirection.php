@@ -58,24 +58,8 @@ function mgeo_handle_redirection_api($request)
         return new WP_REST_Response(["redirect" => false]);
     }
 
-    // Get all redirections
-    $redirections = mgeo_get_redirections();
-    if (empty($redirections)) {
-        return new WP_REST_Response(["redirect" => false]);
-    }
-
-    // Get geo location data
-    $location_data = mgeo_get_geolocation_data();
-    if (empty($location_data)) {
-        return new WP_REST_Response(["redirect" => false]);
-    }
-
-    // Find matching redirection
-    $redirect_url = mgeo_find_matching_redirection(
-        $redirections,
-        $location_data,
-        $current_url
-    );
+    // Get the potential redirect URL using the core logic function
+    $redirect_url = mgeo_get_redirect_url_for_request($current_url);
 
     if (!empty($redirect_url)) {
         return new WP_REST_Response([

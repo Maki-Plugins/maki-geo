@@ -27,33 +27,13 @@ function mgeo_init_geo_redirection()
         return;
     }
 
-    // Get all redirections
-    $redirections = mgeo_get_redirections();
-    if (empty($redirections)) {
-        return;
-    }
-
     // Get current URL
     $current_url = mgeo_get_current_url();
-    // Check if the current URL has any potential redirections before making an API call
-    if (!mgeo_url_has_potential_redirections($redirections, $current_url)) {
-        return;
-    }
 
-    // Get geo location data - only called if there are potential redirections for this URL
-    $location_data = mgeo_get_geolocation_data();
-    if (empty($location_data)) {
-        return;
-    }
+    // Get the potential redirect URL using the core logic function
+    $redirect_url = mgeo_get_redirect_url_for_request($current_url);
 
-    // Find matching redirection
-    $redirect_url = mgeo_find_matching_redirection(
-        $redirections,
-        $location_data,
-        $current_url
-    );
-
-    // Perform redirection if a match was found
+    // Perform redirection if a URL was returned
     if (!empty($redirect_url)) {
         wp_redirect($redirect_url, 302);
         exit();
@@ -368,6 +348,41 @@ function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
     }
 
     return $redirect_url;
+}
+
+/**
+ * Core logic to determine the redirect URL for a given request URL and location.
+ * This function is used by both server-side and client-side redirection mechanisms.
+ *
+ * @param string $current_url The URL to check for redirection.
+ * @return string|null The redirect URL if a match is found, otherwise null.
+ */
+function mgeo_get_redirect_url_for_request($current_url)
+{
+    // Get all redirections
+    $redirections = mgeo_get_redirections();
+    if (empty($redirections)) {
+        return null;
+    }
+
+    // Check if the current URL has any potential redirections before making an API call
+    if (!mgeo_url_has_potential_redirections($redirections, $current_url)) {
+        return null;
+    }
+
+    // Get geo location data - only called if there are potential redirections for this URL
+    $location_data = mgeo_get_geolocation_data();
+    if (empty($location_data) || is_wp_error($location_data)) {
+        // Handle potential WP_Error from location data fetch (e.g., limit exceeded)
+        return null;
+    }
+
+    // Find matching redirection URL
+    return mgeo_find_matching_redirection(
+        $redirections,
+        $location_data,
+        $current_url
+    );
 }
 
 // Hook into WordPress to initialize geo redirection

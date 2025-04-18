@@ -5,7 +5,7 @@
  * @package Maki_Geo
  */
 
-class TestGeoRedirectionBackend extends WP_UnitTestCase
+class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
 {
     private $mockLocationData;
     private $mockRedirections;
@@ -21,6 +21,9 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ];
+
+        // Add filter to mock location data retrieval
+        add_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
 
         // Sample redirection configuration
         $this->mockRedirections = [
@@ -99,16 +102,36 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         ];
     }
 
+    public function tearDown(): void
+    {
+        // Remove the filter
+        remove_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        parent::tearDown();
+    }
+
+    /**
+     * Filter callback to return mock location data.
+     */
+    public function filter_location_data($data)
+    {
+        // Return the mock data set for the current test.
+        return $this->mockLocationData;
+    }
+
     public function test_should_find_matching_redirection()
     {
-        $result = mgeo_find_matching_redirection(
-            $this->mockRedirections,
-            $this->mockLocationData,
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $this->mockRedirections);
+
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/test-page/"
         );
 
         $this->assertNotNull($result);
         $this->assertEquals("https://example.com/en/test-page/", $result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_ignore_disabled_redirections()
@@ -117,16 +140,19 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
         $locationData = array_merge($this->mockLocationData, [
             "country" => "Canada",
             "country_code" => "CA",
-        ]);
+        $this->mockLocationData = $locationData; // Update mock data for the filter
 
-        // Only the disabled US redirection should match, but it should be ignored
-        $result = mgeo_find_matching_redirection(
-            $this->mockRedirections,
-            $locationData,
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $this->mockRedirections);
+
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/test-page/"
         );
 
         $this->assertNull($result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_handle_specific_page_targeting()
@@ -171,21 +197,23 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $specificRedirections);
+
         // Test matching URL
-        $result = mgeo_find_matching_redirection(
-            $specificRedirections,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://us-store.example.com/products/", $result);
 
         // Test non-matching URL
-        $result = mgeo_find_matching_redirection(
-            $specificRedirections,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/contact/"
         );
         $this->assertNull($result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_respect_exclusions()
@@ -234,37 +262,35 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $redirectionsWithExclusions);
+
         // Test URL that should be excluded by exact match
-        $result = mgeo_find_matching_redirection(
-            $redirectionsWithExclusions,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/no-redirect/"
         );
         $this->assertNull($result);
 
         // Test URL that should be excluded by contains
-        $result = mgeo_find_matching_redirection(
-            $redirectionsWithExclusions,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/wp-admin/options.php"
         );
         $this->assertNull($result);
 
         // Test URL that should be excluded by query parameter
-        $result = mgeo_find_matching_redirection(
-            $redirectionsWithExclusions,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/page/?no_redirect=1"
         );
         $this->assertNull($result);
 
         // Test URL that should not be excluded
-        $result = mgeo_find_matching_redirection(
-            $redirectionsWithExclusions,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://us.example.com/products/", $result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_handle_path_and_query_options()
@@ -345,36 +371,44 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
-        // Test no path, no query
-        $result = mgeo_find_matching_redirection(
-            [$redirectionsWithOptions[0]],
-            $this->mockLocationData,
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $redirectionsWithOptions);
+
+        // Test no path, no query (Matches red_128)
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
         $this->assertEquals("https://us.example.com/", $result);
 
-        // Test path, no query
+        // Test path, no query (Matches red_129)
         $canadaLocation = array_merge($this->mockLocationData, [
             "country" => "Canada",
             "country_code" => "CA",
+            "region" => "Ontario", // Change region to avoid matching red_130
         ]);
-        $result = mgeo_find_matching_redirection(
-            [$redirectionsWithOptions[1]],
-            $canadaLocation,
+        $this->mockLocationData = $canadaLocation; // Update mock data for the filter
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
         $this->assertEquals("https://ca.example.com/products/", $result);
 
-        // Test path and query
-        $result = mgeo_find_matching_redirection(
-            [$redirectionsWithOptions[2]],
-            $this->mockLocationData,
+        // Test path and query (Matches red_130)
+        $californiaLocation = array_merge($this->mockLocationData, [
+            "country" => "United States",
+            "country_code" => "US",
+            "region" => "California",
+        ]);
+        $this->mockLocationData = $californiaLocation; // Update mock data for the filter
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
         $this->assertEquals(
             "https://ca.example.com/products/?color=red",
             $result
         );
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_handle_complex_conditions()
@@ -441,10 +475,17 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
-        // Test AND conditions - should match
-        $result = mgeo_find_matching_redirection(
-            [$complexRedirections[0]],
-            $this->mockLocationData,
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $complexRedirections);
+
+        // Test AND conditions - should match (red_131)
+        $californiaLocation = array_merge($this->mockLocationData, [
+            "country" => "United States",
+            "country_code" => "US",
+            "region" => "California",
+        ]);
+        $this->mockLocationData = $californiaLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals(
@@ -452,40 +493,44 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             $result
         );
 
-        // Test AND conditions - should not match
+        // Test AND conditions - should not match (red_131)
         $texasLocation = array_merge($this->mockLocationData, [
             "region" => "Texas",
         ]);
-        $result = mgeo_find_matching_redirection(
-            [$complexRedirections[0]],
-            $texasLocation,
+        $this->mockLocationData = $texasLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
-        $this->assertNull($result);
+        $this->assertNull($result); // No other rule matches Texas
 
-        // Test OR conditions - should match first condition
+        // Test OR conditions - should match first condition (red_132)
         $ukLocation = array_merge($this->mockLocationData, [
             "country" => "United Kingdom",
             "country_code" => "UK",
+            "continent" => "Europe",
+            "region" => "England",
         ]);
-        $result = mgeo_find_matching_redirection(
-            [$complexRedirections[1]],
-            $ukLocation,
+        $this->mockLocationData = $ukLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://english.example.com/products/", $result);
 
-        // Test OR conditions - should match second condition
+        // Test OR conditions - should match second condition (red_132)
         $auLocation = array_merge($this->mockLocationData, [
             "country" => "Australia",
             "country_code" => "AU",
+            "continent" => "Oceania",
+            "region" => "New South Wales",
         ]);
-        $result = mgeo_find_matching_redirection(
-            [$complexRedirections[1]],
-            $auLocation,
+        $this->mockLocationData = $auLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://english.example.com/products/", $result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_handle_multiple_locations_in_redirection()
@@ -535,25 +580,33 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
-        // Test first location
-        $result = mgeo_find_matching_redirection(
-            $multiLocationRedirection,
-            $this->mockLocationData,
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $multiLocationRedirection);
+
+        // Test first location (US)
+        $usLocation = array_merge($this->mockLocationData, [
+            "country" => "United States",
+            "country_code" => "US",
+        ]);
+        $this->mockLocationData = $usLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://us.example.com/products/", $result);
 
-        // Test second location
+        // Test second location (CA)
         $canadaLocation = array_merge($this->mockLocationData, [
             "country" => "Canada",
             "country_code" => "CA",
         ]);
-        $result = mgeo_find_matching_redirection(
-            $multiLocationRedirection,
-            $canadaLocation,
+        $this->mockLocationData = $canadaLocation;
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/"
         );
         $this->assertEquals("https://ca.example.com/products/", $result);
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_handle_hash_contains_exclusion()
@@ -592,24 +645,26 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             ],
         ];
 
+        // Mock get_option to return our test redirections
+        update_option('mgeo_redirections', $hashExclusionRedirection);
+
         // Test URL with hash that should be excluded
-        $result = mgeo_find_matching_redirection(
-            $hashExclusionRedirection,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/#no-redirect"
         );
         $this->assertNull($result);
 
         // Test URL with hash that should not be excluded
-        $result = mgeo_find_matching_redirection(
-            $hashExclusionRedirection,
-            $this->mockLocationData,
+        $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/#section1"
         );
         $this->assertEquals(
             "https://us.example.com/products/#section1",
             $result
         );
+
+        // Clean up option
+        delete_option('mgeo_redirections');
     }
 
     public function test_should_check_url_has_potential_redirections()
@@ -787,5 +842,96 @@ class TestGeoRedirectionBackend extends WP_UnitTestCase
             "https://example.com/normal-page/"
         );
         $this->assertTrue($result);
+    }
+
+    public function test_should_return_null_if_no_redirections()
+    {
+        update_option('mgeo_redirections', []); // No redirections
+        $result = mgeo_get_redirect_url_for_request(
+            "https://example.com/any-page/"
+        );
+        $this->assertNull($result);
+        delete_option('mgeo_redirections');
+    }
+
+    public function test_should_return_null_if_no_potential_redirections_for_url()
+    {
+        // Use specific page redirections from another test
+        $specificPageRedirections = [
+            [
+                "id" => "red_135",
+                "name" => "Specific Pages Only",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_469",
+                        "conditions" => [
+                            [
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "specific",
+                        "redirectUrl" => "",
+                        "redirectMappings" => [
+                            [
+                                "id" => "map_125",
+                                "fromUrl" => "https://example.com/products/",
+                                "toUrl" => "https://us.example.com/products/",
+                            ],
+                        ],
+                        "exclusions" => [],
+                        "passPath" => false,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+        ];
+        update_option('mgeo_redirections', $specificPageRedirections);
+
+        // This URL doesn't match any specific mapping
+        $result = mgeo_get_redirect_url_for_request(
+            "https://example.com/contact/"
+        );
+        $this->assertNull($result);
+        delete_option('mgeo_redirections');
+    }
+
+    public function test_should_return_null_if_location_data_fetch_fails()
+    {
+        update_option('mgeo_redirections', $this->mockRedirections);
+        // Make the location data filter return null
+        remove_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        add_filter('mgeo_location_data_result', function() { return null; });
+
+        $result = mgeo_get_redirect_url_for_request(
+            "https://example.com/test-page/"
+        );
+        $this->assertNull($result);
+
+        // Restore filter
+        remove_filter('mgeo_location_data_result', function() { return null; });
+        add_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        delete_option('mgeo_redirections');
+    }
+
+     public function test_should_return_null_if_location_data_fetch_returns_error()
+    {
+        update_option('mgeo_redirections', $this->mockRedirections);
+        // Make the location data filter return WP_Error
+        remove_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        add_filter('mgeo_location_data_result', function() { return new WP_Error('test_error', 'Test error'); });
+
+        $result = mgeo_get_redirect_url_for_request(
+            "https://example.com/test-page/"
+        );
+        $this->assertNull($result);
+
+        // Restore filter
+        remove_filter('mgeo_location_data_result', function() { return new WP_Error('test_error', 'Test error'); });
+        add_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        delete_option('mgeo_redirections');
     }
 }
