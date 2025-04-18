@@ -106,10 +106,11 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
     {
         update_option('mgeo_client_server_mode', 'server');
         $result = mgeo_country_flag_shortcode([]);
-        // Check for the consistent part of the path, ignoring scheme/host
-        $this->assertStringContainsString(
-            'src="/plugins/maki-geo/src/assets/flags/us.svg"',
-            $result
+        // Use regex to check if src attribute ends with the expected path
+        $this->assertMatchesRegularExpression(
+            '|src="[^"]*/plugins/maki-geo/src/assets/flags/us\.svg"|',
+            $result,
+            'The src attribute should end with the correct flag path.'
         );
         $this->assertStringContainsString('alt="United States flag"', $result);
         $this->assertStringContainsString('style="width: 24px; height: auto;"', $result);
