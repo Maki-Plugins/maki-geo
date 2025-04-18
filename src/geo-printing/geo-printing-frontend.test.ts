@@ -17,17 +17,7 @@ if (!window.wp) {
 // Mock makiGeoPrintingData
 window.makiGeoPrintingData = {
   pluginUrl: "http://localhost/wp-content/plugins/maki-geo/",
-};
-
-// Dynamically import the script to test after setting up mocks
-async function loadScript() {
-  // Reset DOM before each dynamic import
-  document.body.innerHTML = "";
-  // Reset modules to ensure clean state for each test
-  jest.resetModules();
-  // Import the script which executes on load
-  await import("./geo-printing-frontend");
-}
+import { initGeoPrinting } from "./geo-printing-frontend";
 
 describe("Geo Printing Frontend Script", () => {
   const mockLocationData: LocationData = {
@@ -61,7 +51,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="city" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const countrySpan = document.querySelector(
       "[data-mgeo-field='country']",
@@ -84,7 +74,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="32px" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const flagSpan = document.querySelector(
       "[data-mgeo-field='flag']",
@@ -118,7 +108,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="city" data-mgeo-default="Default City" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const regionSpan = document.querySelector(
       "[data-mgeo-field='region']",
@@ -147,7 +137,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="20px" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const countrySpan = document.querySelector(
       "[data-mgeo-field='country']",
@@ -181,7 +171,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="country" data-mgeo-default="Fallback" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const countrySpan = document.querySelector(
       "[data-mgeo-field='country']",
@@ -199,7 +189,7 @@ describe("Geo Printing Frontend Script", () => {
   test("should not fetch API if no placeholders are found", async () => {
     document.body.innerHTML = `<div>No placeholders here</div>`;
 
-    await loadScript();
+    await initGeoPrinting();
 
     expect(window.wp?.apiFetch).not.toHaveBeenCalled();
   });
@@ -211,7 +201,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="24px" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const flagSpan = document.querySelector(
       "[data-mgeo-field='flag']",
@@ -240,7 +230,7 @@ describe("Geo Printing Frontend Script", () => {
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="24px" style="visibility: hidden;"></span>
     `;
 
-    await loadScript();
+    await initGeoPrinting();
 
     const flagSpan = document.querySelector(
       "[data-mgeo-field='flag']",

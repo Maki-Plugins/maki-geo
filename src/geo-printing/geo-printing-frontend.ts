@@ -1,6 +1,6 @@
 import { LocationData } from "../types/types";
 
-async function initGeoPrinting(): Promise<void> {
+export async function initGeoPrinting(): Promise<void> {
   const placeholders = document.querySelectorAll<HTMLElement>(
     "span[data-mgeo-print='true']",
   );
