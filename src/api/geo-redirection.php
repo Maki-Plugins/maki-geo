@@ -23,20 +23,49 @@ function mgeo_register_redirection_api()
 add_action("rest_api_init", "mgeo_register_redirection_api");
 
 /**
- * Register REST API endpoint for managing redirections
+ * Register REST API endpoints for managing redirections (CRUD)
  */
 function mgeo_register_redirections_api()
 {
+    // Get all redirections
     register_rest_route("maki-geo/v1", "/redirections", [
-        [
-            "methods" => "GET",
-            "callback" => "mgeo_get_redirections_api",
-            "permission_callback" => "mgeo_can_manage_rules",
+        "methods" => "GET",
+        "callback" => "mgeo_get_redirections_api",
+        "permission_callback" => "mgeo_can_manage_rules",
+    ]);
+
+    // Create a new redirection
+    register_rest_route("maki-geo/v1", "/redirections", [
+        "methods" => "POST",
+        "callback" => "mgeo_create_redirection_api",
+        "permission_callback" => "mgeo_can_manage_rules",
+    ]);
+
+    // Update a specific redirection
+    register_rest_route("maki-geo/v1", "/redirections/(?P<id>[a-zA-Z0-9_]+)", [
+        "methods" => "PUT", // Or POST with _method=PUT if PUT is problematic
+        "callback" => "mgeo_update_redirection_api",
+        "permission_callback" => "mgeo_can_manage_rules",
+        "args" => [
+            "id" => [
+                "validate_callback" => function ($param, $request, $key) {
+                    return is_string($param);
+                },
+            ],
         ],
-        [
-            "methods" => "POST",
-            "callback" => "mgeo_save_redirections_api",
-            "permission_callback" => "mgeo_can_manage_rules",
+    ]);
+
+    // Delete a specific redirection
+    register_rest_route("maki-geo/v1", "/redirections/(?P<id>[a-zA-Z0-9_]+)", [
+        "methods" => "DELETE",
+        "callback" => "mgeo_delete_redirection_api",
+        "permission_callback" => "mgeo_can_manage_rules",
+        "args" => [
+            "id" => [
+                "validate_callback" => function ($param, $request, $key) {
+                    return is_string($param);
+                },
+            ],
         ],
     ]);
 }
@@ -84,74 +113,142 @@ function mgeo_get_redirections_api()
 }
 
 /**
- * Handle POST requests for redirections API
+ * Handle POST requests to create a new redirection.
  *
- * @param WP_REST_Request $request API request object
- * @return WP_REST_Response API response
+ * @param WP_REST_Request $request API request object.
+ * @return WP_REST_Response API response.
  */
-function mgeo_save_redirections_api($request)
+function mgeo_create_redirection_api($request)
 {
     mgeo_verify_nonce();
-    $redirections = $request->get_json_params();
+    $new_redirection_data = $request->get_json_params();
 
-    if (empty($redirections) || !is_array($redirections)) {
+    // TODO: Add robust validation/sanitization for the incoming data structure
+    if (empty($new_redirection_data) || !is_array($new_redirection_data)) {
         return new WP_REST_Response(
-            ["success" => false, "message" => "Invalid redirections data"],
+            ["success" => false, "message" => "Invalid redirection data provided."],
             400
         );
     }
 
-    $success = mgeo_save_redirections($redirections);
+    // Assign a unique ID
+    $new_redirection_data["id"] = uniqid("red_");
 
-    if ($success) {
-        return new WP_REST_Response(["success" => true]);
+    $redirections = mgeo_get_redirections(); // Get current redirections
+    $redirections[] = $new_redirection_data; // Add the new one
+
+    // Save the updated list
+    if (update_option("mgeo_redirections", $redirections)) {
+        return new WP_REST_Response(
+            ["success" => true, "redirection" => $new_redirection_data],
+            201
+        ); // Return the created redirection with its ID
     } else {
         return new WP_REST_Response(
-            ["success" => false, "message" => "Failed to save redirections"],
+            ["success" => false, "message" => "Failed to create redirection."],
             500
         );
     }
 }
 
 /**
- * Save redirections to the database
+ * Handle PUT requests to update an existing redirection.
  *
- * @param array $redirections Array of redirection configurations
- * @return bool Whether the save was successful
+ * @param WP_REST_Request $request API request object.
+ * @return WP_REST_Response API response.
  */
-function mgeo_save_redirections($redirections)
+function mgeo_update_redirection_api($request)
 {
-    // Ensure we have an array
-    if (!is_array($redirections)) {
-        return false;
+    mgeo_verify_nonce();
+    $id = $request->get_param("id");
+    $updated_data = $request->get_json_params();
+
+    // TODO: Add robust validation/sanitization for the incoming data structure
+    if (empty($updated_data) || !is_array($updated_data) || !isset($updated_data["id"]) || $updated_data["id"] !== $id) {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Invalid redirection data or ID mismatch."],
+            400
+        );
     }
 
-    // Update the option
-    // TODO: Check if the user is allowed to update this
-    return update_option("mgeo_redirections", $redirections);
-}
+    $redirections = mgeo_get_redirections();
+    $found_index = -1;
 
-/**
- * Sanitize redirections data before saving
- *
- * @param mixed $redirections Redirections data to sanitize
- * @return array Sanitized redirections data
- */
-function mgeo_sanitize_redirections($redirections)
-{
-    // If it's a JSON string, decode it
-    if (is_string($redirections)) {
-        $decoded = json_decode($redirections, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $redirections = $decoded;
+    foreach ($redirections as $index => $redirection) {
+        if (isset($redirection["id"]) && $redirection["id"] === $id) {
+            $found_index = $index;
+            break;
         }
     }
 
-    // Ensure we have an array
-    if (!is_array($redirections)) {
-        return [];
+    if ($found_index === -1) {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Redirection not found."],
+            404
+        );
     }
 
-    // Return the sanitized array
-    return $redirections;
+    // Replace the old redirection with the updated data
+    $redirections[$found_index] = $updated_data;
+
+    // Save the updated list
+    if (update_option("mgeo_redirections", $redirections)) {
+        return new WP_REST_Response(["success" => true, "redirection" => $updated_data]);
+    } else {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Failed to update redirection."],
+            500
+        );
+    }
 }
+
+/**
+ * Handle DELETE requests to remove a redirection.
+ *
+ * @param WP_REST_Request $request API request object.
+ * @return WP_REST_Response API response.
+ */
+function mgeo_delete_redirection_api($request)
+{
+    mgeo_verify_nonce();
+    $id = $request->get_param("id");
+
+    if (empty($id)) {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Redirection ID is required."],
+            400
+        );
+    }
+
+    $redirections = mgeo_get_redirections();
+    $initial_count = count($redirections);
+
+    // Filter out the redirection with the matching ID
+    $updated_redirections = array_filter(
+        $redirections, function ($redirection) use ($id) {
+            return !isset($redirection["id"]) || $redirection["id"] !== $id;
+        }
+    );
+
+    // Check if any redirection was actually removed
+    if (count($updated_redirections) === $initial_count) {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Redirection not found."],
+            404
+        );
+    }
+
+    // Save the updated list (re-index array)
+    if (update_option("mgeo_redirections", array_values($updated_redirections))) {
+        return new WP_REST_Response(["success" => true]);
+    } else {
+        return new WP_REST_Response(
+            ["success" => false, "message" => "Failed to delete redirection."],
+            500
+        );
+    }
+}
+
+// Note: mgeo_save_redirections and mgeo_sanitize_redirections are no longer needed
+// as saving/validation is handled within specific CRUD endpoints.
+// They can be removed if not used elsewhere.

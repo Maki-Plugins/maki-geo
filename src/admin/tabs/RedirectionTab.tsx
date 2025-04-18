@@ -29,63 +29,110 @@ export function RedirectionTab(): JSX.Element {
     }
   }, []);
 
-  // Save redirections to the database
-  const saveRedirections = async (redirectionsToSave: Redirection[]) => {
+  // --- CRUD Operations ---
+
+  const handleCreateRedirection = async (newRedirectionData: Redirection) => {
     setIsSaving(true);
     setSaveMessage(null);
-
     try {
+      // Remove temporary frontend ID before sending
+      const { id, ...dataToSend } = newRedirectionData;
       const response = await apiFetch({
         path: "maki-geo/v1/redirections",
         method: "POST",
-        data: redirectionsToSave,
+        data: dataToSend, // Send data without the temporary ID
       });
 
-      if (response && response.success) {
-        setSaveMessage({
-          text: "Redirections saved successfully!",
-          type: "success",
-        });
-        // Auto-hide success message after 3 seconds
-        setTimeout(() => {
-          setSaveMessage(null);
-        }, 3000);
+      if (response && response.success && response.redirection) {
+        // Add the new redirection (with server-assigned ID) to the state
+        setRedirections([...redirections, response.redirection]);
+        setNewRedirectionId(null); // Close the "new" card
+        setSaveMessage({ text: "Redirection created!", type: "success" });
       } else {
-        setSaveMessage({
-          text: response.message || "Failed to save redirections.",
-          type: "error",
-        });
+        throw new Error(response.message || "Failed to create redirection.");
       }
-    } catch (error) {
-      console.error("Error saving redirections:", error);
+    } catch (error: any) {
+      console.error("Error creating redirection:", error);
       setSaveMessage({
-        text: "An error occurred while saving redirections.",
+        text: `Create failed: ${error.message || "Unknown error"}`,
         type: "error",
       });
     } finally {
       setIsSaving(false);
+      setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
     }
   };
 
-  const handleRedirectionComplete = (redirection: Redirection) => {
-    const updatedRedirections = [
-      ...redirections,
-      { ...redirection, id: String(Date.now()) },
-    ];
-    setRedirections(updatedRedirections);
-    setNewRedirectionId(null);
-    saveRedirections(updatedRedirections);
-  };
+  const handleUpdateRedirection = async (updatedRedirectionData: Redirection) => {
+    setIsSaving(true);
+    setSaveMessage(null);
+    const idToUpdate = updatedRedirectionData.id;
 
-  const handleDeleteRedirection = (redirectionId: string) => {
-    if (window.confirm("Are you sure you want to delete this redirection?")) {
-      const updatedRedirections = redirections.filter(
-        (redirection) => redirection.id !== redirectionId,
-      );
-      setRedirections(updatedRedirections);
-      saveRedirections(updatedRedirections); // Re-enable save on delete
+    try {
+      const response = await apiFetch({
+        path: `maki-geo/v1/redirections/${idToUpdate}`,
+        method: "PUT",
+        data: updatedRedirectionData,
+      });
+
+      if (response && response.success && response.redirection) {
+        // Update the redirection in the local state
+        const updatedList = redirections.map((r) =>
+          r.id === idToUpdate ? response.redirection : r,
+        );
+        setRedirections(updatedList);
+        setExpandedRedirectionId(null); // Close the editing card
+        setSaveMessage({ text: "Redirection updated!", type: "success" });
+      } else {
+        throw new Error(response.message || "Failed to update redirection.");
+      }
+    } catch (error: any) {
+      console.error("Error updating redirection:", error);
+      setSaveMessage({
+        text: `Update failed: ${error.message || "Unknown error"}`,
+        type: "error",
+      });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
     }
   };
+
+
+  const handleDeleteRedirection = async (redirectionId: string) => {
+     if (window.confirm("Are you sure you want to delete this redirection?")) {
+        setIsSaving(true); // Indicate activity during delete
+        setSaveMessage(null);
+        try {
+            const response = await apiFetch({
+                path: `maki-geo/v1/redirections/${redirectionId}`,
+                method: "DELETE",
+            });
+
+            if (response && response.success) {
+                // Remove the redirection from local state
+                const updatedRedirections = redirections.filter(
+                    (redirection) => redirection.id !== redirectionId,
+                );
+                setRedirections(updatedRedirections);
+                setSaveMessage({ text: "Redirection deleted!", type: "success" });
+            } else {
+                 throw new Error(response.message || "Failed to delete redirection.");
+            }
+        } catch (error: any) {
+            console.error("Error deleting redirection:", error);
+            setSaveMessage({
+                text: `Delete failed: ${error.message || "Unknown error"}`,
+                type: "error",
+            });
+        } finally {
+            setIsSaving(false);
+            setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
+        }
+     }
+  };
+
+  // --- Render Logic ---
 
   return (
     <div className="p-5">
@@ -143,7 +190,7 @@ export function RedirectionTab(): JSX.Element {
 
               <div className="mt-4 pt-4 border-t">
                 <RedirectionCard
-                  onComplete={handleRedirectionComplete}
+                  onComplete={handleCreateRedirection} // Use create handler
                   isNew={true}
                 />
               </div>
@@ -217,16 +264,7 @@ export function RedirectionTab(): JSX.Element {
               >
                 {/* Always render RedirectionCard when its container is visible to preserve state */}
                 <RedirectionCard
-                  onComplete={(updatedRedirection) => {
-                    const updatedRedirections = redirections.map((r) =>
-                      r.id === redirection.id
-                        ? { ...updatedRedirection, id: redirection.id }
-                        : r,
-                    );
-                    setRedirections(updatedRedirections);
-                    setExpandedRedirectionId(null);
-                    // saveRedirections(updatedRedirections); // Removed auto-save on edit complete
-                  }}
+                  onComplete={handleUpdateRedirection} // Use update handler
                   isNew={false}
                   initialData={redirection}
                 />
