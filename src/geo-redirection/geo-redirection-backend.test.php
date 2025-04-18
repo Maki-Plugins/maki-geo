@@ -369,6 +369,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
             "city" => "Toronto",
             "ip" => "192.168.1.2",
         ]);
+        $this->reset_location_static_cache(); // Reset cache after setting mock data
         $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
@@ -384,6 +385,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ]);
+        $this->reset_location_static_cache(); // Reset cache after setting mock data
         $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
