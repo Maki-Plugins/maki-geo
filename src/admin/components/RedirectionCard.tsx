@@ -1,4 +1,6 @@
-import { useState } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
+import { useForm, useFieldArray, FormProvider, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
 import {
   ExclusionType,
@@ -8,17 +10,35 @@ import {
   RedirectionLocation,
   RedirectMapping,
 } from "../../types/types";
+import {
+  redirectionSchema,
+  RedirectionFormData,
+} from "./redirection-schema";
 import { Dashicon } from "@wordpress/components";
 import Toggle from "./Toggle";
 import HelpHover from "./HelpHover";
 
-// Types
-export type WizardStep = "settings" | "review";
+// Types (WizardStep removed)
 
 interface RedirectionCardProps {
-  onComplete: (redirection: Redirection) => void;
+  onComplete: (redirection: RedirectionFormData) => void; // Use validated form data type
   isNew?: boolean;
-  initialData?: Redirection;
+  initialData?: Redirection; // Keep initialData type as is from WP
+}
+
+// Helper to create default location structure matching the schema
+function createDefaultLocation(): RedirectionLocation {
+  return {
+    id: `loc_${Date.now()}`, // RHF useFieldArray will manage its own IDs later
+    conditions: [{ type: "country", value: "", operator: "is" }],
+    operator: "OR",
+    pageTargetingType: "all",
+    redirectUrl: "",
+    redirectMappings: [],
+    exclusions: [],
+    passPath: true,
+    passQuery: true,
+  };
 }
 
 export function RedirectionCard({
@@ -26,13 +46,29 @@ export function RedirectionCard({
   isNew = true,
   initialData,
 }: RedirectionCardProps): JSX.Element {
-  const [currentStep, setCurrentStep] = useState<WizardStep>("settings");
-  const [redirectionName, setRedirectionName] = useState<string>(
-    initialData?.name || "",
-  );
-  const [isEnabled, setIsEnabled] = useState<boolean>(
-    initialData?.isEnabled ?? true,
-  );
+  // --- React Hook Form Setup ---
+  const methods = useForm<RedirectionFormData>({
+    resolver: zodResolver(redirectionSchema),
+    defaultValues: initialData
+      ? { ...initialData } // Spread initial data if editing
+      : { // Default values for a new redirection
+          id: `new_${Date.now()}`, // Temporary ID for new
+          name: "",
+          isEnabled: true,
+          locations: [createDefaultLocation()],
+        },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control, // Needed for Controller later
+    watch,   // Needed for conditional rendering later
+  } = methods;
+
+  // --- State for UI (to be replaced/reduced later) ---
+  // Keep locations state for now until useFieldArray is implemented in Step 2
   const [locations, setLocations] = useState<RedirectionLocation[]>(
     initialData?.locations || [createDefaultLocation()],
   );
@@ -41,9 +77,11 @@ export function RedirectionCard({
   );
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
 
+  // --- Functions (to be replaced/refactored) ---
+  // Keep createDefaultLocation for now
   function createDefaultLocation(): RedirectionLocation {
     return {
-      id: `loc_${Date.now()}`,
+      id: `loc_${Date.now()}`, // Keep generating IDs for now
       conditions: [{ type: "country", value: "", operator: "is" }],
       operator: "OR",
       pageTargetingType: "all",
@@ -55,12 +93,14 @@ export function RedirectionCard({
     };
   }
 
+  // TODO: Replace with useFieldArray in Step 2
   function addLocation() {
     const newLocation = createDefaultLocation();
     setLocations([...locations, newLocation]);
     setExpandedLocationId(newLocation.id);
   }
 
+  // TODO: Replace with useFieldArray in Step 2
   function updateLocation(
     locationId: string,
     updates: Partial<RedirectionLocation>,
@@ -72,6 +112,7 @@ export function RedirectionCard({
     );
   }
 
+  // TODO: Replace with useFieldArray in Step 2
   function deleteLocation(locationId: string) {
     if (locations.length <= 1) {
       return; // Don't delete the last location
@@ -82,6 +123,7 @@ export function RedirectionCard({
     }
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function addRedirectMapping(locationId: string) {
     const location = locations.find((loc) => loc.id === locationId);
     if (!location) return;
@@ -97,6 +139,7 @@ export function RedirectionCard({
     });
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function updateRedirectMapping(
     locationId: string,
     mappingId: string,
@@ -112,6 +155,7 @@ export function RedirectionCard({
     updateLocation(locationId, { redirectMappings: updatedMappings });
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function deleteRedirectMapping(locationId: string, mappingId: string) {
     const location = locations.find((loc) => loc.id === locationId);
     if (!location) return;
@@ -123,6 +167,7 @@ export function RedirectionCard({
     updateLocation(locationId, { redirectMappings: updatedMappings });
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function addExclusion(locationId: string) {
     const location = locations.find((loc) => loc.id === locationId);
     if (!location) return;
@@ -138,6 +183,7 @@ export function RedirectionCard({
     });
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function updateExclusion(
     locationId: string,
     exclusionId: string,
@@ -153,6 +199,7 @@ export function RedirectionCard({
     updateLocation(locationId, { exclusions: updatedExclusions });
   }
 
+  // TODO: Replace with nested useFieldArray in Step 3
   function deleteExclusion(locationId: string, exclusionId: string) {
     const location = locations.find((loc) => loc.id === locationId);
     if (!location) return;
@@ -164,6 +211,7 @@ export function RedirectionCard({
     updateLocation(locationId, { exclusions: updatedExclusions });
   }
 
+  // TODO: Refactor with Controller in Step 4
   function handleConditionsChange(
     locationId: string,
     conditions: GeoCondition[],
@@ -172,66 +220,11 @@ export function RedirectionCard({
     updateLocation(locationId, { conditions, operator });
   }
 
-  function handleNext() {
-    if (currentStep === "settings") {
-      // Validate settings
-      if (!redirectionName.trim()) {
-        alert("Please enter a redirection name");
-        return;
-      }
-
-      // Check if at least one location has valid conditions
-      const hasValidLocation = locations.some(
-        (loc) =>
-          loc.conditions.length > 0 &&
-          loc.conditions.every((c) => c.value.trim() !== ""),
-      );
-
-      if (!hasValidLocation) {
-        alert("Please set at least one valid geo condition");
-        return;
-      }
-
-      // Check if all locations have valid redirect URLs
-      const hasInvalidRedirects = locations.some((loc) => {
-        if (loc.pageTargetingType === "all" && !loc.redirectUrl.trim()) {
-          return true;
-        }
-        if (
-          loc.pageTargetingType === "specific" &&
-          (loc.redirectMappings.length === 0 ||
-            loc.redirectMappings.some(
-              (m) => !m.fromUrl.trim() || !m.toUrl.trim(),
-            ))
-        ) {
-          return true;
-        }
-        return false;
-      });
-
-      if (hasInvalidRedirects) {
-        alert("Please set valid redirect URLs for all locations");
-        return;
-      }
-
-      setCurrentStep("review");
-    } else if (currentStep === "review") {
-      // Create the final redirection object
-      const redirection: Redirection = {
-        id: `red_${Date.now()}`,
-        name: redirectionName,
-        locations: locations,
-        isEnabled: isEnabled,
-      };
-
-      onComplete(redirection);
-    }
-  }
-
-  function handleBack() {
-    if (currentStep === "review") {
-      setCurrentStep("settings");
-    }
+  // --- Form Submission ---
+  const onSubmit = (data: RedirectionFormData) => {
+    console.log("Form Data Submitted:", data); // For debugging
+    // Call the original onComplete with the validated data
+    onComplete(data);
   }
 
   function getLocationTitle(
@@ -267,6 +260,7 @@ export function RedirectionCard({
     return `Location ${index + 1}: ${title} - ${pageSummary}`;
   }
 
+  // TODO: Refactor in Step 2 to use useFieldArray fields
   function renderLocationCard(location: RedirectionLocation, index: number) {
     const isExpanded = expandedLocationId === location.id;
 
@@ -561,9 +555,12 @@ export function RedirectionCard({
     );
   }
 
-  function renderSettingsStep() {
-    return (
-      <div className="space-y-6">
+  // --- Render Logic ---
+  // No longer need separate render steps (settings/review)
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Top Level Fields */}
         <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
             <label className="label" htmlFor="mgeo_redirect_name">
@@ -575,11 +572,15 @@ export function RedirectionCard({
             <input
               id="mgeo_redirect_name"
               type="text"
-              value={redirectionName}
-              onChange={(e) => setRedirectionName(e.target.value)}
+              {...register("name")} // Register the name field
               placeholder="US and CA to English site"
-              className="input input-bordered input-sm w-full"
+              className={`input input-bordered input-sm w-full ${
+                errors.name ? "input-error" : ""
+              }`}
             />
+            {errors.name && (
+              <p className="text-error text-xs mt-1">{errors.name.message}</p>
+            )}
           </div>
           <div className="form-control">
             <label className="label">
@@ -589,14 +590,21 @@ export function RedirectionCard({
               </span>
             </label>
             <div className="flex items-center gap-2">
-              <Toggle
-                checked={isEnabled}
-                onChange={(e) => setIsEnabled(e.target.checked)}
-              />
+              {/* TODO: Use Controller in Step 4 */}
+              <input type="checkbox" {...register("isEnabled")} className="toggle toggle-primary" />
+              {/* <Toggle
+                // checked={isEnabled} // Replace with Controller value
+                // onChange={(e) => setIsEnabled(e.target.checked)} // Replace with Controller onChange
+                {...register("isEnabled")} // Simple registration for now
+              /> */}
+               {errors.isEnabled && (
+                <p className="text-error text-xs mt-1">{errors.isEnabled.message}</p>
+               )}
             </div>
           </div>
         </div>
 
+        {/* Locations Section (using manual state for now) */}
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold flex items-center">
@@ -612,9 +620,12 @@ export function RedirectionCard({
             >
               <Dashicon icon="plus" /> Add Location
             </button>
+            {/* TODO: Display location array errors in Step 5 */}
+            {/* {errors.locations && <p className="text-error text-xs mt-1">{errors.locations.message || 'Error in locations'}</p>} */}
           </div>
         </div>
 
+        {/* Advanced Settings (Placeholder) */}
         <div className="collapse collapse-arrow bg-base-200">
           <input
             type="checkbox"
@@ -631,81 +642,14 @@ export function RedirectionCard({
             </p>
           </div>
         </div>
-      </div>
-    );
-  }
 
-  function renderReviewStep() {
-    return (
-      <div className="space-y-6">
-        <div className="bg-base-200 p-4 rounded-none">
-          <h3 className="text-lg font-semibold mb-2">Redirection Summary</h3>
-          <div className="space-y-2">
-            <p>
-              <strong>Name:</strong> {redirectionName}
-            </p>
-            <p>
-              <strong>Status:</strong> {isEnabled ? "Active" : "Inactive"}
-            </p>
-            <p>
-              <strong>Locations:</strong> {locations.length}
-            </p>
-
-            {locations.map((location, index) => (
-              <div key={location.id} className="ml-4 mt-2">
-                <p className="font-medium">
-                  {getLocationTitle(location, index)}
-                </p>
-                <ul className="list-disc list-inside ml-4">
-                  <li>
-                    Conditions:{" "}
-                    {location.conditions
-                      .map((c) => `${c.type} ${c.operator} ${c.value}`)
-                      .join(` ${location.operator} `)}
-                  </li>
-                  <li>
-                    {location.pageTargetingType === "all"
-                      ? `Redirect all pages to: ${location.redirectUrl}`
-                      : `Redirect ${location.redirectMappings.length} specific pages`}
-                  </li>
-                  {location.exclusions.length > 0 && (
-                    <li>
-                      {location.exclusions.length} page exclusion
-                      {location.exclusions.length !== 1 ? "s" : ""}
-                    </li>
-                  )}
-                </ul>
-              </div>
-            ))}
-          </div>
+        {/* Submit Button */}
+        <div className="flex justify-end gap-2 mt-6">
+          <button type="submit" className="btn btn-primary">
+            {isNew ? "Create Redirection" : "Update Redirection"}
+          </button>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {currentStep === "settings" && renderSettingsStep()}
-      {currentStep === "review" && renderReviewStep()}
-
-      <div className="flex justify-end gap-2 mt-6">
-        {currentStep === "settings" ? (
-          <>
-            <button className="btn btn-primary" onClick={handleNext}>
-              Review & save
-            </button>
-          </>
-        ) : (
-          <>
-            <button className="btn btn-ghost" onClick={handleBack}>
-              Back
-            </button>
-            <button className="btn btn-primary" onClick={handleNext}>
-              {isNew ? "Create Redirection" : "Update Redirection"}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
+      </form>
+    </FormProvider>
   );
 }
