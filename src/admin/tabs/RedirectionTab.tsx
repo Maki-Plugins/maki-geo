@@ -212,26 +212,24 @@ export function RedirectionTab(): JSX.Element {
               </div>
 
               {/* Always render the container, but hide it conditionally */}
-              <div className={`mt-4 pt-4 border-t ${expandedRedirectionId === redirection.id ? '' : 'hidden'}`}>
-                {/* Only mount RedirectionCard when expanded to avoid unnecessary initial renders/API calls if many cards exist,
-                    but rely on React's reconciliation to keep state if it was already mounted and just hidden/shown.
-                    If state loss persists, remove the conditional rendering of RedirectionCard itself. */}
-                {expandedRedirectionId === redirection.id && (
-                  <RedirectionCard
-                    onComplete={(updatedRedirection) => {
-                      const updatedRedirections = redirections.map((r) =>
-                        r.id === redirection.id
-                          ? { ...updatedRedirection, id: redirection.id }
-                          : r,
-                      );
-                      setRedirections(updatedRedirections);
-                      setExpandedRedirectionId(null);
-                      // saveRedirections(updatedRedirections); // Removed auto-save on edit complete
-                    }}
-                    isNew={false}
-                    initialData={redirection}
-                  />
-                )}
+              <div
+                className={`mt-4 pt-4 border-t ${expandedRedirectionId === redirection.id ? "" : "hidden"}`}
+              >
+                {/* Always render RedirectionCard when its container is visible to preserve state */}
+                <RedirectionCard
+                  onComplete={(updatedRedirection) => {
+                    const updatedRedirections = redirections.map((r) =>
+                      r.id === redirection.id
+                        ? { ...updatedRedirection, id: redirection.id }
+                        : r,
+                    );
+                    setRedirections(updatedRedirections);
+                    setExpandedRedirectionId(null);
+                    // saveRedirections(updatedRedirections); // Removed auto-save on edit complete
+                  }}
+                  isNew={false}
+                  initialData={redirection}
+                />
               </div>
             </div>
           </div>
