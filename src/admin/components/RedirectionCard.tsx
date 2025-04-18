@@ -63,25 +63,29 @@ export function RedirectionCard({
     register,
     handleSubmit,
     formState: { errors },
-    control, // Needed for Controller later
+    control, // Needed for useFieldArray and Controller
     watch,   // Needed for conditional rendering later
+    getValues, // Useful for debugging or complex logic if needed
   } = methods;
 
-  // --- State for UI (to be replaced/reduced later) ---
-  // Keep locations state for now until useFieldArray is implemented in Step 2
-  const [locations, setLocations] = useState<RedirectionLocation[]>(
-    initialData?.locations || [createDefaultLocation()],
-  );
+  // --- Field Array for Locations ---
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "locations",
+  });
+
+  // --- State for UI ---
+  // Use RHF's field.id for expansion state
   const [expandedLocationId, setExpandedLocationId] = useState<string | null>(
-    locations[0]?.id || null,
+    fields[0]?.id || null, // Use RHF's field id
   );
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
 
-  // --- Functions (to be replaced/refactored) ---
-  // Keep createDefaultLocation for now
-  function createDefaultLocation(): RedirectionLocation {
+  // --- Functions ---
+  // Default location structure for appending new locations
+  function createDefaultLocation(): Omit<RedirectionLocation, 'id'> { // Omit id, RHF handles it
     return {
-      id: `loc_${Date.now()}`, // Keep generating IDs for now
+      // id: `loc_${Date.now()}`, // RHF provides id
       conditions: [{ type: "country", value: "", operator: "is" }],
       operator: "OR",
       pageTargetingType: "all",
@@ -93,38 +97,35 @@ export function RedirectionCard({
     };
   }
 
-  // TODO: Replace with useFieldArray in Step 2
+  // --- Functions using useFieldArray ---
   function addLocation() {
     const newLocation = createDefaultLocation();
-    setLocations([...locations, newLocation]);
-    setExpandedLocationId(newLocation.id);
+    append(newLocation);
+    // Optionally expand the newly added location - need RHF's ID after append
+    // This is slightly more complex, might need useEffect or watch
+    // For now, let's not auto-expand. User can click.
+    // const newIndex = fields.length; // Index before append
+    // setTimeout(() => { // Allow RHF to update fields
+    //   const newFieldId = fields[newIndex]?.id;
+    //   if (newFieldId) setExpandedLocationId(newFieldId);
+    // }, 0);
   }
 
-  // TODO: Replace with useFieldArray in Step 2
-  function updateLocation(
-    locationId: string,
-    updates: Partial<RedirectionLocation>,
-  ) {
-    setLocations(
-      locations.map((loc) =>
-        loc.id === locationId ? { ...loc, ...updates } : loc,
-      ),
-    );
-  }
-
-  // TODO: Replace with useFieldArray in Step 2
-  function deleteLocation(locationId: string) {
-    if (locations.length <= 1) {
+  function deleteLocation(index: number) {
+    if (fields.length <= 1) {
+      alert("You must have at least one location."); // Or handle via validation
       return; // Don't delete the last location
     }
-    setLocations(locations.filter((loc) => loc.id !== locationId));
-    if (expandedLocationId === locationId) {
-      setExpandedLocationId(null);
+    // Check if the deleted item was the expanded one
+    const fieldIdToDelete = fields[index]?.id;
+    if (expandedLocationId === fieldIdToDelete) {
+      setExpandedLocationId(null); // Collapse if deleting expanded item
     }
+    remove(index);
   }
 
   // TODO: Replace with nested useFieldArray in Step 3
-  function addRedirectMapping(locationId: string) {
+  function addRedirectMapping(locationId: string) { // Keep locationId for now
     const location = locations.find((loc) => loc.id === locationId);
     if (!location) return;
 
@@ -260,33 +261,42 @@ export function RedirectionCard({
     return `Location ${index + 1}: ${title} - ${pageSummary}`;
   }
 
-  // TODO: Refactor in Step 2 to use useFieldArray fields
-  function renderLocationCard(location: RedirectionLocation, index: number) {
-    const isExpanded = expandedLocationId === location.id;
+  // Render function now uses RHF's field and index
+  function renderLocationCard(field: RedirectionLocation & { id: string }, index: number) {
+    const isExpanded = expandedLocationId === field.id; // Use RHF field id
+    const locationData = watch(`locations.${index}`); // Watch current location data for display/logic
+
+    // Get specific errors for this location index
+    const locationErrors = errors.locations?.[index];
 
     return (
       <div
-        key={location.id}
+        key={field.id} // Use RHF field id as key
         className="card border-neutral shadow-sm rounded-none max-w-full mb-4 mt-0"
       >
         <div className="card-body p-1">
           <div
-            className="flex items-center gap-4 cursor-pointer"
+            className="flex items-center gap-4 cursor-pointer p-4" // Added padding
             onClick={() =>
-              setExpandedLocationId(isExpanded ? null : location.id)
+              setExpandedLocationId(isExpanded ? null : field.id) // Use RHF field id
             }
           >
             <div className="flex-1">
               <h3 className="font-bold text-base">
-                {getLocationTitle(location, index)}
+                {/* Pass watched data to title function */}
+                {getLocationTitle(locationData, index)}
               </h3>
+              {/* Display top-level location error */}
+              {locationErrors && typeof locationErrors === 'object' && !locationErrors.conditions && !locationErrors.redirectUrl && !locationErrors.redirectMappings && (
+                 <p className="text-error text-xs mt-1">{locationErrors.message}</p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <button
                 className="btn btn-ghost btn-square btn-sm"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setExpandedLocationId(isExpanded ? null : location.id);
+                  e.stopPropagation(); // Prevent card click
+                  setExpandedLocationId(isExpanded ? null : field.id); // Use RHF field id
                 }}
               >
                 <svg
@@ -316,13 +326,23 @@ export function RedirectionCard({
                       <HelpHover text="Set conditions based on visitor's location data such as country, region, or city. Multiple conditions can be combined with AND/OR operators." />
                     </span>
                   </label>
+                  {/* TODO: Integrate GeoConditionEditor with Controller in Step 4 */}
                   <GeoConditionEditor
-                    conditions={location.conditions}
-                    operator={location.operator}
-                    onChange={(conditions, operator) =>
-                      handleConditionsChange(location.id, conditions, operator)
-                    }
+                    conditions={locationData.conditions} // Use watched data
+                    operator={locationData.operator}   // Use watched data
+                    onChange={(conditions, operator) => {
+                      // TODO: Replace with Controller/setValue in Step 4
+                      // Manually update for now (less ideal)
+                      const currentLocations = getValues('locations');
+                      currentLocations[index].conditions = conditions;
+                      currentLocations[index].operator = operator;
+                      methods.setValue('locations', currentLocations, { shouldValidate: true });
+                      // handleConditionsChange(field.id, conditions, operator) // Old way
+                    }}
                   />
+                   {locationErrors?.conditions && (
+                     <p className="text-error text-xs mt-1">{locationErrors.conditions.message || 'Error in conditions'}</p>
+                   )}
                 </div>
                 <div>
                   <div className="form-control">
@@ -336,56 +356,53 @@ export function RedirectionCard({
                       <label className="label cursor-pointer">
                         <input
                           type="radio"
-                          name={`pageTargeting-${location.id}`}
+                          // name={`pageTargeting-${field.id}`} // RHF handles name grouping
                           className="radio radio-primary"
-                          checked={location.pageTargetingType === "all"}
-                          onChange={() =>
-                            updateLocation(location.id, {
-                              pageTargetingType: "all",
-                            })
-                          }
+                          value="all" // Set value for radio group
+                          {...register(`locations.${index}.pageTargetingType`)} // Register with RHF
                         />
                         <span className="label-text ml-1">All pages</span>
                       </label>
                       <label className="label cursor-pointer">
                         <input
                           type="radio"
-                          name={`pageTargeting-${location.id}`}
+                          // name={`pageTargeting-${field.id}`} // RHF handles name grouping
                           className="radio radio-primary"
-                          checked={location.pageTargetingType === "specific"}
-                          onChange={() =>
-                            updateLocation(location.id, {
-                              pageTargetingType: "specific",
-                            })
-                          }
+                          value="specific" // Set value for radio group
+                          {...register(`locations.${index}.pageTargetingType`)} // Register with RHF
                         />
                         <span className="label-text ml-1">Specific pages</span>
                       </label>
+                      {locationErrors?.pageTargetingType && (
+                        <p className="text-error text-xs mt-1">{locationErrors.pageTargetingType.message}</p>
+                      )}
                     </div>
                   </div>
 
-                  {location.pageTargetingType === "all" ? (
+                  {/* Conditional rendering based on watched value */}
+                  {watch(`locations.${index}.pageTargetingType`) === "all" ? (
                     <div className="form-control">
-                      <label className="label" htmlFor="mgeo_redirect_url">
+                      <label className="label" htmlFor={`locations.${index}.redirectUrl`}>
                         <span className="label-text font-semibold flex items-center">
                           Redirect URL
                           <HelpHover text="The destination URL where visitors will be redirected to. Use a full URL including https://." />
                         </span>
                       </label>
                       <input
-                        id="mgeo_redirect_url"
+                        id={`locations.${index}.redirectUrl`}
                         type="text"
-                        value={location.redirectUrl}
-                        onChange={(e) =>
-                          updateLocation(location.id, {
-                            redirectUrl: e.target.value,
-                          })
-                        }
-                        placeholder="https://example.com"
-                        className="input input-bordered input-sm w-full"
+                        {...register(`locations.${index}.redirectUrl`)} // Register with RHF
+                        placeholder="https://example.com/target-path/"
+                        className={`input input-bordered input-sm w-full ${
+                          locationErrors?.redirectUrl ? "input-error" : ""
+                        }`}
                       />
+                      {locationErrors?.redirectUrl && (
+                        <p className="text-error text-xs mt-1">{locationErrors.redirectUrl.message}</p>
+                      )}
                     </div>
                   ) : (
+                    // TODO: Integrate Redirect Mappings with nested useFieldArray in Step 3
                     <div className="form-control">
                       <label className="label">
                         <span className="label-text font-semibold flex items-center">
@@ -394,47 +411,57 @@ export function RedirectionCard({
                         </span>
                       </label>
                       <div className="space-y-2">
-                        {location.redirectMappings.map((mapping) => (
+                        {/* Placeholder for Mappings - requires Step 3 */}
+                        {locationData.redirectMappings.map((mapping, mapIndex) => (
                           <div
-                            key={mapping.id}
+                            key={mapping.id} // Use existing ID for now
                             className="join flex items-center"
                           >
                             <input
                               type="text"
-                              value={mapping.fromUrl}
-                              onChange={(e) =>
-                                updateRedirectMapping(location.id, mapping.id, {
-                                  fromUrl: e.target.value,
-                                })
-                              }
-                              placeholder="From URL"
-                              className="input input-bordered input-sm w-full join-item"
+                              // value={mapping.fromUrl} // Replace with register
+                              {...register(`locations.${index}.redirectMappings.${mapIndex}.fromUrl`)}
+                              placeholder="From URL Path (e.g., /source)"
+                              className={`input input-bordered input-sm w-full join-item ${
+                                locationErrors?.redirectMappings?.[mapIndex]?.fromUrl ? "input-error" : ""
+                              }`}
                             />
                             <span className="join-item mx-2">→</span>
                             <input
                               type="text"
-                              value={mapping.toUrl}
-                              onChange={(e) =>
-                                updateRedirectMapping(location.id, mapping.id, {
-                                  toUrl: e.target.value,
-                                })
-                              }
-                              placeholder="To URL"
-                              className="input input-bordered input-sm w-full join-item"
+                              // value={mapping.toUrl} // Replace with register
+                              {...register(`locations.${index}.redirectMappings.${mapIndex}.toUrl`)}
+                              placeholder="To URL (e.g., https://site.com/dest)"
+                              className={`input input-bordered input-sm w-full join-item ${
+                                locationErrors?.redirectMappings?.[mapIndex]?.toUrl ? "input-error" : ""
+                              }`}
                             />
                             <button
+                              type="button" // Prevent form submission
                               className="btn btn-sm btn-error btn-ghost join-item"
-                              onClick={() =>
-                                deleteRedirectMapping(location.id, mapping.id)
-                              }
+                              onClick={() => deleteRedirectMapping(field.id, mapping.id)} // Keep old logic for now
                             >
                               ✕
                             </button>
                           </div>
                         ))}
+                         {/* Display mapping-level errors */}
+                         {locationErrors?.redirectMappings?.map((mapError, mapIndex) => (
+                            mapError && (
+                              <div key={`mapErr-${mapIndex}`} className="text-error text-xs mt-1 ml-1">
+                                {mapError.fromUrl && <p>From URL: {mapError.fromUrl.message}</p>}
+                                {mapError.toUrl && <p>To URL: {mapError.toUrl.message}</p>}
+                              </div>
+                            )
+                         ))}
+                         {/* Display array-level error for mappings */}
+                         {locationErrors?.redirectMappings && typeof locationErrors.redirectMappings === 'object' && locationErrors.redirectMappings.message && (
+                            <p className="text-error text-xs mt-1">{locationErrors.redirectMappings.message}</p>
+                         )}
                         <button
+                          type="button" // Prevent form submission
                           className="btn btn-sm btn-accent btn-outline"
-                          onClick={() => addRedirectMapping(location.id)}
+                          onClick={() => addRedirectMapping(field.id)} // Keep old logic for now
                         >
                           <Dashicon icon="plus" /> Add URL Mapping
                         </button>
@@ -442,6 +469,7 @@ export function RedirectionCard({
                     </div>
                   )}
                 </div>
+                {/* TODO: Integrate Exclusions with nested useFieldArray in Step 3 */}
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-semibold flex items-center">
@@ -450,49 +478,55 @@ export function RedirectionCard({
                     </span>
                   </label>
                   <div className="space-y-2">
-                    {location.exclusions.map((exclusion) => (
+                     {/* Placeholder for Exclusions - requires Step 3 */}
+                    {locationData.exclusions.map((exclusion, exclIndex) => (
                       <div
-                        key={exclusion.id}
+                        key={exclusion.id} // Use existing ID for now
                         className="join flex items-center"
                       >
                         <select
-                          value={exclusion.type}
-                          onChange={(e) =>
-                            updateExclusion(location.id, exclusion.id, {
-                              type: e.target.value as ExclusionType,
-                            })
-                          }
-                          className="select select-bordered select-sm join-item"
+                          // value={exclusion.type} // Replace with register
+                          {...register(`locations.${index}.exclusions.${exclIndex}.type`)}
+                          className={`select select-bordered select-sm join-item ${
+                            locationErrors?.exclusions?.[exclIndex]?.type ? "select-error" : ""
+                          }`}
                         >
-                          <option value="url_equals">URL equals</option>
-                          <option value="url_contains">URL contains</option>
+                          <option value="url_equals">URL Path equals</option>
+                          <option value="url_contains">URL Path contains</option>
                           <option value="query_contains">Query contains</option>
                           <option value="hash_contains">Hash contains</option>
                         </select>
                         <input
                           type="text"
-                          value={exclusion.value}
-                          onChange={(e) =>
-                            updateExclusion(location.id, exclusion.id, {
-                              value: e.target.value,
-                            })
-                          }
-                          placeholder="URL or query/hash text"
-                          className="input input-bordered input-sm w-full join-item"
+                          // value={exclusion.value} // Replace with register
+                          {...register(`locations.${index}.exclusions.${exclIndex}.value`)}
+                          placeholder="Value to exclude"
+                          className={`input input-bordered input-sm w-full join-item ${
+                            locationErrors?.exclusions?.[exclIndex]?.value ? "input-error" : ""
+                          }`}
                         />
                         <button
+                          type="button" // Prevent form submission
                           className="btn btn-sm btn-error btn-ghost join-item"
-                          onClick={() =>
-                            deleteExclusion(location.id, exclusion.id)
-                          }
+                          onClick={() => deleteExclusion(field.id, exclusion.id)} // Keep old logic for now
                         >
                           ✕
                         </button>
                       </div>
                     ))}
+                    {/* Display exclusion-level errors */}
+                    {locationErrors?.exclusions?.map((exclError, exclIndex) => (
+                      exclError && (
+                        <div key={`exclErr-${exclIndex}`} className="text-error text-xs mt-1 ml-1">
+                          {exclError.type && <p>Type: {exclError.type.message}</p>}
+                          {exclError.value && <p>Value: {exclError.value.message}</p>}
+                        </div>
+                      )
+                    ))}
                     <button
+                      type="button" // Prevent form submission
                       className="btn btn-sm btn-accent btn-outline"
-                      onClick={() => addExclusion(location.id)}
+                      onClick={() => addExclusion(field.id)} // Keep old logic for now
                     >
                       <Dashicon icon="plus" /> Add Exclusion
                     </button>
@@ -510,39 +544,48 @@ export function RedirectionCard({
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         Pass page path to redirect URLs
-                        <HelpHover text="When enabled, the current page path will be appended to the destination URL." />
+                        <HelpHover text="When enabled, the current page path (e.g., /about-us/) will be appended to the destination URL. Only applies when 'Page Targeting' is 'All pages'." />
                       </span>
-                      <Toggle
-                        checked={location.passPath}
-                        onChange={(e) =>
-                          updateLocation(location.id, {
-                            passPath: e.target.checked,
-                          })
-                        }
+                      {/* TODO: Use Controller in Step 4 */}
+                      <input
+                        type="checkbox"
+                        className="toggle toggle-primary"
+                        {...register(`locations.${index}.passPath`)}
                       />
+                      {/* <Toggle
+                        // checked={locationData.passPath} // Use Controller
+                        // onChange={(e) => // Use Controller
+                        //   updateLocation(field.id, { passPath: e.target.checked })
+                        // }
+                      /> */}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         Pass query string to redirect URLs
-                        <HelpHover text="When enabled, query parameters from the current URL will be preserved and added to the destination URL." />
+                        <HelpHover text="When enabled, query parameters from the current URL (e.g., ?utm_source=google) will be preserved and added to the destination URL." />
                       </span>
-                      <Toggle
-                        checked={location.passQuery}
-                        onChange={(e) =>
-                          updateLocation(location.id, {
-                            passQuery: e.target.checked,
-                          })
-                        }
+                       {/* TODO: Use Controller in Step 4 */}
+                       <input
+                        type="checkbox"
+                        className="toggle toggle-primary"
+                        {...register(`locations.${index}.passQuery`)}
                       />
+                      {/* <Toggle
+                        // checked={locationData.passQuery} // Use Controller
+                        // onChange={(e) => // Use Controller
+                        //   updateLocation(field.id, { passQuery: e.target.checked })
+                        // }
+                      /> */}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex justify-end">
                   <button
+                    type="button" // Prevent form submission
                     className="btn btn-sm btn-error btn-outline"
-                    onClick={() => deleteLocation(location.id)}
-                    disabled={locations.length <= 1}
+                    onClick={() => deleteLocation(index)} // Use index for remove
+                    disabled={fields.length <= 1} // Disable based on RHF fields length
                   >
                     Delete Location
                   </button>
@@ -613,15 +656,19 @@ export function RedirectionCard({
             </span>
           </label>
           <div className="space-y-2">
-            {locations.map(renderLocationCard)}
+            {/* Map over fields from useFieldArray */}
+            {fields.map((field, index) => renderLocationCard(field as RedirectionLocation & { id: string }, index))}
             <button
+              type="button" // Prevent form submission
               className="btn btn-sm btn-accent btn-outline"
-              onClick={addLocation}
+              onClick={addLocation} // Use the new addLocation function
             >
               <Dashicon icon="plus" /> Add Location
             </button>
-            {/* TODO: Display location array errors in Step 5 */}
-            {/* {errors.locations && <p className="text-error text-xs mt-1">{errors.locations.message || 'Error in locations'}</p>} */}
+            {/* Display top-level array error */}
+            {errors.locations && !Array.isArray(errors.locations) && (
+               <p className="text-error text-xs mt-1">{errors.locations.message}</p>
+            )}
           </div>
         </div>
 
