@@ -31,13 +31,25 @@ function mgeo_register_geo_target_assets()
         plugins_url("../build/geo-content-frontend.js", __FILE__),
         ["wp-api-fetch"],
         "1.0.0",
+        "1.0.0",
+        true
+    );
+    wp_register_script(
+        "geo-printing-frontend",
+        plugins_url("../build/geo-printing-frontend.js", __FILE__),
+        ["wp-api-fetch"],
+        "1.0.0",
         true
     );
 
-    wp_localize_script("geo-target-frontend", "makiGeoData", [
+    // Localize data for both scripts
+    $localized_data = [
         "endpoint" => rest_url("maki-geo/v1/location"),
         "nonce" => wp_create_nonce("wp_rest"),
-    ]);
+        "pluginUrl" => plugin_dir_url(dirname(__FILE__)), // Pass plugin URL for flag paths
+    ];
+    wp_localize_script("geo-target-frontend", "makiGeoData", $localized_data);
+    wp_localize_script("geo-printing-frontend", "makiGeoPrintingData", $localized_data);
 }
 add_action("init", "mgeo_register_geo_target_assets");
 
@@ -83,6 +95,7 @@ require_once "api/location.php";
 require_once "api/verify-key.php";
 require_once "blocks/setup.php";
 require_once "geo-conditions/evaluate-conditions-backend.php";
+require_once "geo-printing/geo-printing-frontend.php"; // Add this line
 require_once "geo-redirection/geo-redirection-backend.php";
 require_once "geo-redirection/geo-redirection-frontend.php";
 require_once "shortcodes/geo-content-shortcode.php";

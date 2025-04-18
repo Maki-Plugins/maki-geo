@@ -19,6 +19,10 @@ module.exports = {
       __dirname,
       "src/geo-redirection/geo-redirection-frontend.ts",
     ),
+    "geo-printing-frontend": path.resolve(
+      __dirname,
+      "src/geo-printing/geo-printing-frontend.ts",
+    ),
   },
   output: {
     path: path.resolve(__dirname, "build"),
