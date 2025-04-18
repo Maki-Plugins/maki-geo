@@ -54,6 +54,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "react-beautiful-dnd": "^13.1.1"
+    "@hookform/resolvers": "^5.0.1",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-hook-form": "^7.55.0",
+    "zod": "^3.24.3"
   }
 }
