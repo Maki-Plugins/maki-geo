@@ -83,7 +83,7 @@ export function RedirectionTab(): JSX.Element {
         (redirection) => redirection.id !== redirectionId,
       );
       setRedirections(updatedRedirections);
-      // saveRedirections(updatedRedirections); // Removed auto-save on delete
+      saveRedirections(updatedRedirections); // Re-enable save on delete
     }
   };
 
@@ -211,8 +211,12 @@ export function RedirectionTab(): JSX.Element {
                 </div>
               </div>
 
-              {expandedRedirectionId === redirection.id && (
-                <div className="mt-4 pt-4 border-t">
+              {/* Always render the container, but hide it conditionally */}
+              <div className={`mt-4 pt-4 border-t ${expandedRedirectionId === redirection.id ? '' : 'hidden'}`}>
+                {/* Only mount RedirectionCard when expanded to avoid unnecessary initial renders/API calls if many cards exist,
+                    but rely on React's reconciliation to keep state if it was already mounted and just hidden/shown.
+                    If state loss persists, remove the conditional rendering of RedirectionCard itself. */}
+                {expandedRedirectionId === redirection.id && (
                   <RedirectionCard
                     onComplete={(updatedRedirection) => {
                       const updatedRedirections = redirections.map((r) =>
@@ -227,8 +231,8 @@ export function RedirectionTab(): JSX.Element {
                     isNew={false}
                     initialData={redirection}
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         ))}
