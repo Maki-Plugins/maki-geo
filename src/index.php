@@ -95,10 +95,11 @@ require_once "api/location.php";
 require_once "api/verify-key.php";
 require_once "blocks/setup.php";
 require_once "geo-conditions/evaluate-conditions-backend.php";
-require_once "geo-printing/geo-printing-frontend.php"; // Add this line
+require_once "geo-printing/geo-printing-backend.php"; // Add this line
+require_once "geo-printing/geo-printing-frontend.php";
 require_once "geo-redirection/geo-redirection-backend.php";
 require_once "geo-redirection/geo-redirection-frontend.php";
 require_once "shortcodes/geo-content-shortcode.php";
-require_once "shortcodes/print-geo-shortcodes.php";
+// require_once "shortcodes/print-geo-shortcodes.php"; // Removed this line
 require_once "settings-registry.php";
 require_once "wp-utils.php";
