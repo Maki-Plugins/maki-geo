@@ -275,11 +275,11 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
     public function test_should_handle_path_and_query_options()
     {
         // Create redirections with different path/query options
-        // IMPORTANT: Order matters. More specific rules (like region) should come before broader rules (like country).
+        // Order matters for specificity (Region before Country).
         $redirectionsWithOptions = [
-            [ // Rule for California (Region) - More specific
+            [ // Rule for California: passPath=true, passQuery=true
                 "id" => "red_130",
-                "name" => "Path And Query",
+                "name" => "California (Path=T, Query=T)",
                 "isEnabled" => true,
                 "locations" => [
                     [
@@ -293,7 +293,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
                         ],
                         "operator" => "OR",
                         "pageTargetingType" => "all",
-                        "redirectUrl" => "https://ca.example.com/", // Target URL for California
+                        "redirectUrl" => "https://cali.example.com/", // Target URL for California
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => true,
@@ -301,23 +301,28 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
                     ],
                 ],
             ],
-            [ // Rule for US (Country) - Broader than California
-                "id" => "red_128",
-                "name" => "No Path No Query",
+             [ // Rule for Texas: passPath=false, passQuery=false
+                "id" => "red_130b",
+                "name" => "Texas (Path=F, Query=F)",
                 "isEnabled" => true,
                 "locations" => [
                     [
-                        "id" => "loc_461",
+                        "id" => "loc_461b",
                         "conditions" => [
                             [
+                                "type" => "region",
+                                "value" => "Texas",
+                                "operator" => "is",
+                            ],
+                             [ // Ensure it's US Texas
                                 "type" => "country",
                                 "value" => "US",
                                 "operator" => "is",
                             ],
                         ],
-                        "operator" => "OR",
+                        "operator" => "AND", // Match US AND Texas
                         "pageTargetingType" => "all",
-                        "redirectUrl" => "https://us.example.com/",
+                        "redirectUrl" => "https://tx.example.com/", // Target URL for Texas
                         "redirectMappings" => [],
                         "exclusions" => [],
                         "passPath" => false,
@@ -325,9 +330,43 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
                     ],
                 ],
             ],
-            [ // Rule for Canada (Country)
+            [ // Rule for US (excluding California and Texas): passPath=false, passQuery=true
+                "id" => "red_128",
+                "name" => "US excl CA/TX (Path=F, Query=T)",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_461",
+                        "conditions" => [
+                            [ // Is US
+                                "type" => "country",
+                                "value" => "US",
+                                "operator" => "is",
+                            ],
+                            [ // Is NOT California
+                                "type" => "region",
+                                "value" => "California",
+                                "operator" => "is not",
+                            ],
+                             [ // Is NOT Texas
+                                "type" => "region",
+                                "value" => "Texas",
+                                "operator" => "is not",
+                            ],
+                        ],
+                        "operator" => "AND", // Must satisfy all conditions
+                        "pageTargetingType" => "all",
+                        "redirectUrl" => "https://us.example.com/", // Target URL for general US
+                        "redirectMappings" => [],
+                        "exclusions" => [],
+                        "passPath" => false, // Test this combo
+                        "passQuery" => true,  // Test this combo
+                    ],
+                ],
+            ],
+            [ // Rule for Canada: passPath=true, passQuery=false
                 "id" => "red_129",
-                "name" => "Path No Query",
+                "name" => "Canada (Path=T, Query=F)",
                 "isEnabled" => true,
                 "locations" => [
                     [
@@ -355,15 +394,17 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
         // Mock get_option to return our test redirections
         update_option("mgeo_redirections", $redirectionsWithOptions);
 
-        // Test no path, no query (Matches red_128)
-        $result = mgeo_get_redirect_url_for_request(
-            "https://example.com/products/?color=red"
+        // --- Test Case 1: California (Matches red_130: Path=T, Query=T) ---
+        // Location is already US/California from setUp
+        $request_url = "https://example.com/products/?color=red&size=large#details";
+        $result = mgeo_get_redirect_url_for_request($request_url);
+        $this->assertEquals(
+            "https://cali.example.com/products/?color=red&size=large#details", // Expect path, query, and hash
+            $result,
+            "Failed: California rule (Path=T, Query=T)"
         );
-        // This should match red_130 (California) first, which passes path and query
-        $this->assertEquals("https://ca.example.com/products/?color=red", $result); 
 
-        // Test path, no query (Matches red_129)
-        // Set mock location data for Canada/Ontario
+        // --- Test Case 2: Canada (Matches red_129: Path=T, Query=F) ---
         $this->set_mock_location_data([
             "continent" => "North America",
             "country" => "Canada",
@@ -372,30 +413,61 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
             "city" => "Toronto",
             "ip" => "192.168.1.2",
         ]);
-        // Cache reset is now handled within set_mock_location_data
-        $result = mgeo_get_redirect_url_for_request(
-            "https://example.com/products/?color=red"
+        $result = mgeo_get_redirect_url_for_request($request_url);
+        $this->assertEquals(
+            "https://ca.example.com/products/#details", // Expect path and hash, but NO query
+            $result,
+            "Failed: Canada rule (Path=T, Query=F)"
         );
-        $this->assertEquals("https://ca.example.com/products/", $result);
 
-        // Test path and query (Matches red_130)
-        // Set mock location data back to US/California (default)
+        // --- Test Case 3: US - New York (Matches red_128: Path=F, Query=T) ---
         $this->set_mock_location_data([
             "continent" => "North America",
             "country" => "United States",
             "country_code" => "US",
-            "region" => "California",
-            "city" => "San Francisco",
-            "ip" => "192.168.1.1",
+            "region" => "New York", // Not California or Texas
+            "city" => "New York City",
+            "ip" => "192.168.1.3",
         ]);
-        // Cache reset is now handled within set_mock_location_data
-        $result = mgeo_get_redirect_url_for_request(
-            "https://example.com/products/?color=red"
-        );
+         $result = mgeo_get_redirect_url_for_request($request_url);
+         $this->assertEquals(
+             "https://us.example.com/?color=red&size=large#details", // Expect query and hash, but NO path
+             $result,
+             "Failed: General US rule (Path=F, Query=T)"
+         );
+
+        // --- Test Case 4: US - Texas (Matches red_130b: Path=F, Query=F) ---
+        $this->set_mock_location_data([
+            "continent" => "North America",
+            "country" => "United States",
+            "country_code" => "US",
+            "region" => "Texas",
+            "city" => "Austin",
+            "ip" => "192.168.1.4",
+        ]);
+        $result = mgeo_get_redirect_url_for_request($request_url);
         $this->assertEquals(
-            "https://ca.example.com/products/?color=red",
-            $result
+            "https://tx.example.com/#details", // Expect hash ONLY
+            $result,
+            "Failed: Texas rule (Path=F, Query=F)"
         );
+
+        // --- Test Case 5: Reset to California (Matches red_130 again) ---
+        // This ensures the mock data changes didn't break the initial state logic
+         $this->set_mock_location_data([ // Set back to default
+             "continent" => "North America",
+             "country" => "United States",
+             "country_code" => "US",
+             "region" => "California",
+             "city" => "San Francisco",
+             "ip" => "192.168.1.1",
+         ]);
+         $result = mgeo_get_redirect_url_for_request($request_url);
+         $this->assertEquals(
+             "https://cali.example.com/products/?color=red&size=large#details",
+             $result,
+             "Failed: California rule after reset (Path=T, Query=T)"
+         );
     }
 
     public function test_should_handle_complex_conditions()
