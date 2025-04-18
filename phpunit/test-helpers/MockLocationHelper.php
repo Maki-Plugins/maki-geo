@@ -48,10 +48,14 @@ trait MockLocationHelper
      * Sets the location data to be returned by the mock filter.
      *
      * @param array|null $data The mock location data array, or null to simulate failure.
+     * @param bool $reset_cache Whether to reset the static cache after setting data. Defaults to true.
      */
-    public function set_mock_location_data(?array $data)
+    public function set_mock_location_data(?array $data, $reset_cache = true)
     {
         $this->current_mock_location_data = $data;
+        if ($reset_cache) {
+            $this->reset_location_static_cache();
+        }
     }
 
     /**

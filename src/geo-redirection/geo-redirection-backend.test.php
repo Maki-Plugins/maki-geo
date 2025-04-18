@@ -275,8 +275,33 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
     public function test_should_handle_path_and_query_options()
     {
         // Create redirections with different path/query options
+        // IMPORTANT: Order matters. More specific rules (like region) should come before broader rules (like country).
         $redirectionsWithOptions = [
-            [
+            [ // Rule for California (Region) - More specific
+                "id" => "red_130",
+                "name" => "Path And Query",
+                "isEnabled" => true,
+                "locations" => [
+                    [
+                        "id" => "loc_463",
+                        "conditions" => [
+                            [
+                                "type" => "region",
+                                "value" => "California",
+                                "operator" => "is",
+                            ],
+                        ],
+                        "operator" => "OR",
+                        "pageTargetingType" => "all",
+                        "redirectUrl" => "https://ca.example.com/", // Target URL for California
+                        "redirectMappings" => [],
+                        "exclusions" => [],
+                        "passPath" => true,
+                        "passQuery" => true,
+                    ],
+                ],
+            ],
+            [ // Rule for US (Country) - Broader than California
                 "id" => "red_128",
                 "name" => "No Path No Query",
                 "isEnabled" => true,
@@ -300,7 +325,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
                     ],
                 ],
             ],
-            [
+            [ // Rule for Canada (Country)
                 "id" => "red_129",
                 "name" => "Path No Query",
                 "isEnabled" => true,
@@ -324,30 +349,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
                     ],
                 ],
             ],
-            [
-                "id" => "red_130",
-                "name" => "Path And Query",
-                "isEnabled" => true,
-                "locations" => [
-                    [
-                        "id" => "loc_463",
-                        "conditions" => [
-                            [
-                                "type" => "region",
-                                "value" => "California",
-                                "operator" => "is",
-                            ],
-                        ],
-                        "operator" => "OR",
-                        "pageTargetingType" => "all",
-                        "redirectUrl" => "https://ca.example.com/",
-                        "redirectMappings" => [],
-                        "exclusions" => [],
-                        "passPath" => true,
-                        "passQuery" => true,
-                    ],
-                ],
-            ],
+            // red_130 (California rule) moved above red_128 (US rule)
         ];
 
         // Mock get_option to return our test redirections
@@ -369,7 +371,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
             "city" => "Toronto",
             "ip" => "192.168.1.2",
         ]);
-        $this->reset_location_static_cache(); // Reset cache after setting mock data
+        // Cache reset is now handled within set_mock_location_data
         $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );
@@ -385,7 +387,7 @@ class TestGeoRedirectionCoreLogic extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ]);
-        $this->reset_location_static_cache(); // Reset cache after setting mock data
+        // Cache reset is now handled within set_mock_location_data
         $result = mgeo_get_redirect_url_for_request(
             "https://example.com/products/?color=red"
         );

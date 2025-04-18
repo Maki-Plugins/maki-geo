@@ -55,7 +55,7 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ]);
-        $this->reset_location_static_cache(); // Reset cache after setting mock data
+        // Cache reset is now handled within set_mock_location_data
 
         $result = mgeo_shortcode_handler([], "", "mgeo_region");
         $this->assertEquals("Unknown", $result);
@@ -73,7 +73,7 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ]);
-        $this->reset_location_static_cache(); // Reset cache after setting mock data
+        // Cache reset is now handled within set_mock_location_data
 
         $result = mgeo_shortcode_handler(
             ["default" => "N/A"], // Provide custom default
@@ -135,7 +135,7 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
             "city" => "San Francisco",
             "ip" => "192.168.1.1",
         ]);
-        $this->reset_location_static_cache(); // Reset cache after setting mock data
+        // Cache reset is now handled within set_mock_location_data
 
         $result = mgeo_country_flag_shortcode([]);
         $this->assertEquals("", $result);
