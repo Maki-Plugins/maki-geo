@@ -11,24 +11,13 @@
 
 class TestGeoPrintingShortcodes extends WP_UnitTestCase
 {
-    private $mock_location_data;
+    use MockLocationHelper;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        // Set default location data for tests
-        $this->mock_location_data = [
-            "continent" => "North America",
-            "country" => "United States",
-            "country_code" => "US",
-            "region" => "California",
-            "city" => "San Francisco",
-            "ip" => "192.168.1.1",
-        ];
-
-        // Add filter to provide mock location data for server-side tests
-        add_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        $this->start_mocking_location();
+        $this->reset_location_static_cache(); // Ensure clean static cache for each test
 
         // Set default mode to server-side for most tests initially
         update_option('mgeo_client_server_mode', 'server');
@@ -36,20 +25,10 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
 
     public function tearDown(): void
     {
-        // Remove the filter
-        remove_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
+        $this->stop_mocking_location();
         // Clean up options
         delete_option('mgeo_client_server_mode');
         parent::tearDown();
-    }
-
-    /**
-     * Filter callback to return mock location data.
-     */
-    public function filter_location_data($data)
-    {
-        // Return the mock data set for the current test.
-        return $this->mock_location_data;
     }
 
     // --- Tests for mgeo_shortcode_handler ---
@@ -67,23 +46,39 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
     public function test_shortcode_handler_server_mode_unknown()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["region"] = "Unknown"; // Simulate unknown data
+        // Set mock data specifically for this test
+        $this->set_mock_location_data([
+            "continent" => "North America",
+            "country" => "United States",
+            "country_code" => "US",
+            "region" => "Unknown", // Simulate unknown data
+            "city" => "San Francisco",
+            "ip" => "192.168.1.1",
+        ]);
 
         $result = mgeo_shortcode_handler([], "", "mgeo_region");
-        $this->assertEquals("Unknown", $result); // Expect default value
+        $this->assertEquals("Unknown", $result);
     }
 
     public function test_shortcode_handler_server_mode_default_attribute()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["region"] = "Unknown"; // Simulate unknown data
+        // Set mock data specifically for this test
+        $this->set_mock_location_data([
+            "continent" => "North America",
+            "country" => "United States",
+            "country_code" => "US",
+            "region" => "Unknown", // Simulate unknown data
+            "city" => "San Francisco",
+            "ip" => "192.168.1.1",
+        ]);
 
         $result = mgeo_shortcode_handler(
             ["default" => "N/A"], // Provide custom default
             "",
             "mgeo_region"
         );
-        $this->assertEquals("N/A", $result); // Expect custom default value
+        $this->assertEquals("N/A", $result);
     }
 
     public function test_shortcode_handler_client_mode()
@@ -129,10 +124,18 @@ class TestGeoPrintingShortcodes extends WP_UnitTestCase
     public function test_flag_shortcode_server_mode_unknown_country()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["country_code"] = "Unknown"; // Simulate unknown country
+        // Set mock data specifically for this test
+        $this->set_mock_location_data([
+            "continent" => "North America",
+            "country" => "United States",
+            "country_code" => "Unknown", // Simulate unknown country
+            "region" => "California",
+            "city" => "San Francisco",
+            "ip" => "192.168.1.1",
+        ]);
 
         $result = mgeo_country_flag_shortcode([]);
-        $this->assertEquals("", $result); // Should return empty string
+        $this->assertEquals("", $result);
     }
 
     public function test_flag_shortcode_client_mode()

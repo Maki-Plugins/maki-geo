@@ -28,6 +28,13 @@ add_action("rest_api_init", function () {
  */
 function mgeo_get_geolocation_data()
 {
+    // Allow tests to short-circuit the process and provide mock data
+    $pre_result = apply_filters('pre_mgeo_get_geolocation_data', null);
+    if ($pre_result !== null) {
+        // Allow tests and other code to filter the final result even when pre-filtered
+        return apply_filters('mgeo_location_data_result', $pre_result);
+    }
+
     mgeo_verify_nonce();
 
     $request_limiter = new mgeo_RequestLimiter();

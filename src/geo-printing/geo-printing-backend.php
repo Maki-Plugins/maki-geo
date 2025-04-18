@@ -12,14 +12,14 @@ if (!defined("ABSPATH")) {
 
 /**
  * Helper function to get location data, caching it per request.
- *
+ * @param bool $force_refresh Optional. Whether to force refreshing the static cache. Default false.
  * @return array|null Location data or null if not available.
  */
-function mgeo_get_location_data()
+function mgeo_get_location_data($force_refresh = false)
 {
     static $location_data = null;
 
-    if ($location_data === null) {
+    if ($location_data === null || $force_refresh) {
         $location_data = mgeo_get_geolocation_data();
     }
 
