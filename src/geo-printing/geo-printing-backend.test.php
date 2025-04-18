@@ -11,9 +11,7 @@ function get_option($option, $default = false)
 {
     // Allow overriding via a global variable for tests
     global $mock_options;
-    return isset($mock_options[$option])
-        ? $mock_options[$option]
-        : $default;
+    return isset($mock_options[$option]) ? $mock_options[$option] : $default;
 }
 
 if (!function_exists("esc_attr")) {
@@ -68,6 +66,7 @@ if (!function_exists("plugin_dir_url")) {
             } else {
                 $out[$name] = $default;
             }
+        }
         // Mock the URL for testing purposes
         return "http://example.com/wp-content/plugins/maki-geo/";
     }
@@ -83,7 +82,6 @@ function mgeo_get_geolocation_data()
 
 class TestGeoPrintingBackend extends WP_UnitTestCase
 {
-    }
     private $original_options;
     private $original_location_data;
 
