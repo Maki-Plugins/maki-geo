@@ -23,7 +23,8 @@ function mgeo_get_location_data()
         $location_data = mgeo_get_geolocation_data();
     }
 
-    return $location_data;
+    // Allow tests to filter the location data
+    return apply_filters('mgeo_location_data_result', $location_data);
 }
 
 /**
