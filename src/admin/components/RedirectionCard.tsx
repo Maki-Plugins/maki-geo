@@ -124,93 +124,17 @@ export function RedirectionCard({
     remove(index);
   }
 
-  // TODO: Replace with nested useFieldArray in Step 3
-  function addRedirectMapping(locationId: string) { // Keep locationId for now
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
+  // --- Nested Field Array Functions (will be called inside renderLocationCard) ---
 
-    const newMapping = {
-      id: `map_${Date.now()}`,
-      fromUrl: "",
-      toUrl: "",
-    };
-
-    updateLocation(locationId, {
-      redirectMappings: [...location.redirectMappings, newMapping],
-    });
+  // Default structures for appending new nested items
+  function createDefaultMapping(): Omit<RedirectMapping, 'id'> {
+    return { fromUrl: "", toUrl: "" };
   }
 
-  // TODO: Replace with nested useFieldArray in Step 3
-  function updateRedirectMapping(
-    locationId: string,
-    mappingId: string,
-    updates: Partial<RedirectMapping>,
-  ) {
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
-
-    const updatedMappings = location.redirectMappings.map((mapping) =>
-      mapping.id === mappingId ? { ...mapping, ...updates } : mapping,
-    );
-
-    updateLocation(locationId, { redirectMappings: updatedMappings });
+  function createDefaultExclusion(): Omit<PageExclusion, 'id'> {
+    return { value: "", type: "url_equals" };
   }
 
-  // TODO: Replace with nested useFieldArray in Step 3
-  function deleteRedirectMapping(locationId: string, mappingId: string) {
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
-
-    const updatedMappings = location.redirectMappings.filter(
-      (mapping) => mapping.id !== mappingId,
-    );
-
-    updateLocation(locationId, { redirectMappings: updatedMappings });
-  }
-
-  // TODO: Replace with nested useFieldArray in Step 3
-  function addExclusion(locationId: string) {
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
-
-    const newExclusion = {
-      id: `excl_${Date.now()}`,
-      value: "",
-      type: "url_equals" as ExclusionType,
-    };
-
-    updateLocation(locationId, {
-      exclusions: [...location.exclusions, newExclusion],
-    });
-  }
-
-  // TODO: Replace with nested useFieldArray in Step 3
-  function updateExclusion(
-    locationId: string,
-    exclusionId: string,
-    updates: Partial<PageExclusion>,
-  ) {
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
-
-    const updatedExclusions = location.exclusions.map((exclusion) =>
-      exclusion.id === exclusionId ? { ...exclusion, ...updates } : exclusion,
-    );
-
-    updateLocation(locationId, { exclusions: updatedExclusions });
-  }
-
-  // TODO: Replace with nested useFieldArray in Step 3
-  function deleteExclusion(locationId: string, exclusionId: string) {
-    const location = locations.find((loc) => loc.id === locationId);
-    if (!location) return;
-
-    const updatedExclusions = location.exclusions.filter(
-      (exclusion) => exclusion.id !== exclusionId,
-    );
-
-    updateLocation(locationId, { exclusions: updatedExclusions });
-  }
 
   // TODO: Refactor with Controller in Step 4
   function handleConditionsChange(
@@ -268,6 +192,25 @@ export function RedirectionCard({
 
     // Get specific errors for this location index
     const locationErrors = errors.locations?.[index];
+
+    // --- Nested Field Arrays Setup ---
+    const {
+      fields: mappingFields,
+      append: appendMapping,
+      remove: removeMapping,
+    } = useFieldArray({
+      control,
+      name: `locations.${index}.redirectMappings`,
+    });
+
+    const {
+      fields: exclusionFields,
+      append: appendExclusion,
+      remove: removeExclusion,
+    } = useFieldArray({
+      control,
+      name: `locations.${index}.exclusions`,
+    });
 
     return (
       <div
@@ -411,15 +354,14 @@ export function RedirectionCard({
                         </span>
                       </label>
                       <div className="space-y-2">
-                        {/* Placeholder for Mappings - requires Step 3 */}
-                        {locationData.redirectMappings.map((mapping, mapIndex) => (
+                        {/* Use mappingFields from nested useFieldArray */}
+                        {mappingFields.map((mappingField, mapIndex) => (
                           <div
-                            key={mapping.id} // Use existing ID for now
+                            key={mappingField.id} // Use RHF field id
                             className="join flex items-center"
                           >
                             <input
                               type="text"
-                              // value={mapping.fromUrl} // Replace with register
                               {...register(`locations.${index}.redirectMappings.${mapIndex}.fromUrl`)}
                               placeholder="From URL Path (e.g., /source)"
                               className={`input input-bordered input-sm w-full join-item ${
@@ -429,7 +371,6 @@ export function RedirectionCard({
                             <span className="join-item mx-2">→</span>
                             <input
                               type="text"
-                              // value={mapping.toUrl} // Replace with register
                               {...register(`locations.${index}.redirectMappings.${mapIndex}.toUrl`)}
                               placeholder="To URL (e.g., https://site.com/dest)"
                               className={`input input-bordered input-sm w-full join-item ${
@@ -439,7 +380,7 @@ export function RedirectionCard({
                             <button
                               type="button" // Prevent form submission
                               className="btn btn-sm btn-error btn-ghost join-item"
-                              onClick={() => deleteRedirectMapping(field.id, mapping.id)} // Keep old logic for now
+                              onClick={() => removeMapping(mapIndex)} // Use remove from useFieldArray
                             >
                               ✕
                             </button>
@@ -447,7 +388,7 @@ export function RedirectionCard({
                         ))}
                          {/* Display mapping-level errors */}
                          {locationErrors?.redirectMappings?.map((mapError, mapIndex) => (
-                            mapError && (
+                            mapError && !mapError.root && ( // Check it's not a root error message
                               <div key={`mapErr-${mapIndex}`} className="text-error text-xs mt-1 ml-1">
                                 {mapError.fromUrl && <p>From URL: {mapError.fromUrl.message}</p>}
                                 {mapError.toUrl && <p>To URL: {mapError.toUrl.message}</p>}
@@ -455,13 +396,13 @@ export function RedirectionCard({
                             )
                          ))}
                          {/* Display array-level error for mappings */}
-                         {locationErrors?.redirectMappings && typeof locationErrors.redirectMappings === 'object' && locationErrors.redirectMappings.message && (
-                            <p className="text-error text-xs mt-1">{locationErrors.redirectMappings.message}</p>
+                         {locationErrors?.redirectMappings?.root && (
+                            <p className="text-error text-xs mt-1">{locationErrors.redirectMappings.root.message}</p>
                          )}
                         <button
                           type="button" // Prevent form submission
                           className="btn btn-sm btn-accent btn-outline"
-                          onClick={() => addRedirectMapping(field.id)} // Keep old logic for now
+                          onClick={() => appendMapping(createDefaultMapping())} // Use append from useFieldArray
                         >
                           <Dashicon icon="plus" /> Add URL Mapping
                         </button>
@@ -478,14 +419,13 @@ export function RedirectionCard({
                     </span>
                   </label>
                   <div className="space-y-2">
-                     {/* Placeholder for Exclusions - requires Step 3 */}
-                    {locationData.exclusions.map((exclusion, exclIndex) => (
+                     {/* Use exclusionFields from nested useFieldArray */}
+                    {exclusionFields.map((exclusionField, exclIndex) => (
                       <div
-                        key={exclusion.id} // Use existing ID for now
+                        key={exclusionField.id} // Use RHF field id
                         className="join flex items-center"
                       >
                         <select
-                          // value={exclusion.type} // Replace with register
                           {...register(`locations.${index}.exclusions.${exclIndex}.type`)}
                           className={`select select-bordered select-sm join-item ${
                             locationErrors?.exclusions?.[exclIndex]?.type ? "select-error" : ""
@@ -498,7 +438,6 @@ export function RedirectionCard({
                         </select>
                         <input
                           type="text"
-                          // value={exclusion.value} // Replace with register
                           {...register(`locations.${index}.exclusions.${exclIndex}.value`)}
                           placeholder="Value to exclude"
                           className={`input input-bordered input-sm w-full join-item ${
@@ -508,7 +447,7 @@ export function RedirectionCard({
                         <button
                           type="button" // Prevent form submission
                           className="btn btn-sm btn-error btn-ghost join-item"
-                          onClick={() => deleteExclusion(field.id, exclusion.id)} // Keep old logic for now
+                          onClick={() => removeExclusion(exclIndex)} // Use remove from useFieldArray
                         >
                           ✕
                         </button>
@@ -516,17 +455,21 @@ export function RedirectionCard({
                     ))}
                     {/* Display exclusion-level errors */}
                     {locationErrors?.exclusions?.map((exclError, exclIndex) => (
-                      exclError && (
+                      exclError && !exclError.root && ( // Check it's not a root error message
                         <div key={`exclErr-${exclIndex}`} className="text-error text-xs mt-1 ml-1">
                           {exclError.type && <p>Type: {exclError.type.message}</p>}
                           {exclError.value && <p>Value: {exclError.value.message}</p>}
                         </div>
                       )
                     ))}
+                     {/* Display array-level error for exclusions */}
+                     {locationErrors?.exclusions?.root && (
+                        <p className="text-error text-xs mt-1">{locationErrors.exclusions.root.message}</p>
+                     )}
                     <button
                       type="button" // Prevent form submission
                       className="btn btn-sm btn-accent btn-outline"
-                      onClick={() => addExclusion(field.id)} // Keep old logic for now
+                      onClick={() => appendExclusion(createDefaultExclusion())} // Use append from useFieldArray
                     >
                       <Dashicon icon="plus" /> Add Exclusion
                     </button>
