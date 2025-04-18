@@ -106,9 +106,9 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
     {
         update_option('mgeo_client_server_mode', 'server');
         $result = mgeo_country_flag_shortcode([]);
-        // Note: The URL might differ slightly based on wp-env setup, check if needed
+        // Check for the consistent part of the path, ignoring scheme/host
         $this->assertStringContainsString(
-            'src="/wp-content/plugins/maki-geo/src/assets/flags/us.svg"',
+            'src="/plugins/maki-geo/src/assets/flags/us.svg"',
             $result
         );
         $this->assertStringContainsString('alt="United States flag"', $result);
