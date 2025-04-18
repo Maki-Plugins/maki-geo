@@ -6,6 +6,12 @@ async function initGeoTargeting(): Promise<void> {
     const blocks = document.querySelectorAll<HTMLElement>(`.${blocksClass}`);
 
     if (blocks.length > 0) {
+      // Ensure wp and apiFetch are available
+      if (!window.wp?.apiFetch) {
+        console.error("Maki Geo: wp.apiFetch is not available.");
+        return;
+      }
+
       const response = await window.wp.apiFetch({
         path: "maki-geo/v1/location",
       });

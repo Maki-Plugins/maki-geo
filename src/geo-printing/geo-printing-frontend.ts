@@ -10,6 +10,18 @@ async function initGeoPrinting(): Promise<void> {
   }
 
   try {
+    // Ensure wp and apiFetch are available
+    if (!window.wp?.apiFetch) {
+      console.error("Maki Geo: wp.apiFetch is not available.");
+      // Optionally display default values if API fetch is not possible
+      placeholders.forEach((placeholder) => {
+        const defaultValue = placeholder.dataset.mgeoDefault || "";
+        placeholder.textContent = defaultValue;
+        placeholder.style.visibility = "visible";
+      });
+      return;
+    }
+
     const locationData = await window.wp.apiFetch({
       path: "maki-geo/v1/location",
     });

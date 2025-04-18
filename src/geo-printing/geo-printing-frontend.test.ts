@@ -4,21 +4,14 @@
 
 import { LocationData } from "../types/types";
 
-// Mock the global window object and its properties
-declare global {
-  interface Window {
-    wp: {
-      apiFetch: jest.Mock;
-    };
-    makiGeoPrintingData?: {
-      pluginUrl: string;
-    };
-  }
-}
-
-// Mock the API fetch function. The global type now includes jest.Mock properties.
-window.wp = {
-  apiFetch: jest.fn(),
+// Mock the API fetch function. The global type is defined in src/types/types.ts
+// Ensure window.wp is defined for the test environment
+if (!window.wp) {
+  window.wp = {
+    apiFetch: jest.fn(),
+  };
+} else {
+  window.wp.apiFetch = jest.fn();
 };
 
 // Mock makiGeoPrintingData
@@ -46,10 +39,14 @@ describe("Geo Printing Frontend Script", () => {
     ip: "192.168.1.1",
   };
 
-  // Access the mock directly, no need for casting
-  const mockApiFetch = window.wp.apiFetch;
+  // Access the mock, ensuring window.wp exists
+  const mockApiFetch = window.wp?.apiFetch;
 
   beforeEach(() => {
+    // Ensure mockApiFetch is defined before using mock methods
+    if (!mockApiFetch) {
+      throw new Error("window.wp.apiFetch mock is not defined");
+    }
     // Reset mocks before each test
     mockApiFetch.mockClear();
     // Set default successful API response
@@ -73,7 +70,7 @@ describe("Geo Printing Frontend Script", () => {
       "[data-mgeo-field='city']",
     ) as HTMLElement;
 
-    expect(window.wp.apiFetch).toHaveBeenCalledWith({
+    expect(window.wp?.apiFetch).toHaveBeenCalledWith({
       path: "maki-geo/v1/location",
     });
     expect(countrySpan.textContent).toBe("United States");
@@ -198,7 +195,7 @@ describe("Geo Printing Frontend Script", () => {
 
     await loadScript();
 
-    expect(window.wp.apiFetch).not.toHaveBeenCalled();
+    expect(window.wp?.apiFetch).not.toHaveBeenCalled();
   });
 
   test("should handle missing pluginUrl gracefully for flags", async () => {
