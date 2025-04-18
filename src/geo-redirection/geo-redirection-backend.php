@@ -328,40 +328,42 @@ function mgeo_url_matches_mapping($url, $pattern)
  */
 function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
 {
-    $redirect_url = $base_url; // Start with the original base URL
+    $redirect_url = $base_url;
 
     // Handle path appending for 'all' page targeting
-    if (!empty($location["passPath"]) && $location["pageTargetingType"] === "all") {
+    if (
+        !empty($location["passPath"]) &&
+        $location["pageTargetingType"] === "all"
+    ) {
         // Ensure base URL doesn't have a slash if path starts with one, or vice versa
-        if (str_ends_with($redirect_url, '/') && str_starts_with($path, '/')) {
-            $redirect_url = rtrim($redirect_url, '/'); // Remove from base
-        } elseif (!str_ends_with($redirect_url, '/') && !str_starts_with($path, '/')) {
-             // Add slash if neither has one, unless path is just '/'
-             if ($path !== '/') {
-                 $redirect_url .= '/';
-             }
+        if (str_ends_with($redirect_url, "/") && str_starts_with($path, "/")) {
+            $redirect_url = rtrim($redirect_url, "/"); // Remove from base
+        } elseif (
+            !str_ends_with($redirect_url, "/") &&
+            !str_starts_with($path, "/")
+        ) {
+            // Add slash if neither has one, unless path is just '/'
+            if ($path !== "/") {
+                $redirect_url .= "/";
+            }
         }
         // Append the path, ensuring not to add '//' if path is just '/'
-        $redirect_url .= ($path === '/' && str_ends_with($base_url, '/')) ? '' : $path;
-
-    } else {
-         // For specific mapping or when passPath is false, just use the base_url (which might be the toUrl from mapping)
-         // No path appending needed here. We trust the base_url (or mapping's toUrl) is correct.
+        $redirect_url .=
+            $path === "/" && str_ends_with($base_url, "/") ? "" : $path;
     }
-
 
     // Add query string if configured
     if (!empty($location["passQuery"]) && !empty($query)) {
         // Check if URL already has a query string
-        $separator = strpos($redirect_url, '?') === false ? '?' : '&';
+        $separator = strpos($redirect_url, "?") === false ? "?" : "&";
         $redirect_url .= $separator . $query;
     }
 
     // Always pass hash fragment if present
     if (!empty($hash)) {
         // Check if URL already has a hash
-        if (strpos($redirect_url, '#') === false) {
-             $redirect_url .= "#" . $hash;
+        if (strpos($redirect_url, "#") === false) {
+            $redirect_url .= "#" . $hash;
         }
     }
 
