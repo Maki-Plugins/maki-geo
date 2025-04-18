@@ -6,20 +6,23 @@
  */
 
 // Mock WordPress functions needed for testing
-if (!function_exists("get_option")) {
-    function get_option($option, $default = false)
-    {
-        // Allow overriding via a global variable for tests
-        global $mock_options;
-        return isset($mock_options[$option])
-            ? $mock_options[$option]
-            : $default;
-    }
+// Force mock definition even if function exists
+function get_option($option, $default = false)
+{
+    // Allow overriding via a global variable for tests
+    global $mock_options;
+    return isset($mock_options[$option])
+        ? $mock_options[$option]
+        : $default;
 }
 
 if (!function_exists("esc_attr")) {
     function esc_attr($text)
     {
+        global $mock_options;
+        return isset($mock_options[$option])
+            ? $mock_options[$option]
+            : $default;
         return htmlspecialchars($text, ENT_QUOTES, "UTF-8");
     }
 }
@@ -58,22 +61,29 @@ if (!function_exists("shortcode_atts")) {
 if (!function_exists("plugin_dir_url")) {
     function plugin_dir_url($file)
     {
+        $out = [];
+        foreach ($defaults as $name => $default) {
+            if (array_key_exists($name, $atts)) {
+                $out[$name] = $atts[$name];
+            } else {
+                $out[$name] = $default;
+            }
         // Mock the URL for testing purposes
         return "http://example.com/wp-content/plugins/maki-geo/";
     }
 }
 
 // Mock the location data function if it doesn't exist (for isolated testing)
-if (!function_exists("mgeo_get_geolocation_data")) {
-    function mgeo_get_geolocation_data()
-    {
-        global $mock_location_data;
-        return $mock_location_data ?? null;
-    }
+// Force mock definition even if function exists
+function mgeo_get_geolocation_data()
+{
+    global $mock_location_data;
+    return $mock_location_data ?? null;
 }
 
 class TestGeoPrintingBackend extends WP_UnitTestCase
 {
+    }
     private $original_options;
     private $original_location_data;
 
