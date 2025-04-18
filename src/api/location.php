@@ -54,5 +54,6 @@ function mgeo_get_geolocation_data()
         set_transient("mgeo_geo_location_{$ip}", $data, HOUR_IN_SECONDS);
     }
 
-    return $data;
+    // Allow tests and other code to filter the final result
+    return apply_filters('mgeo_location_data_result', $data);
 }
