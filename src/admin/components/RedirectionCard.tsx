@@ -136,15 +136,6 @@ export function RedirectionCard({
   }
 
 
-  // TODO: Refactor with Controller in Step 4
-  function handleConditionsChange(
-    locationId: string,
-    conditions: GeoCondition[],
-    operator: "AND" | "OR",
-  ) {
-    updateLocation(locationId, { conditions, operator });
-  }
-
   // --- Form Submission ---
   const onSubmit = (data: RedirectionFormData) => {
     console.log("Form Data Submitted:", data); // For debugging
@@ -269,22 +260,30 @@ export function RedirectionCard({
                       <HelpHover text="Set conditions based on visitor's location data such as country, region, or city. Multiple conditions can be combined with AND/OR operators." />
                     </span>
                   </label>
-                  {/* TODO: Integrate GeoConditionEditor with Controller in Step 4 */}
-                  <GeoConditionEditor
-                    conditions={locationData.conditions} // Use watched data
-                    operator={locationData.operator}   // Use watched data
-                    onChange={(conditions, operator) => {
-                      // TODO: Replace with Controller/setValue in Step 4
-                      // Manually update for now (less ideal)
-                      const currentLocations = getValues('locations');
-                      currentLocations[index].conditions = conditions;
-                      currentLocations[index].operator = operator;
-                      methods.setValue('locations', currentLocations, { shouldValidate: true });
-                      // handleConditionsChange(field.id, conditions, operator) // Old way
-                    }}
+                  {/* Use Controller for GeoConditionEditor */}
+                  <Controller
+                    name={`locations.${index}`} // Control the whole location object to get conditions/operator
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <GeoConditionEditor
+                        conditions={value.conditions} // Pass conditions from RHF state
+                        operator={value.operator}     // Pass operator from RHF state
+                        onChange={(newConditions, newOperator) => {
+                          // Update the entire location object in RHF state
+                          onChange({
+                            ...value, // Keep other location fields
+                            conditions: newConditions,
+                            operator: newOperator,
+                          });
+                        }}
+                      />
+                    )}
                   />
-                   {locationErrors?.conditions && (
-                     <p className="text-error text-xs mt-1">{locationErrors.conditions.message || 'Error in conditions'}</p>
+                  {/* Display errors for conditions or operator */}
+                   {(locationErrors?.conditions || locationErrors?.operator) && (
+                     <p className="text-error text-xs mt-1">
+                       {locationErrors.conditions?.message || locationErrors.operator?.message || 'Error in conditions'}
+                     </p>
                    )}
                 </div>
                 <div>
@@ -489,36 +488,40 @@ export function RedirectionCard({
                         Pass page path to redirect URLs
                         <HelpHover text="When enabled, the current page path (e.g., /about-us/) will be appended to the destination URL. Only applies when 'Page Targeting' is 'All pages'." />
                       </span>
-                      {/* TODO: Use Controller in Step 4 */}
-                      <input
-                        type="checkbox"
-                        className="toggle toggle-primary"
-                        {...register(`locations.${index}.passPath`)}
+                      {/* Use Controller for Toggle */}
+                      <Controller
+                        name={`locations.${index}.passPath`}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <Toggle
+                            checked={value}
+                            onChange={(e) => onChange(e.target.checked)} // Pass boolean value
+                          />
+                        )}
                       />
-                      {/* <Toggle
-                        // checked={locationData.passPath} // Use Controller
-                        // onChange={(e) => // Use Controller
-                        //   updateLocation(field.id, { passPath: e.target.checked })
-                        // }
-                      /> */}
+                      {locationErrors?.passPath && (
+                        <p className="text-error text-xs mt-1">{locationErrors.passPath.message}</p>
+                      )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         Pass query string to redirect URLs
                         <HelpHover text="When enabled, query parameters from the current URL (e.g., ?utm_source=google) will be preserved and added to the destination URL." />
                       </span>
-                       {/* TODO: Use Controller in Step 4 */}
-                       <input
-                        type="checkbox"
-                        className="toggle toggle-primary"
-                        {...register(`locations.${index}.passQuery`)}
+                       {/* Use Controller for Toggle */}
+                       <Controller
+                        name={`locations.${index}.passQuery`}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <Toggle
+                            checked={value}
+                            onChange={(e) => onChange(e.target.checked)} // Pass boolean value
+                          />
+                        )}
                       />
-                      {/* <Toggle
-                        // checked={locationData.passQuery} // Use Controller
-                        // onChange={(e) => // Use Controller
-                        //   updateLocation(field.id, { passQuery: e.target.checked })
-                        // }
-                      /> */}
+                      {locationErrors?.passQuery && (
+                        <p className="text-error text-xs mt-1">{locationErrors.passQuery.message}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -576,13 +579,17 @@ export function RedirectionCard({
               </span>
             </label>
             <div className="flex items-center gap-2">
-              {/* TODO: Use Controller in Step 4 */}
-              <input type="checkbox" {...register("isEnabled")} className="toggle toggle-primary" />
-              {/* <Toggle
-                // checked={isEnabled} // Replace with Controller value
-                // onChange={(e) => setIsEnabled(e.target.checked)} // Replace with Controller onChange
-                {...register("isEnabled")} // Simple registration for now
-              /> */}
+              {/* Use Controller for Toggle */}
+              <Controller
+                name="isEnabled"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Toggle
+                    checked={value}
+                    onChange={(e) => onChange(e.target.checked)} // Pass boolean value
+                  />
+                )}
+              />
                {errors.isEnabled && (
                 <p className="text-error text-xs mt-1">{errors.isEnabled.message}</p>
                )}
