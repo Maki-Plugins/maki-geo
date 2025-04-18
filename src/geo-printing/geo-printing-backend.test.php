@@ -47,12 +47,9 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
      */
     public function filter_location_data($data)
     {
-        // Reset static cache in the original function to ensure our filter is used
-        $reflection = new ReflectionFunction('mgeo_get_location_data');
-        $static_variables = $reflection->getStaticVariables();
-        $static_variables['location_data'] = null; // Reset the static cache
-        $reflection->setStaticVariables($static_variables);
-
+        // The filter hook allows us to bypass the internal static cache
+        // and return the desired mock data directly for the test.
+        // No need to reset the static variable via reflection.
         return $this->mock_location_data;
     }
 
