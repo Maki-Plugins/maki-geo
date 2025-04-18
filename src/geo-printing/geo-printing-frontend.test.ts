@@ -16,9 +16,9 @@ declare global {
   }
 }
 
-// Mock the API fetch function
+// Mock the API fetch function - Cast to jest.Mock to allow mock methods
 window.wp = {
-  apiFetch: jest.fn(),
+  apiFetch: jest.fn() as jest.Mock,
 };
 
 // Mock makiGeoPrintingData
@@ -46,11 +46,13 @@ describe("Geo Printing Frontend Script", () => {
     ip: "192.168.1.1",
   };
 
+  const mockApiFetch = window.wp.apiFetch as jest.Mock;
+
   beforeEach(() => {
     // Reset mocks before each test
-    window.wp.apiFetch.mockClear();
+    mockApiFetch.mockClear();
     // Set default successful API response
-    window.wp.apiFetch.mockResolvedValue(mockLocationData);
+    mockApiFetch.mockResolvedValue(mockLocationData);
     // Reset DOM state
     document.body.innerHTML = "";
   });
@@ -108,7 +110,7 @@ describe("Geo Printing Frontend Script", () => {
       region: "Unknown", // Missing region
       // city is missing
     };
-    window.wp.apiFetch.mockResolvedValue(partialLocationData);
+    mockApiFetch.mockResolvedValue(partialLocationData);
 
     document.body.innerHTML = `
       <span data-mgeo-print="true" data-mgeo-field="region" data-mgeo-default="Default Region" style="visibility: hidden;"></span>
@@ -131,7 +133,7 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle API fetch failure gracefully", async () => {
-    window.wp.apiFetch.mockRejectedValue(new Error("API Error"));
+    mockApiFetch.mockRejectedValue(new Error("API Error"));
     const consoleErrorSpy = jest
       .spyOn(console, "error")
       .mockImplementation(() => {}); // Suppress console error
@@ -163,7 +165,7 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle null API response gracefully", async () => {
-    window.wp.apiFetch.mockResolvedValue(null);
+    mockApiFetch.mockResolvedValue(null);
     const consoleWarnSpy = jest
       .spyOn(console, "warn")
       .mockImplementation(() => {}); // Suppress console warning
@@ -222,7 +224,7 @@ describe("Geo Printing Frontend Script", () => {
       ...mockLocationData,
       country_code: "unknown",
     };
-    window.wp.apiFetch.mockResolvedValue(unknownCountryData);
+    mockApiFetch.mockResolvedValue(unknownCountryData);
 
     document.body.innerHTML = `
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="24px" style="visibility: hidden;"></span>
