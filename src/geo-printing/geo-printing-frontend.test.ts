@@ -108,8 +108,10 @@ describe("Geo Printing Frontend Script", () => {
       region: "Unknown", // Missing region
       // city is missing
     };
-    // Use mock methods directly
-    mockApiFetch.mockResolvedValue(partialLocationData);
+    // Use mock methods directly, ensuring mockApiFetch is defined
+    if (mockApiFetch) {
+      mockApiFetch.mockResolvedValue(partialLocationData);
+    }
 
     document.body.innerHTML = `
       <span data-mgeo-print="true" data-mgeo-field="region" data-mgeo-default="Default Region" style="visibility: hidden;"></span>
@@ -132,8 +134,10 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle API fetch failure gracefully", async () => {
-    // Use mock methods directly
-    mockApiFetch.mockRejectedValue(new Error("API Error"));
+    // Use mock methods directly, ensuring mockApiFetch is defined
+    if (mockApiFetch) {
+      mockApiFetch.mockRejectedValue(new Error("API Error"));
+    }
     const consoleErrorSpy = jest
       .spyOn(console, "error")
       .mockImplementation(() => {}); // Suppress console error
@@ -165,8 +169,10 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle null API response gracefully", async () => {
-    // Use mock methods directly
-    mockApiFetch.mockResolvedValue(null);
+    // Use mock methods directly, ensuring mockApiFetch is defined
+    if (mockApiFetch) {
+      mockApiFetch.mockResolvedValue(null);
+    }
     const consoleWarnSpy = jest
       .spyOn(console, "warn")
       .mockImplementation(() => {}); // Suppress console warning
@@ -225,8 +231,10 @@ describe("Geo Printing Frontend Script", () => {
       ...mockLocationData,
       country_code: "unknown",
     };
-    // Use mock methods directly
-    mockApiFetch.mockResolvedValue(unknownCountryData);
+    // Use mock methods directly, ensuring mockApiFetch is defined
+    if (mockApiFetch) {
+      mockApiFetch.mockResolvedValue(unknownCountryData);
+    }
 
     document.body.innerHTML = `
       <span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="24px" style="visibility: hidden;"></span>
