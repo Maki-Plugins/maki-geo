@@ -1,6 +1,7 @@
 <?php
 /**
- * Test cases for geo printing shortcode backend logic.
+ * Test cases for geo printing shortcode logic (both modes).
+ * Tests functions in src/shortcodes/print-geo-shortcodes.php
  *
  * @package Maki_Geo
  */
@@ -8,7 +9,7 @@
 // We don't need to mock WP functions anymore, wp-env provides them.
 // We will control behavior using options and filters.
 
-class TestGeoPrintingBackend extends WP_UnitTestCase
+class TestGeoPrintingShortcodes extends WP_UnitTestCase
 {
     private $mock_location_data;
 
@@ -26,10 +27,10 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
             "ip" => "192.168.1.1",
         ];
 
-        // Add filter to provide mock location data
+        // Add filter to provide mock location data for server-side tests
         add_filter('mgeo_location_data_result', [$this, 'filter_location_data']);
 
-        // Set default mode to server-side for most tests
+        // Set default mode to server-side for most tests initially
         update_option('mgeo_client_server_mode', 'server');
     }
 
@@ -47,9 +48,7 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
      */
     public function filter_location_data($data)
     {
-        // The filter hook allows us to bypass the internal static cache
-        // and return the desired mock data directly for the test.
-        // No need to reset the static variable via reflection.
+        // Return the mock data set for the current test.
         return $this->mock_location_data;
     }
 
@@ -68,23 +67,23 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
     public function test_shortcode_handler_server_mode_unknown()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["region"] = "Unknown";
+        $this->mock_location_data["region"] = "Unknown"; // Simulate unknown data
 
         $result = mgeo_shortcode_handler([], "", "mgeo_region");
-        $this->assertEquals("Unknown", $result); // Default value from shortcode_atts
+        $this->assertEquals("Unknown", $result); // Expect default value
     }
 
     public function test_shortcode_handler_server_mode_default_attribute()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["region"] = "Unknown";
+        $this->mock_location_data["region"] = "Unknown"; // Simulate unknown data
 
         $result = mgeo_shortcode_handler(
-            ["default" => "N/A"],
+            ["default" => "N/A"], // Provide custom default
             "",
             "mgeo_region"
         );
-        $this->assertEquals("N/A", $result);
+        $this->assertEquals("N/A", $result); // Expect custom default value
     }
 
     public function test_shortcode_handler_client_mode()
@@ -95,6 +94,7 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
             "",
             "mgeo_country"
         );
+        // Expect the client-side placeholder span
         $expected =
             '<span data-mgeo-print="true" data-mgeo-field="country" data-mgeo-default="Fallback Country" style="visibility: hidden;">Fallback Country</span>';
         $this->assertEquals($expected, $result);
@@ -113,7 +113,7 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
             'The src attribute should end with the correct flag path.'
         );
         $this->assertStringContainsString('alt="United States flag"', $result);
-        $this->assertStringContainsString('style="width: 24px; height: auto;"', $result);
+        $this->assertStringContainsString('style="width: 24px; height: auto;"', $result); // Default size
     }
 
     public function test_flag_shortcode_server_mode_custom_size()
@@ -129,7 +129,7 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
     public function test_flag_shortcode_server_mode_unknown_country()
     {
         update_option('mgeo_client_server_mode', 'server');
-        $this->mock_location_data["country_code"] = "Unknown";
+        $this->mock_location_data["country_code"] = "Unknown"; // Simulate unknown country
 
         $result = mgeo_country_flag_shortcode([]);
         $this->assertEquals("", $result); // Should return empty string
@@ -139,9 +139,9 @@ class TestGeoPrintingBackend extends WP_UnitTestCase
     {
         update_option('mgeo_client_server_mode', 'client');
         $result = mgeo_country_flag_shortcode(["size" => "30px"]);
+        // Expect the client-side placeholder span
         $expected =
             '<span data-mgeo-print="true" data-mgeo-field="flag" data-mgeo-size="30px" style="visibility: hidden;"></span>';
         $this->assertEquals($expected, $result);
     }
 }
-?>

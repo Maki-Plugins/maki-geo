@@ -100,6 +100,6 @@ require_once "geo-printing/geo-printing-frontend.php";
 require_once "geo-redirection/geo-redirection-backend.php";
 require_once "geo-redirection/geo-redirection-frontend.php";
 require_once "shortcodes/geo-content-shortcode.php";
-// require_once "shortcodes/print-geo-shortcodes.php"; // Removed this line
+require_once "shortcodes/print-geo-shortcodes.php";
 require_once "settings-registry.php";
 require_once "wp-utils.php";
