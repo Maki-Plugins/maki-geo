@@ -3,6 +3,7 @@
  */
 
 import { LocationData } from "../types/types";
+import { initGeoPrinting } from "./geo-printing-frontend";
 
 // Mock the API fetch function. The global type is defined in src/types/types.ts
 // Ensure window.wp is defined for the test environment
@@ -12,12 +13,12 @@ if (!window.wp) {
   };
 } else {
   window.wp.apiFetch = jest.fn();
-};
+}
 
 // Mock makiGeoPrintingData
 window.makiGeoPrintingData = {
   pluginUrl: "http://localhost/wp-content/plugins/maki-geo/",
-import { initGeoPrinting } from "./geo-printing-frontend";
+};
 
 describe("Geo Printing Frontend Script", () => {
   const mockLocationData: LocationData = {

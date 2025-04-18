@@ -146,21 +146,17 @@ export const GeoConditionEditor: React.FC<GeoConditionEditorProps> = ({
               {conditions.map((condition, index) => (
                 <>
                   {index > 0 && (
-                    <div style={{ textAlign: "center", margin: "-9px 0" }}>
+                    <div style={{ textAlign: "center" }}>
                       <ButtonGroup>
                         <Button
-                          variant={
-                            operator === "AND" ? "primary" : "secondary"
-                          }
+                          variant={operator === "AND" ? "primary" : "secondary"}
                           onClick={() => onChange(conditions, "AND")}
                           size="small"
                         >
                           and
                         </Button>
                         <Button
-                          variant={
-                            operator === "OR" ? "primary" : "secondary"
-                          }
+                          variant={operator === "OR" ? "primary" : "secondary"}
                           onClick={() => onChange(conditions, "OR")}
                           size="small"
                         >
@@ -241,7 +237,9 @@ export const GeoConditionEditor: React.FC<GeoConditionEditorProps> = ({
       <Button
         variant="secondary"
         isSmall
-        className="add-condition-button" onClick={addCondition}>
+        className="add-condition-button"
+        onClick={addCondition}
+      >
         Add Condition
       </Button>
     </div>
