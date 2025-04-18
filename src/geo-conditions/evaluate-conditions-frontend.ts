@@ -1,13 +1,5 @@
 import { GeoRule, LocationData } from "../types/types";
 
-declare global {
-  interface Window {
-    wp: {
-      apiFetch: (options: { path: string }) => Promise<LocationData>;
-    };
-  }
-}
-
 async function initGeoTargeting(): Promise<void> {
   try {
     const blocksClass = "mgeo-geo-target-block";

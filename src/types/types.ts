@@ -64,11 +64,28 @@ export interface LocationData {
   language?: string;
 }
 
+// Define the structure for wp.apiFetch, including Jest mock properties
+// Use Promise<any> for broader compatibility across different endpoints.
+type WpApiFetch = ((options: { path: string }) => Promise<any>) & jest.Mock;
+
 declare global {
   interface Window {
+    // Define wp object, making it optional as it might not exist initially
+    wp?: {
+      apiFetch: WpApiFetch;
+    };
+    // Central definition for makiGeoData used in admin and blocks
     makiGeoData?: {
       nonce: string;
       settings: AdminSettings;
+      redirections?: Redirection[]; // Added from RedirectionTab usage
+      globalRules?: GeoRule[]; // Added from admin.php usage
+    };
+    // Central definition for makiGeoPrintingData used in geo-printing frontend
+    makiGeoPrintingData?: {
+      pluginUrl: string;
+      endpoint?: string; // Added from index.php localization
+      nonce?: string;    // Added from index.php localization
     };
   }
 }

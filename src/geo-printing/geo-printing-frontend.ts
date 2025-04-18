@@ -1,16 +1,5 @@
 import { LocationData } from "../types/types";
 
-declare global {
-  interface Window {
-    wp: {
-      apiFetch: (options: { path: string }) => Promise<LocationData>;
-    };
-    makiGeoPrintingData?: {
-      pluginUrl: string;
-    };
-  }
-}
-
 async function initGeoPrinting(): Promise<void> {
   const placeholders = document.querySelectorAll<HTMLElement>(
     "span[data-mgeo-print='true']",

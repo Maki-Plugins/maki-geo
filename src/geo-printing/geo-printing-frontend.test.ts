@@ -16,9 +16,9 @@ declare global {
   }
 }
 
-// Mock the API fetch function - Cast to jest.Mock to allow mock methods
+// Mock the API fetch function. The global type now includes jest.Mock properties.
 window.wp = {
-  apiFetch: jest.fn() as jest.Mock,
+  apiFetch: jest.fn(),
 };
 
 // Mock makiGeoPrintingData
@@ -46,7 +46,8 @@ describe("Geo Printing Frontend Script", () => {
     ip: "192.168.1.1",
   };
 
-  const mockApiFetch = window.wp.apiFetch as jest.Mock;
+  // Access the mock directly, no need for casting
+  const mockApiFetch = window.wp.apiFetch;
 
   beforeEach(() => {
     // Reset mocks before each test
@@ -110,6 +111,7 @@ describe("Geo Printing Frontend Script", () => {
       region: "Unknown", // Missing region
       // city is missing
     };
+    // Use mock methods directly
     mockApiFetch.mockResolvedValue(partialLocationData);
 
     document.body.innerHTML = `
@@ -133,6 +135,7 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle API fetch failure gracefully", async () => {
+    // Use mock methods directly
     mockApiFetch.mockRejectedValue(new Error("API Error"));
     const consoleErrorSpy = jest
       .spyOn(console, "error")
@@ -165,6 +168,7 @@ describe("Geo Printing Frontend Script", () => {
   });
 
   test("should handle null API response gracefully", async () => {
+    // Use mock methods directly
     mockApiFetch.mockResolvedValue(null);
     const consoleWarnSpy = jest
       .spyOn(console, "warn")
@@ -224,6 +228,7 @@ describe("Geo Printing Frontend Script", () => {
       ...mockLocationData,
       country_code: "unknown",
     };
+    // Use mock methods directly
     mockApiFetch.mockResolvedValue(unknownCountryData);
 
     document.body.innerHTML = `
