@@ -29,7 +29,10 @@ require_once $_tests_dir . '/includes/functions.php';
 // Load your plugin
 function _manually_load_plugin()
 {
-    include dirname(__DIR__) . '/maki-geo.php';   
+    // Load the helper trait first
+    require_once dirname(__FILE__) . '/test-helpers/MockLocationHelper.php';
+    // Then load the main plugin file
+    require dirname(dirname(__DIR__)) . '/maki-geo.php';
 }
 tests_add_filter('muplugins_loaded', '_manually_load_plugin');
 
