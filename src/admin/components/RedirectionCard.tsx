@@ -26,10 +26,15 @@ interface RedirectionCardProps {
   initialData?: Redirection; // Keep initialData type as is from WP
 }
 
+// Helper function to generate unique IDs
+function generateUniqueId(prefix = "loc_"): string {
+  return `${prefix}${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
 // Helper to create default location structure matching the schema
 function createDefaultLocation(): RedirectionLocation {
   return {
-    id: `loc_${Date.now()}`, // RHF useFieldArray will manage its own IDs later
+    id: generateUniqueId(), // Use the helper function
     conditions: [{ type: "country", value: "", operator: "is" }],
     operator: "OR",
     pageTargetingType: "all",
@@ -52,10 +57,23 @@ export function RedirectionCard({
     defaultValues: initialData
       ? { ...initialData } // Spread initial data if editing
       : { // Default values for a new redirection
-          id: `new_${Date.now()}`, // Temporary ID for new
+          id: `new_${Date.now()}`, // Temporary ID for new redirection itself
           name: "",
           isEnabled: true,
-          locations: [createDefaultLocation()],
+          // Ensure the first default location also gets a unique ID
+          locations: [
+            {
+              id: generateUniqueId(), // Generate ID for the first location
+              conditions: [{ type: "country", value: "", operator: "is" }],
+              operator: "OR",
+              pageTargetingType: "all",
+              redirectUrl: "",
+              redirectMappings: [],
+              exclusions: [],
+              passPath: true,
+              passQuery: true,
+            }
+          ],
         },
   });
 
@@ -84,9 +102,10 @@ export function RedirectionCard({
 
   // --- Functions ---
   // Default location structure for appending new locations
-  function createDefaultLocation(): Omit<RedirectionLocation, 'id'> { // Omit id, RHF handles it
+  // This function is now used by the 'Add Location' button
+  function createDefaultLocationForAppend(): RedirectionLocation {
     return {
-      // id: `loc_${Date.now()}`, // RHF provides id
+      id: generateUniqueId(), // Generate a unique ID when appending
       conditions: [{ type: "country", value: "", operator: "is" }],
       operator: "OR",
       pageTargetingType: "all",
@@ -100,9 +119,9 @@ export function RedirectionCard({
 
   // --- Functions using useFieldArray ---
   function addLocation() {
-    const newLocation = createDefaultLocation();
+    const newLocation = createDefaultLocationForAppend(); // Use the correct function
     append(newLocation);
-    // Optionally expand the newly added location - need RHF's ID after append
+    // Optionally expand the newly added location - use the generated ID
     // This is slightly more complex, might need useEffect or watch
     // For now, let's not auto-expand. User can click.
     // const newIndex = fields.length; // Index before append
@@ -413,7 +432,8 @@ export function RedirectionCard({
                         <button
                           type="button" // Prevent form submission
                           className="btn btn-sm btn-accent btn-outline"
-                          onClick={() => appendMapping(createDefaultMapping())} // Use append from useFieldArray
+                          // Pass a default mapping structure with a generated ID
+                          onClick={() => appendMapping({ id: generateUniqueId('map_'), fromUrl: '', toUrl: '' })}
                         >
                           <Dashicon icon="plus" /> Add URL Mapping
                         </button>
@@ -480,7 +500,8 @@ export function RedirectionCard({
                     <button
                       type="button" // Prevent form submission
                       className="btn btn-sm btn-accent btn-outline"
-                      onClick={() => appendExclusion(createDefaultExclusion())} // Use append from useFieldArray
+                      // Pass a default exclusion structure with a generated ID
+                      onClick={() => appendExclusion({ id: generateUniqueId('excl_'), value: '', type: 'url_equals' })}
                     >
                       <Dashicon icon="plus" /> Add Exclusion
                     </button>

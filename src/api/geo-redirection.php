@@ -140,11 +140,40 @@ function mgeo_create_redirection_api($request)
         );
     }
 
-    // Assign a unique ID
+    // Assign a unique ID to the redirection itself
     $new_redirection_data["id"] = uniqid("red_");
 
+    // Ensure all locations within the new redirection have an ID (backend fallback)
+    if (isset($new_redirection_data["locations"]) && is_array($new_redirection_data["locations"])) {
+        foreach ($new_redirection_data["locations"] as &$location) {
+            if (empty($location["id"])) {
+                $location["id"] = uniqid("loc_");
+            }
+            // Ensure nested mappings have IDs
+            if (isset($location["redirectMappings"]) && is_array($location["redirectMappings"])) {
+                foreach ($location["redirectMappings"] as &$mapping) {
+                    if (empty($mapping["id"])) {
+                        $mapping["id"] = uniqid("map_");
+                    }
+                }
+                unset($mapping); // Unset reference
+            }
+            // Ensure nested exclusions have IDs
+            if (isset($location["exclusions"]) && is_array($location["exclusions"])) {
+                foreach ($location["exclusions"] as &$exclusion) {
+                    if (empty($exclusion["id"])) {
+                        $exclusion["id"] = uniqid("excl_");
+                    }
+                }
+                unset($exclusion); // Unset reference
+            }
+        }
+        unset($location); // Unset reference to the last element
+    }
+
+
     $redirections = mgeo_get_redirections(); // Get current redirections
-    $redirections[] = $new_redirection_data; // Add the new one
+    $redirections[] = $new_redirection_data; // Add the new one (with ensured location IDs)
 
     // Save the updated list
     if (update_option("mgeo_redirections", $redirections)) {
