@@ -71,9 +71,10 @@ function mgeo_register_redirections_api()
 }
 add_action("rest_api_init", "mgeo_register_redirections_api");
 
-function mgeo_sanitize_redirections()
+function mgeo_sanitize_redirections($redirections_input)
 {
     // TODO: write sanitization code.
+    return $redirections_input;
 }
 
 /**
@@ -131,7 +132,10 @@ function mgeo_create_redirection_api($request)
     // TODO: Add robust validation/sanitization for the incoming data structure
     if (empty($new_redirection_data) || !is_array($new_redirection_data)) {
         return new WP_REST_Response(
-            ["success" => false, "message" => "Invalid redirection data provided."],
+            [
+                "success" => false,
+                "message" => "Invalid redirection data provided.",
+            ],
             400
         );
     }
@@ -169,9 +173,17 @@ function mgeo_update_redirection_api($request)
     $updated_data = $request->get_json_params();
 
     // TODO: Add robust validation/sanitization for the incoming data structure
-    if (empty($updated_data) || !is_array($updated_data) || !isset($updated_data["id"]) || $updated_data["id"] !== $id) {
+    if (
+        empty($updated_data) ||
+        !is_array($updated_data) ||
+        !isset($updated_data["id"]) ||
+        $updated_data["id"] !== $id
+    ) {
         return new WP_REST_Response(
-            ["success" => false, "message" => "Invalid redirection data or ID mismatch."],
+            [
+                "success" => false,
+                "message" => "Invalid redirection data or ID mismatch.",
+            ],
             400
         );
     }
@@ -198,7 +210,10 @@ function mgeo_update_redirection_api($request)
 
     // Save the updated list
     if (update_option("mgeo_redirections", $redirections)) {
-        return new WP_REST_Response(["success" => true, "redirection" => $updated_data]);
+        return new WP_REST_Response([
+            "success" => true,
+            "redirection" => $updated_data,
+        ]);
     } else {
         return new WP_REST_Response(
             ["success" => false, "message" => "Failed to update redirection."],
@@ -229,11 +244,11 @@ function mgeo_delete_redirection_api($request)
     $initial_count = count($redirections);
 
     // Filter out the redirection with the matching ID
-    $updated_redirections = array_filter(
-        $redirections, function ($redirection) use ($id) {
-            return !isset($redirection["id"]) || $redirection["id"] !== $id;
-        }
-    );
+    $updated_redirections = array_filter($redirections, function (
+        $redirection
+    ) use ($id) {
+        return !isset($redirection["id"]) || $redirection["id"] !== $id;
+    });
 
     // Check if any redirection was actually removed
     if (count($updated_redirections) === $initial_count) {
@@ -244,7 +259,9 @@ function mgeo_delete_redirection_api($request)
     }
 
     // Save the updated list (re-index array)
-    if (update_option("mgeo_redirections", array_values($updated_redirections))) {
+    if (
+        update_option("mgeo_redirections", array_values($updated_redirections))
+    ) {
         return new WP_REST_Response(["success" => true]);
     } else {
         return new WP_REST_Response(
