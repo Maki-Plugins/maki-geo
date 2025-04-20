@@ -25,6 +25,7 @@ interface RedirectionCardProps {
   onComplete: (redirection: RedirectionFormData) => void; // Use validated form data type
   isNew?: boolean;
   initialData?: Redirection; // Keep initialData type as is from WP
+  isSaving: boolean; // Add prop to indicate saving state
 }
 
 // Helper function to generate unique IDs
@@ -51,6 +52,7 @@ export function RedirectionCard({
   onComplete,
   isNew = true,
   initialData,
+  isSaving, // Destructure the new prop
 }: RedirectionCardProps): JSX.Element {
   // --- React Hook Form Setup ---
   const methods = useForm<RedirectionFormData>({
@@ -323,8 +325,16 @@ export function RedirectionCard({
           {formErrorMessage && !methods.formState.isValid && methods.formState.isSubmitted && (
             <p className="text-error text-sm">{formErrorMessage}</p>
           )}
-          <button type="submit" className="btn btn-primary">
-            {isNew ? "Create Redirection" : "Update Redirection"}
+          <button
+            type="submit"
+            className={`btn btn-primary ${isSaving ? "loading" : ""}`} // Add loading class
+            disabled={isSaving} // Disable button when saving
+          >
+            {isSaving
+              ? "Saving..."
+              : isNew
+                ? "Create Redirection"
+                : "Update Redirection"}
           </button>
         </div>
       </form>

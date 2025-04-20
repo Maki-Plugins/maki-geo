@@ -16,7 +16,8 @@ export function RedirectionTab(): JSX.Element {
   >(null);
   const [redirections, setRedirections] = useState<Redirection[]>([]);
   const [newRedirectionId, setNewRedirectionId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  // Track which redirection is currently being saved
+  const [savingRedirectionId, setSavingRedirectionId] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<{
     text: string;
     type: "success" | "error";
@@ -32,7 +33,8 @@ export function RedirectionTab(): JSX.Element {
   // --- CRUD Operations ---
 
   const handleCreateRedirection = async (newRedirectionData: Redirection) => {
-    setIsSaving(true);
+    const tempId = newRedirectionData.id; // Keep track of the temporary ID
+    setSavingRedirectionId(tempId); // Indicate saving started for this new card
     setSaveMessage(null);
     try {
       // Remove temporary frontend ID before sending
@@ -46,7 +48,9 @@ export function RedirectionTab(): JSX.Element {
       if (response && response.success && response.redirection) {
         // Add the new redirection (with server-assigned ID) to the state
         setRedirections([...redirections, response.redirection]);
+        setRedirections([...redirections, response.redirection]);
         setNewRedirectionId(null); // Close the "new" card
+        setExpandedRedirectionId(null); // Ensure no card is expanded
         setSaveMessage({ text: "Redirection created!", type: "success" });
       } else {
         throw new Error(response.message || "Failed to create redirection.");
@@ -57,16 +61,17 @@ export function RedirectionTab(): JSX.Element {
         text: `Create failed: ${error.message || "Unknown error"}`,
         type: "error",
       });
+      // Don't close the card on error
     } finally {
-      setIsSaving(false);
-      setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
+      setSavingRedirectionId(null); // Indicate saving finished
+      setTimeout(() => setSaveMessage(null), 5000); // Auto-hide message after 5s
     }
   };
 
   const handleUpdateRedirection = async (updatedRedirectionData: Redirection) => {
-    setIsSaving(true);
-    setSaveMessage(null);
     const idToUpdate = updatedRedirectionData.id;
+    setSavingRedirectionId(idToUpdate); // Indicate saving started for this card
+    setSaveMessage(null);
 
     try {
       const response = await apiFetch({
@@ -82,6 +87,8 @@ export function RedirectionTab(): JSX.Element {
         );
         setRedirections(updatedList);
         setExpandedRedirectionId(null); // Close the editing card
+        setRedirections(updatedList);
+        setExpandedRedirectionId(null); // Close the editing card on success
         setSaveMessage({ text: "Redirection updated!", type: "success" });
       } else {
         throw new Error(response.message || "Failed to update redirection.");
@@ -92,19 +99,21 @@ export function RedirectionTab(): JSX.Element {
         text: `Update failed: ${error.message || "Unknown error"}`,
         type: "error",
       });
+      // Don't close the card on error
     } finally {
-      setIsSaving(false);
-      setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
+      setSavingRedirectionId(null); // Indicate saving finished
+      setTimeout(() => setSaveMessage(null), 5000); // Auto-hide message after 5s
     }
   };
 
 
   const handleDeleteRedirection = async (redirectionId: string) => {
-     if (window.confirm("Are you sure you want to delete this redirection?")) {
-        setIsSaving(true); // Indicate activity during delete
-        setSaveMessage(null);
-        try {
-            const response = await apiFetch({
+    if (window.confirm("Are you sure you want to delete this redirection?")) {
+      // Use savingRedirectionId to indicate activity during delete
+      setSavingRedirectionId(redirectionId);
+      setSaveMessage(null);
+      try {
+        const response = await apiFetch({
                 path: `maki-geo/v1/redirections/${redirectionId}`,
                 method: "DELETE",
             });
@@ -126,10 +135,10 @@ export function RedirectionTab(): JSX.Element {
                 type: "error",
             });
         } finally {
-            setIsSaving(false);
-            setTimeout(() => setSaveMessage(null), 3000); // Auto-hide message
+            setSavingRedirectionId(null); // Indicate delete finished
+            setTimeout(() => setSaveMessage(null), 5000); // Auto-hide message after 5s
         }
-     }
+    }
   };
 
   // --- Render Logic ---
@@ -192,6 +201,8 @@ export function RedirectionTab(): JSX.Element {
                 <RedirectionCard
                   onComplete={handleCreateRedirection} // Use create handler
                   isNew={true}
+                  // Pass saving state specific to this new card
+                  isSaving={savingRedirectionId === newRedirectionId}
                 />
               </div>
             </div>
@@ -267,6 +278,8 @@ export function RedirectionTab(): JSX.Element {
                   onComplete={handleUpdateRedirection} // Use update handler
                   isNew={false}
                   initialData={redirection}
+                  // Pass saving state specific to this card
+                  isSaving={savingRedirectionId === redirection.id}
                 />
               </div>
             </div>
