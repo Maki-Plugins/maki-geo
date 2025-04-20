@@ -149,8 +149,6 @@ export function RedirectionCard({
     // like focusing the first field with an error.
     alert("Please check the form for errors before submitting.");
   };
-    onComplete(data);
-  }
 
   function getLocationTitle(
     location: RedirectionLocation,
