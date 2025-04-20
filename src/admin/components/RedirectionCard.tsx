@@ -1,19 +1,18 @@
-import { useState, useEffect } from "@wordpress/element";
-import { useForm, useFieldArray, FormProvider, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
+import { useState } from "@wordpress/element";
 import {
-  ExclusionType,
-  GeoCondition,
+  useForm,
+  useFieldArray,
+  FormProvider,
+  Controller,
+} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
   PageExclusion,
   Redirection,
   RedirectionLocation,
   RedirectMapping,
 } from "../../types/types";
-import {
-  redirectionSchema,
-  RedirectionFormData,
-} from "./redirection-schema";
+import { redirectionSchema, RedirectionFormData } from "./redirection-schema";
 import { Dashicon } from "@wordpress/components";
 import Toggle from "./Toggle";
 import HelpHover from "./HelpHover";
@@ -59,7 +58,8 @@ export function RedirectionCard({
     resolver: zodResolver(redirectionSchema),
     defaultValues: initialData
       ? { ...initialData } // Spread initial data if editing
-      : { // Default values for a new redirection
+      : {
+          // Default values for a new redirection
           id: `new_${Date.now()}`, // Temporary ID for new redirection itself
           name: "",
           isEnabled: true,
@@ -75,7 +75,7 @@ export function RedirectionCard({
               exclusions: [],
               passPath: true,
               passQuery: true,
-            }
+            },
           ],
         },
   });
@@ -85,7 +85,7 @@ export function RedirectionCard({
     handleSubmit,
     formState: { errors },
     control, // Needed for useFieldArray and Controller
-    watch,   // Needed for conditional rendering later
+    watch, // Needed for conditional rendering later
     getValues, // Useful for debugging or complex logic if needed
   } = methods;
 
@@ -150,21 +150,20 @@ export function RedirectionCard({
   // --- Nested Field Array Functions (will be called inside renderLocationCard) ---
 
   // Default structures for appending new nested items
-  function createDefaultMapping(): Omit<RedirectMapping, 'id'> {
+  function createDefaultMapping(): Omit<RedirectMapping, "id"> {
     return { fromUrl: "", toUrl: "" };
   }
 
-  function createDefaultExclusion(): Omit<PageExclusion, 'id'> {
+  function createDefaultExclusion(): Omit<PageExclusion, "id"> {
     return { value: "", type: "url_equals" };
   }
-
 
   // --- Form Submission ---
   const onSubmit = (data: RedirectionFormData) => {
     console.log("Form Data Submitted:", data); // For debugging
     // Call the original onComplete with the validated data
     onComplete(data);
-  }
+  };
 
   const onInvalid = (errors: any) => {
     console.error("Form validation failed:", errors);
@@ -216,7 +215,13 @@ export function RedirectionCard({
   return (
     <FormProvider {...methods}>
       {/* Pass the onInvalid handler to handleSubmit, clear message on valid submit */}
-      <form onSubmit={handleSubmit(() => { setFormErrorMessage(null); onSubmit(getValues()); }, onInvalid)} className="space-y-6">
+      <form
+        onSubmit={handleSubmit(() => {
+          setFormErrorMessage(null);
+          onSubmit(getValues());
+        }, onInvalid)}
+        className="space-y-6"
+      >
         {/* Top Level Fields */}
         <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
@@ -258,9 +263,11 @@ export function RedirectionCard({
                   />
                 )}
               />
-               {errors.isEnabled && (
-                <p className="text-error text-xs mt-1">{errors.isEnabled.message}</p>
-               )}
+              {errors.isEnabled && (
+                <p className="text-error text-xs mt-1">
+                  {errors.isEnabled.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -281,7 +288,11 @@ export function RedirectionCard({
                 locationIndex={index}
                 field={field as RedirectionLocation & { id: string }}
                 isExpanded={expandedLocationId === field.id}
-                onToggleExpand={() => setExpandedLocationId(expandedLocationId === field.id ? null : field.id)}
+                onToggleExpand={() =>
+                  setExpandedLocationId(
+                    expandedLocationId === field.id ? null : field.id,
+                  )
+                }
                 onDelete={() => deleteLocation(index)}
                 getLocationTitle={getLocationTitle}
                 isLastLocation={fields.length <= 1}
@@ -296,7 +307,9 @@ export function RedirectionCard({
             </button>
             {/* Display top-level array error */}
             {errors.locations && !Array.isArray(errors.locations) && (
-               <p className="text-error text-xs mt-1">{errors.locations.message}</p>
+              <p className="text-error text-xs mt-1">
+                {errors.locations.message}
+              </p>
             )}
           </div>
         </div>
@@ -322,9 +335,11 @@ export function RedirectionCard({
         {/* Submit Button & Error Message */}
         <div className="flex flex-col items-end gap-2 mt-6">
           {/* Display general form error message */}
-          {formErrorMessage && !methods.formState.isValid && methods.formState.isSubmitted && (
-            <p className="text-error text-sm">{formErrorMessage}</p>
-          )}
+          {formErrorMessage &&
+            !methods.formState.isValid &&
+            methods.formState.isSubmitted && (
+              <p className="text-error text-sm">{formErrorMessage}</p>
+            )}
           <button
             type="submit"
             className="btn btn-primary" // Remove loading class from button itself
