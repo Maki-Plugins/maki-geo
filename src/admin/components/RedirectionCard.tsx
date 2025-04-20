@@ -80,6 +80,7 @@ export function RedirectionCard({
     fields[0]?.id || null, // Use RHF's field id
   );
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
+  const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null); // State for general form error
 
   // --- Functions ---
   // Default location structure for appending new locations
@@ -145,9 +146,12 @@ export function RedirectionCard({
 
   const onInvalid = (errors: any) => {
     console.error("Form validation failed:", errors);
-    // You could add more user-friendly error handling here,
-    // like focusing the first field with an error.
-    alert("Please check the form for errors before submitting.");
+    setFormErrorMessage("Please correct the errors highlighted above.");
+    // Optionally, focus the first field with an error
+    // const firstErrorField = Object.keys(errors)[0];
+    // if (firstErrorField) {
+    //   methods.setFocus(firstErrorField as any);
+    // }
   };
 
   function getLocationTitle(
@@ -555,8 +559,8 @@ export function RedirectionCard({
   // No longer need separate render steps (settings/review)
   return (
     <FormProvider {...methods}>
-      {/* Pass the onInvalid handler to handleSubmit */}
-      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
+      {/* Pass the onInvalid handler to handleSubmit, clear message on valid submit */}
+      <form onSubmit={handleSubmit(() => { setFormErrorMessage(null); onSubmit(getValues()); }, onInvalid)} className="space-y-6">
         {/* Top Level Fields */}
         <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
@@ -648,8 +652,12 @@ export function RedirectionCard({
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end gap-2 mt-6">
+        {/* Submit Button & Error Message */}
+        <div className="flex flex-col items-end gap-2 mt-6">
+          {/* Display general form error message */}
+          {formErrorMessage && !methods.formState.isValid && methods.formState.isSubmitted && (
+            <p className="text-error text-sm">{formErrorMessage}</p>
+          )}
           <button type="submit" className="btn btn-primary">
             {isNew ? "Create Redirection" : "Update Redirection"}
           </button>
