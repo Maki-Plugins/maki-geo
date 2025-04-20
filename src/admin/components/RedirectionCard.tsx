@@ -147,11 +147,11 @@ export function RedirectionCard({
   const onInvalid = (errors: any) => {
     console.error("Form validation failed:", errors);
     setFormErrorMessage("Please correct the errors highlighted above.");
-    // Optionally, focus the first field with an error
-    // const firstErrorField = Object.keys(errors)[0];
-    // if (firstErrorField) {
-    //   methods.setFocus(firstErrorField as any);
-    // }
+    // Focus the first field with an error
+    const firstErrorField = Object.keys(errors)[0];
+    if (firstErrorField) {
+      methods.setFocus(firstErrorField as any);
+    }
   };
 
   function getLocationTitle(

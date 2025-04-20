@@ -53,7 +53,7 @@ const pageExclusionSchema = z.object({
 // We use superRefine for cross-field validation
 const redirectionLocationSchema = z
   .object({
-    id: z.string(), // Keep ID for React keys
+    id: z.any(), // Keep ID for React keys
     conditions: z
       .array(geoConditionSchema)
       .min(1, { message: "At least one location condition is required" }),

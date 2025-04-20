@@ -71,6 +71,11 @@ function mgeo_register_redirections_api()
 }
 add_action("rest_api_init", "mgeo_register_redirections_api");
 
+function mgeo_sanitize_redirections()
+{
+    // TODO: write sanitization code.
+}
+
 /**
  * Handle client-side redirection API requests
  *
