@@ -1,13 +1,7 @@
-import React from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Dashicon } from "@wordpress/components";
 import { GeoConditionEditor } from "../../components/geo-condition-editor/geo-condition-editor";
-import {
-  RedirectionLocation,
-  RedirectionFormData,
-  RedirectMapping,
-  PageExclusion,
-} from "../../types/types";
+import { RedirectionLocation } from "../../types/types";
 import Toggle from "./Toggle";
 import HelpHover from "./HelpHover";
 
@@ -74,18 +68,26 @@ export function LocationCard({
       <div className="card-body p-1">
         {/* Card Header */}
         <div
-          className="flex items-center gap-4 cursor-pointer p-4"
+          className="flex items-center gap-4 cursor-pointer"
           onClick={onToggleExpand}
         >
           <div className="flex-1">
-            <h3 className="font-bold text-base">
+            <h3 className="font-semibold">
+              <Dashicon icon="location" />{" "}
               {/* Pass watched data to title function */}
               {getLocationTitle(locationData, locationIndex)}
             </h3>
             {/* Display top-level location error (if any, beyond specific fields) */}
-            {locationErrors && typeof locationErrors === 'object' && !locationErrors.conditions && !locationErrors.redirectUrl && !locationErrors.redirectMappings && !locationErrors.exclusions && (
-               <p className="text-error text-xs mt-1">{locationErrors.message || locationErrors.root?.message}</p>
-            )}
+            {locationErrors &&
+              typeof locationErrors === "object" &&
+              !locationErrors.conditions &&
+              !locationErrors.redirectUrl &&
+              !locationErrors.redirectMappings &&
+              !locationErrors.exclusions && (
+                <p className="text-error text-xs mt-1">
+                  {locationErrors.message || locationErrors.root?.message}
+                </p>
+              )}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -115,8 +117,12 @@ export function LocationCard({
 
         {/* Expanded Content */}
         {isExpanded && (
-          <div className="p-4 border-t"> {/* Add padding around content */}
-            <div className="space-y-6"> {/* Reduced spacing */}
+          <div className="p-4 border-t">
+            {" "}
+            {/* Add padding around content */}
+            <div className="space-y-6">
+              {" "}
+              {/* Reduced spacing */}
               {/* Location Conditions */}
               <div className="form-control">
                 <label className="label">
@@ -145,12 +151,11 @@ export function LocationCard({
                 {(locationErrors?.conditions || locationErrors?.operator) && (
                   <p className="text-error text-xs mt-1">
                     {locationErrors.conditions?.root?.message || // RHF nests array errors under root
-                     locationErrors.operator?.message ||
-                     'Error in conditions'}
+                      locationErrors.operator?.message ||
+                      "Error in conditions"}
                   </p>
                 )}
               </div>
-
               {/* Page Targeting & Redirect URL/Mappings */}
               <div>
                 <div className="form-control">
@@ -166,7 +171,9 @@ export function LocationCard({
                         type="radio"
                         className="radio radio-primary radio-sm" // Smaller radio
                         value="all"
-                        {...register(`locations.${locationIndex}.pageTargetingType`)}
+                        {...register(
+                          `locations.${locationIndex}.pageTargetingType`,
+                        )}
                       />
                       <span className="label-text ml-1">All pages</span>
                     </label>
@@ -175,19 +182,27 @@ export function LocationCard({
                         type="radio"
                         className="radio radio-primary radio-sm" // Smaller radio
                         value="specific"
-                        {...register(`locations.${locationIndex}.pageTargetingType`)}
+                        {...register(
+                          `locations.${locationIndex}.pageTargetingType`,
+                        )}
                       />
                       <span className="label-text ml-1">Specific pages</span>
                     </label>
                     {locationErrors?.pageTargetingType && (
-                      <p className="text-error text-xs mt-1">{locationErrors.pageTargetingType.message}</p>
+                      <p className="text-error text-xs mt-1">
+                        {locationErrors.pageTargetingType.message}
+                      </p>
                     )}
                   </div>
                 </div>
 
-                {watch(`locations.${locationIndex}.pageTargetingType`) === "all" ? (
+                {watch(`locations.${locationIndex}.pageTargetingType`) ===
+                "all" ? (
                   <div className="form-control mt-4">
-                    <label className="label py-0" htmlFor={`locations.${locationIndex}.redirectUrl`}>
+                    <label
+                      className="label py-0"
+                      htmlFor={`locations.${locationIndex}.redirectUrl`}
+                    >
                       <span className="label-text font-semibold flex items-center">
                         Redirect URL
                         <HelpHover text="The destination URL where visitors will be redirected to. Use a full URL including https://." />
@@ -203,7 +218,9 @@ export function LocationCard({
                       }`}
                     />
                     {locationErrors?.redirectUrl && (
-                      <p className="text-error text-xs mt-1">{locationErrors.redirectUrl.message}</p>
+                      <p className="text-error text-xs mt-1">
+                        {locationErrors.redirectUrl.message}
+                      </p>
                     )}
                   </div>
                 ) : (
@@ -222,19 +239,29 @@ export function LocationCard({
                         >
                           <input
                             type="text"
-                            {...register(`locations.${locationIndex}.redirectMappings.${mapIndex}.fromUrl`)}
+                            {...register(
+                              `locations.${locationIndex}.redirectMappings.${mapIndex}.fromUrl`,
+                            )}
                             placeholder="From URL Path (e.g., /source)"
                             className={`input input-bordered input-sm w-full join-item ${
-                              locationErrors?.redirectMappings?.[mapIndex]?.fromUrl ? "input-error" : ""
+                              locationErrors?.redirectMappings?.[mapIndex]
+                                ?.fromUrl
+                                ? "input-error"
+                                : ""
                             }`}
                           />
                           <span className="join-item mx-2">→</span>
                           <input
                             type="text"
-                            {...register(`locations.${locationIndex}.redirectMappings.${mapIndex}.toUrl`)}
+                            {...register(
+                              `locations.${locationIndex}.redirectMappings.${mapIndex}.toUrl`,
+                            )}
                             placeholder="To URL (e.g., https://site.com/dest)"
                             className={`input input-bordered input-sm w-full join-item ${
-                              locationErrors?.redirectMappings?.[mapIndex]?.toUrl ? "input-error" : ""
+                              locationErrors?.redirectMappings?.[mapIndex]
+                                ?.toUrl
+                                ? "input-error"
+                                : ""
                             }`}
                           />
                           <button
@@ -246,21 +273,38 @@ export function LocationCard({
                           </button>
                         </div>
                       ))}
-                      {locationErrors?.redirectMappings?.map((mapError, mapIndex) => (
-                        mapError && !mapError.root && (
-                          <div key={`mapErr-${mapIndex}`} className="text-error text-xs mt-1 ml-1">
-                            {mapError.fromUrl && <p>From URL: {mapError.fromUrl.message}</p>}
-                            {mapError.toUrl && <p>To URL: {mapError.toUrl.message}</p>}
-                          </div>
-                        )
-                      ))}
+                      {locationErrors?.redirectMappings?.map(
+                        (mapError, mapIndex) =>
+                          mapError &&
+                          !mapError.root && (
+                            <div
+                              key={`mapErr-${mapIndex}`}
+                              className="text-error text-xs mt-1 ml-1"
+                            >
+                              {mapError.fromUrl && (
+                                <p>From URL: {mapError.fromUrl.message}</p>
+                              )}
+                              {mapError.toUrl && (
+                                <p>To URL: {mapError.toUrl.message}</p>
+                              )}
+                            </div>
+                          ),
+                      )}
                       {locationErrors?.redirectMappings?.root && (
-                        <p className="text-error text-xs mt-1">{locationErrors.redirectMappings.root.message}</p>
+                        <p className="text-error text-xs mt-1">
+                          {locationErrors.redirectMappings.root.message}
+                        </p>
                       )}
                       <button
                         type="button"
                         className="btn btn-xs btn-accent btn-outline" // Smaller button
-                        onClick={() => appendMapping({ id: generateUniqueId('map_'), fromUrl: '', toUrl: '' })}
+                        onClick={() =>
+                          appendMapping({
+                            id: generateUniqueId("map_"),
+                            fromUrl: "",
+                            toUrl: "",
+                          })
+                        }
                       >
                         <Dashicon icon="plus" size={16} /> Add URL Mapping
                       </button>
@@ -268,7 +312,6 @@ export function LocationCard({
                   </div>
                 )}
               </div>
-
               {/* Page Exclusions */}
               <div className="form-control">
                 <label className="label py-0">
@@ -284,9 +327,13 @@ export function LocationCard({
                       className="join flex items-center"
                     >
                       <select
-                        {...register(`locations.${locationIndex}.exclusions.${exclIndex}.type`)}
+                        {...register(
+                          `locations.${locationIndex}.exclusions.${exclIndex}.type`,
+                        )}
                         className={`select select-bordered select-sm join-item ${
-                          locationErrors?.exclusions?.[exclIndex]?.type ? "select-error" : ""
+                          locationErrors?.exclusions?.[exclIndex]?.type
+                            ? "select-error"
+                            : ""
                         }`}
                       >
                         <option value="url_equals">URL Path equals</option>
@@ -296,10 +343,14 @@ export function LocationCard({
                       </select>
                       <input
                         type="text"
-                        {...register(`locations.${locationIndex}.exclusions.${exclIndex}.value`)}
+                        {...register(
+                          `locations.${locationIndex}.exclusions.${exclIndex}.value`,
+                        )}
                         placeholder="Value to exclude"
                         className={`input input-bordered input-sm w-full join-item ${
-                          locationErrors?.exclusions?.[exclIndex]?.value ? "input-error" : ""
+                          locationErrors?.exclusions?.[exclIndex]?.value
+                            ? "input-error"
+                            : ""
                         }`}
                       />
                       <button
@@ -311,27 +362,43 @@ export function LocationCard({
                       </button>
                     </div>
                   ))}
-                  {locationErrors?.exclusions?.map((exclError, exclIndex) => (
-                    exclError && !exclError.root && (
-                      <div key={`exclErr-${exclIndex}`} className="text-error text-xs mt-1 ml-1">
-                        {exclError.type && <p>Type: {exclError.type.message}</p>}
-                        {exclError.value && <p>Value: {exclError.value.message}</p>}
-                      </div>
-                    )
-                  ))}
+                  {locationErrors?.exclusions?.map(
+                    (exclError, exclIndex) =>
+                      exclError &&
+                      !exclError.root && (
+                        <div
+                          key={`exclErr-${exclIndex}`}
+                          className="text-error text-xs mt-1 ml-1"
+                        >
+                          {exclError.type && (
+                            <p>Type: {exclError.type.message}</p>
+                          )}
+                          {exclError.value && (
+                            <p>Value: {exclError.value.message}</p>
+                          )}
+                        </div>
+                      ),
+                  )}
                   {locationErrors?.exclusions?.root && (
-                    <p className="text-error text-xs mt-1">{locationErrors.exclusions.root.message}</p>
+                    <p className="text-error text-xs mt-1">
+                      {locationErrors.exclusions.root.message}
+                    </p>
                   )}
                   <button
                     type="button"
                     className="btn btn-xs btn-accent btn-outline" // Smaller button
-                    onClick={() => appendExclusion({ id: generateUniqueId('excl_'), value: '', type: 'url_equals' })}
+                    onClick={() =>
+                      appendExclusion({
+                        id: generateUniqueId("excl_"),
+                        value: "",
+                        type: "url_equals",
+                      })
+                    }
                   >
                     <Dashicon icon="plus" size={16} /> Add Exclusion
                   </button>
                 </div>
               </div>
-
               {/* Additional Options */}
               <div className="form-control">
                 <label className="label py-0">
@@ -342,7 +409,9 @@ export function LocationCard({
                 </label>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center text-sm"> {/* Smaller text */}
+                    <span className="flex items-center text-sm">
+                      {" "}
+                      {/* Smaller text */}
                       Pass page path to redirect URLs
                       <HelpHover text="When enabled, the current page path (e.g., /about-us/) will be appended to the destination URL. Only applies when 'Page Targeting' is 'All pages'." />
                     </span>
@@ -357,11 +426,15 @@ export function LocationCard({
                       )}
                     />
                     {locationErrors?.passPath && (
-                      <p className="text-error text-xs mt-1">{locationErrors.passPath.message}</p>
+                      <p className="text-error text-xs mt-1">
+                        {locationErrors.passPath.message}
+                      </p>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center text-sm"> {/* Smaller text */}
+                    <span className="flex items-center text-sm">
+                      {" "}
+                      {/* Smaller text */}
                       Pass query string to redirect URLs
                       <HelpHover text="When enabled, query parameters from the current URL (e.g., ?utm_source=google) will be preserved and added to the destination URL." />
                     </span>
@@ -376,14 +449,17 @@ export function LocationCard({
                       )}
                     />
                     {locationErrors?.passQuery && (
-                      <p className="text-error text-xs mt-1">{locationErrors.passQuery.message}</p>
+                      <p className="text-error text-xs mt-1">
+                        {locationErrors.passQuery.message}
+                      </p>
                     )}
                   </div>
                 </div>
               </div>
-
               {/* Delete Location Button */}
-              <div className="flex justify-end pt-4"> {/* Add padding top */}
+              <div className="flex justify-end pt-4">
+                {" "}
+                {/* Add padding top */}
                 <button
                   type="button"
                   className="btn btn-sm btn-error btn-outline"
@@ -393,10 +469,12 @@ export function LocationCard({
                   Delete Location
                 </button>
               </div>
-            </div> {/* End space-y */}
+            </div>{" "}
+            {/* End space-y */}
           </div> // End expanded content container
         )}
-      </div> {/* End card-body */}
+      </div>{" "}
+      {/* End card-body */}
     </div> // End card
   );
 }

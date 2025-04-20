@@ -71,14 +71,14 @@ function mgeo_register_redirections_api()
 }
 add_action("rest_api_init", "mgeo_register_redirections_api");
 
-
 /**
  * Sanitizes a single redirection object.
  *
  * @param array $redirection The redirection object to sanitize.
  * @return array|null The sanitized redirection object, or null if invalid.
  */
-function mgeo_sanitize_single_redirection($redirection) {
+function mgeo_sanitize_single_redirection($redirection)
+{
     if (!is_array($redirection)) {
         return null;
     }
@@ -88,100 +88,192 @@ function mgeo_sanitize_single_redirection($redirection) {
     $allowed_condition_operators = ["is", "is not"];
     $allowed_location_operators = ["AND", "OR"];
     $allowed_targeting_types = ["all", "specific"];
-    $allowed_exclusion_types = ["url_equals", "url_contains", "query_contains", "hash_contains"];
+    $allowed_exclusion_types = [
+        "url_equals",
+        "url_contains",
+        "query_contains",
+        "hash_contains",
+    ];
 
-    $sanitized['id'] = isset($redirection['id']) ? sanitize_key($redirection['id']) : uniqid('red_');
-    $sanitized['isEnabled'] = isset($redirection['isEnabled']) ? (bool) $redirection['isEnabled'] : true;
-    $sanitized['name'] = isset($redirection['name']) ? sanitize_text_field($redirection['name']) : 'Untitled Redirection';
+    $sanitized["id"] = isset($redirection["id"])
+        ? sanitize_key($redirection["id"])
+        : uniqid("red_");
+    $sanitized["isEnabled"] = isset($redirection["isEnabled"])
+        ? (bool) $redirection["isEnabled"]
+        : true;
+    $sanitized["name"] = isset($redirection["name"])
+        ? sanitize_text_field($redirection["name"])
+        : "Untitled Redirection";
 
-    $sanitized['locations'] = [];
-    if (isset($redirection['locations']) && is_array($redirection['locations'])) {
-        foreach ($redirection['locations'] as $location) {
-            if (!is_array($location)) continue;
+    $sanitized["locations"] = [];
+    if (
+        isset($redirection["locations"]) &&
+        is_array($redirection["locations"])
+    ) {
+        foreach ($redirection["locations"] as $location) {
+            if (!is_array($location)) {
+                continue;
+            }
 
             $sanitized_loc = [];
-            $sanitized_loc['id'] = isset($location['id']) ? sanitize_key($location['id']) : uniqid('loc_');
+            $sanitized_loc["id"] = isset($location["id"])
+                ? sanitize_key($location["id"])
+                : uniqid("loc_");
 
-            $sanitized_loc['conditions'] = [];
-            if (isset($location['conditions']) && is_array($location['conditions'])) {
-                foreach ($location['conditions'] as $condition) {
-                    if (!is_array($condition) || empty($condition['type']) || empty($condition['operator']) || !isset($condition['value'])) continue;
+            $sanitized_loc["conditions"] = [];
+            if (
+                isset($location["conditions"]) &&
+                is_array($location["conditions"])
+            ) {
+                foreach ($location["conditions"] as $condition) {
+                    if (
+                        !is_array($condition) ||
+                        empty($condition["type"]) ||
+                        empty($condition["operator"]) ||
+                        !isset($condition["value"])
+                    ) {
+                        continue;
+                    }
 
                     $sanitized_cond = [];
-                    $sanitized_cond['type'] = in_array($condition['type'], $allowed_condition_types) ? sanitize_key($condition['type']) : 'country';
-                    $sanitized_cond['operator'] = in_array($condition['operator'], $allowed_condition_operators) ? sanitize_key($condition['operator']) : 'is';
-                    $sanitized_cond['value'] = sanitize_text_field($condition['value']); // Basic sanitization for all types
+                    $sanitized_cond["type"] = in_array(
+                        $condition["type"],
+                        $allowed_condition_types
+                    )
+                        ? sanitize_key($condition["type"])
+                        : "country";
+                    $sanitized_cond["operator"] = in_array(
+                        $condition["operator"],
+                        $allowed_condition_operators
+                    )
+                        ? sanitize_key($condition["operator"])
+                        : "is";
+                    $sanitized_cond["value"] = sanitize_text_field(
+                        $condition["value"]
+                    ); // Basic sanitization for all types
 
-                    if (!empty($sanitized_cond['value'])) { // Don't add conditions with empty values
-                       $sanitized_loc['conditions'][] = $sanitized_cond;
+                    if (!empty($sanitized_cond["value"])) {
+                        // Don't add conditions with empty values
+                        $sanitized_loc["conditions"][] = $sanitized_cond;
                     }
                 }
             }
-             // A location must have at least one valid condition
-            if (empty($sanitized_loc['conditions'])) {
-                 continue; // Skip this location if it has no valid conditions
+            // A location must have at least one valid condition
+            if (empty($sanitized_loc["conditions"])) {
+                continue; // Skip this location if it has no valid conditions
             }
 
+            $sanitized_loc["operator"] =
+                isset($location["operator"]) &&
+                in_array($location["operator"], $allowed_location_operators)
+                    ? sanitize_text_field($location["operator"])
+                    : "OR";
+            $sanitized_loc["pageTargetingType"] =
+                isset($location["pageTargetingType"]) &&
+                in_array(
+                    $location["pageTargetingType"],
+                    $allowed_targeting_types
+                )
+                    ? sanitize_key($location["pageTargetingType"])
+                    : "all";
+            $sanitized_loc["redirectUrl"] = isset($location["redirectUrl"])
+                ? esc_url_raw($location["redirectUrl"])
+                : "";
 
-            $sanitized_loc['operator'] = isset($location['operator']) && in_array($location['operator'], $allowed_location_operators) ? sanitize_key($location['operator']) : 'OR';
-            $sanitized_loc['pageTargetingType'] = isset($location['pageTargetingType']) && in_array($location['pageTargetingType'], $allowed_targeting_types) ? sanitize_key($location['pageTargetingType']) : 'all';
-            $sanitized_loc['redirectUrl'] = isset($location['redirectUrl']) ? esc_url_raw($location['redirectUrl']) : '';
+            $sanitized_loc["redirectMappings"] = [];
+            if (
+                isset($location["redirectMappings"]) &&
+                is_array($location["redirectMappings"])
+            ) {
+                foreach ($location["redirectMappings"] as $mapping) {
+                    if (
+                        !is_array($mapping) ||
+                        empty($mapping["fromUrl"]) ||
+                        empty($mapping["toUrl"])
+                    ) {
+                        continue;
+                    }
 
-            $sanitized_loc['redirectMappings'] = [];
-            if (isset($location['redirectMappings']) && is_array($location['redirectMappings'])) {
-                foreach ($location['redirectMappings'] as $mapping) {
-                     if (!is_array($mapping) || empty($mapping['fromUrl']) || empty($mapping['toUrl'])) continue;
-
-                     $sanitized_map = [];
-                     $sanitized_map['id'] = isset($mapping['id']) ? sanitize_key($mapping['id']) : uniqid('map_');
-                     // Allow relative paths for 'fromUrl', but sanitize
-                     $sanitized_map['fromUrl'] = sanitize_text_field($mapping['fromUrl']);
-                     $sanitized_map['toUrl'] = esc_url_raw($mapping['toUrl']);
-                     $sanitized_loc['redirectMappings'][] = $sanitized_map;
+                    $sanitized_map = [];
+                    $sanitized_map["id"] = isset($mapping["id"])
+                        ? sanitize_key($mapping["id"])
+                        : uniqid("map_");
+                    // Allow relative paths for 'fromUrl', but sanitize
+                    $sanitized_map["fromUrl"] = sanitize_text_field(
+                        $mapping["fromUrl"]
+                    );
+                    $sanitized_map["toUrl"] = esc_url_raw($mapping["toUrl"]);
+                    $sanitized_loc["redirectMappings"][] = $sanitized_map;
                 }
             }
 
-            $sanitized_loc['exclusions'] = [];
-             if (isset($location['exclusions']) && is_array($location['exclusions'])) {
-                foreach ($location['exclusions'] as $exclusion) {
-                     if (!is_array($exclusion) || empty($exclusion['type']) || !isset($exclusion['value'])) continue;
+            $sanitized_loc["exclusions"] = [];
+            if (
+                isset($location["exclusions"]) &&
+                is_array($location["exclusions"])
+            ) {
+                foreach ($location["exclusions"] as $exclusion) {
+                    if (
+                        !is_array($exclusion) ||
+                        empty($exclusion["type"]) ||
+                        !isset($exclusion["value"])
+                    ) {
+                        continue;
+                    }
 
-                     $sanitized_excl = [];
-                     $sanitized_excl['id'] = isset($exclusion['id']) ? sanitize_key($exclusion['id']) : uniqid('excl_');
-                     $sanitized_excl['type'] = in_array($exclusion['type'], $allowed_exclusion_types) ? sanitize_key($exclusion['type']) : 'url_equals';
-                     $sanitized_excl['value'] = sanitize_text_field($exclusion['value']);
+                    $sanitized_excl = [];
+                    $sanitized_excl["id"] = isset($exclusion["id"])
+                        ? sanitize_key($exclusion["id"])
+                        : uniqid("excl_");
+                    $sanitized_excl["type"] = in_array(
+                        $exclusion["type"],
+                        $allowed_exclusion_types
+                    )
+                        ? sanitize_key($exclusion["type"])
+                        : "url_equals";
+                    $sanitized_excl["value"] = sanitize_text_field(
+                        $exclusion["value"]
+                    );
 
-                     if (!empty($sanitized_excl['value'])) { // Don't add exclusions with empty values
-                        $sanitized_loc['exclusions'][] = $sanitized_excl;
-                     }
+                    if (!empty($sanitized_excl["value"])) {
+                        // Don't add exclusions with empty values
+                        $sanitized_loc["exclusions"][] = $sanitized_excl;
+                    }
                 }
             }
 
-            $sanitized_loc['passPath'] = isset($location['passPath']) ? (bool) $location['passPath'] : true;
-            $sanitized_loc['passQuery'] = isset($location['passQuery']) ? (bool) $location['passQuery'] : true;
+            $sanitized_loc["passPath"] = isset($location["passPath"])
+                ? (bool) $location["passPath"]
+                : true;
+            $sanitized_loc["passQuery"] = isset($location["passQuery"])
+                ? (bool) $location["passQuery"]
+                : true;
 
             // Validate cross-field rules after sanitizing individual fields
-            if ($sanitized_loc['pageTargetingType'] === 'all' && empty($sanitized_loc['redirectUrl'])) {
-                 continue; // Skip location if 'all' pages but no redirect URL
+            if (
+                $sanitized_loc["pageTargetingType"] === "all" &&
+                empty($sanitized_loc["redirectUrl"])
+            ) {
+                continue; // Skip location if 'all' pages but no redirect URL
             }
-            if ($sanitized_loc['pageTargetingType'] === 'specific' && empty($sanitized_loc['redirectMappings'])) {
-                 continue; // Skip location if 'specific' pages but no mappings
+            if (
+                $sanitized_loc["pageTargetingType"] === "specific" &&
+                empty($sanitized_loc["redirectMappings"])
+            ) {
+                continue; // Skip location if 'specific' pages but no mappings
             }
 
-
-            $sanitized['locations'][] = $sanitized_loc;
+            $sanitized["locations"][] = $sanitized_loc;
         }
     }
 
-     // A redirection must have at least one valid location
-    if (empty($sanitized['locations'])) {
+    // A redirection must have at least one valid location
+    if (empty($sanitized["locations"])) {
         return null; // Indicate this redirection is invalid
     }
 
-
     return $sanitized;
 }
-
 
 /**
  * Sanitizes an array of redirection objects.
@@ -198,14 +290,14 @@ function mgeo_sanitize_redirections($redirections_input)
     $sanitized_redirections = [];
     foreach ($redirections_input as $redirection) {
         $sanitized = mgeo_sanitize_single_redirection($redirection);
-        if ($sanitized !== null) { // Only add valid, sanitized redirections
+        if ($sanitized !== null) {
+            // Only add valid, sanitized redirections
             $sanitized_redirections[] = $sanitized;
         }
     }
 
     return $sanitized_redirections;
 }
-
 
 /**
  * Handle client-side redirection API requests
@@ -262,7 +354,8 @@ function mgeo_create_redirection_api($request)
     // Sanitize the incoming data first
     $new_redirection_data = mgeo_sanitize_single_redirection($raw_data);
 
-    if ($new_redirection_data === null) { // Check if sanitization deemed it invalid
+    if ($new_redirection_data === null) {
+        // Check if sanitization deemed it invalid
         return new WP_REST_Response(
             [
                 "success" => false,
@@ -274,35 +367,6 @@ function mgeo_create_redirection_api($request)
 
     // Assign a unique ID to the redirection itself
     $new_redirection_data["id"] = uniqid("red_");
-
-    // Ensure all locations within the new redirection have an ID (backend fallback)
-    if (isset($new_redirection_data["locations"]) && is_array($new_redirection_data["locations"])) {
-        foreach ($new_redirection_data["locations"] as &$location) {
-            if (empty($location["id"])) {
-                $location["id"] = uniqid("loc_");
-            }
-            // Ensure nested mappings have IDs
-            if (isset($location["redirectMappings"]) && is_array($location["redirectMappings"])) {
-                foreach ($location["redirectMappings"] as &$mapping) {
-                    if (empty($mapping["id"])) {
-                        $mapping["id"] = uniqid("map_");
-                    }
-                }
-                unset($mapping); // Unset reference
-            }
-            // Ensure nested exclusions have IDs
-            if (isset($location["exclusions"]) && is_array($location["exclusions"])) {
-                foreach ($location["exclusions"] as &$exclusion) {
-                    if (empty($exclusion["id"])) {
-                        $exclusion["id"] = uniqid("excl_");
-                    }
-                }
-                unset($exclusion); // Unset reference
-            }
-        }
-        unset($location); // Unset reference to the last element
-    }
-
 
     $redirections = mgeo_get_redirections(); // Get current (already sanitized) redirections
     $redirections[] = $new_redirection_data; // Add the newly sanitized redirection
@@ -368,7 +432,16 @@ function mgeo_update_redirection_api($request)
         );
     }
 
-    // Replace the old redirection with the updated data
+    // If the update didn't update anything `update_option` would return false,
+    // which could make it look like the update failed. Therefore, if we're not
+    // updating anything, just return with a positive response.
+    if ($redirections[$found_index] == $updated_data) {
+        return new WP_REST_Response([
+            "success" => true,
+            "redirection" => $updated_data,
+        ]);
+    }
+
     // Replace the old redirection with the sanitized data
     $redirections[$found_index] = $updated_data;
 
