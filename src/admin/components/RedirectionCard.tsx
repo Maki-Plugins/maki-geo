@@ -238,6 +238,7 @@ export function RedirectionCard({
             </div>
             <div className="flex items-center gap-2">
               <button
+                type="button" // Add type="button" here
                 className="btn btn-ghost btn-square btn-sm"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click
