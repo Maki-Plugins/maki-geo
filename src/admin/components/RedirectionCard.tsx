@@ -327,14 +327,18 @@ export function RedirectionCard({
           )}
           <button
             type="submit"
-            className={`btn btn-primary ${isSaving ? "loading" : ""}`} // Add loading class
+            className="btn btn-primary" // Remove loading class from button itself
             disabled={isSaving} // Disable button when saving
           >
-            {isSaving
-              ? "Saving..."
-              : isNew
-                ? "Create Redirection"
-                : "Update Redirection"}
+            {isSaving ? (
+              <>
+                <span className="loading loading-spinner"></span>Saving...
+              </>
+            ) : isNew ? (
+              "Create Redirection"
+            ) : (
+              "Update Redirection"
+            )}
           </button>
         </div>
       </form>
