@@ -21,7 +21,8 @@ import { LocationCard } from "./LocationCard"; // Import the new component
 // Types (WizardStep removed)
 
 interface RedirectionCardProps {
-  onComplete: (redirection: RedirectionFormData) => void; // Use validated form data type
+  // Updated prop type to expect a Promise
+  onComplete: (redirection: RedirectionFormData) => Promise<any>;
   isNew?: boolean;
   initialData?: Redirection; // Keep initialData type as is from WP
   isSaving: boolean; // Add prop to indicate saving state
@@ -102,6 +103,11 @@ export function RedirectionCard({
   );
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null); // State for general form error
+  // Add local state for the save message within the card
+  const [cardSaveMessage, setCardSaveMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  } | null>(null);
 
   // --- Functions ---
   // Default location structure for appending new locations
@@ -159,13 +165,34 @@ export function RedirectionCard({
   }
 
   // --- Form Submission ---
+  // Modified onSubmit to handle the promise from onComplete
   const onSubmit = (data: RedirectionFormData) => {
+    setCardSaveMessage(null); // Clear previous message
+    setFormErrorMessage(null); // Clear validation error message
     console.log("Form Data Submitted:", data); // For debugging
-    // Call the original onComplete with the validated data
-    onComplete(data);
+
+    // Call onComplete and handle the returned promise
+    onComplete(data)
+      .then((response) => {
+        // Determine success message based on context (create/update)
+        const successText = isNew
+          ? "Redirection created successfully!"
+          : `Redirection "${response?.redirection?.name || data.name}" updated successfully!`;
+        setCardSaveMessage({ text: successText, type: "success" });
+        // Optionally reset form if needed, e.g., for 'new' card, but parent handles closing it.
+        // if (isNew) methods.reset(); // Reset form after successful creation if desired
+      })
+      .catch((error) => {
+        console.error("Save operation failed:", error);
+        setCardSaveMessage({
+          text: `Save failed: ${error.message || "Unknown error"}`,
+          type: "error",
+        });
+      });
   };
 
   const onInvalid = (errors: any) => {
+    setCardSaveMessage(null); // Clear save message if validation fails
     console.error("Form validation failed:", errors);
     setFormErrorMessage("Please correct the errors highlighted above.");
     // Focus the first field with an error
@@ -340,6 +367,18 @@ export function RedirectionCard({
             methods.formState.isSubmitted && (
               <p className="text-error text-sm">{formErrorMessage}</p>
             )}
+          {/* Display local card save message */}
+          {cardSaveMessage && (
+            <p
+              className={`text-sm mt-1 ${
+                cardSaveMessage.type === "success"
+                  ? "text-green-600"
+                  : "text-error"
+              }`}
+            >
+              {cardSaveMessage.text}
+            </p>
+          )}
           <button
             type="submit"
             className="btn btn-primary" // Remove loading class from button itself

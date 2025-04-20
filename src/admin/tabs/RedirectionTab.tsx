@@ -42,16 +42,8 @@ export function RedirectionTab(): JSX.Element {
     // Remove temporary frontend ID before sending
     const { id, ...dataToSend } = newRedirectionData;
 
-    // Return the promise from apiFetch
+    // Return the promise from apiFetch, chaining the handlers
     return apiFetch({
-        path: "maki-geo/v1/redirections",
-        method: "POST",
-        data: dataToSend, // Send data without the temporary ID
-      });
-
-      if (response && response.success && response.redirection) {
-        // Add the new redirection (with server-assigned ID) to the state
-        setRedirections([...redirections, response.redirection]);
       path: "maki-geo/v1/redirections",
       method: "POST",
       data: dataToSend, // Send data without the temporary ID
