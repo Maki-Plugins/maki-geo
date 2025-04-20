@@ -47,9 +47,11 @@ function mgeo_register_settings()
         "show_in_rest" => true,
     ]);
 
+    // Sanitization is now handled manually in the custom API endpoints
     $registry->register_setting("mgeo_redirections", [
-        "sanitize_callback" => "mgeo_sanitize_redirections",
+        // "sanitize_callback" => "mgeo_sanitize_redirections", // Removed
         "show_in_rest" => true,
+        // Note: 'type' => 'array' could be added for schema, but validation happens manually.
     ]);
 }
 
