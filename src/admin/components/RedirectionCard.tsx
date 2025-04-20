@@ -143,6 +143,15 @@ export function RedirectionCard({
     onComplete(data);
   }
 
+  const onInvalid = (errors: any) => {
+    console.error("Form validation failed:", errors);
+    // You could add more user-friendly error handling here,
+    // like focusing the first field with an error.
+    alert("Please check the form for errors before submitting.");
+  };
+    onComplete(data);
+  }
+
   function getLocationTitle(
     location: RedirectionLocation,
     index: number,
@@ -548,7 +557,8 @@ export function RedirectionCard({
   // No longer need separate render steps (settings/review)
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Pass the onInvalid handler to handleSubmit */}
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         {/* Top Level Fields */}
         <div className="grid grid-cols-1 gap-4">
           <div className="form-control">
