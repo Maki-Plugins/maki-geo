@@ -28,6 +28,28 @@ add_action("rest_api_init", function () {
  */
 function mgeo_get_geolocation_data()
 {
+    // --- E2E Testing Debug Mechanism ---
+    // Allow forcing a location via query parameter ONLY if MGEO_E2E_TESTING is defined and true
+    if (defined('MGEO_E2E_TESTING') && MGEO_E2E_TESTING) {
+        if (isset($_GET['force_location']) && is_string($_GET['force_location']) && !empty($_GET['force_location'])) {
+            $forced_location_key = sanitize_text_field(wp_unslash($_GET['force_location']));
+
+            $mocks = [
+                'US_CA' => ['continent' => 'North America', 'country' => 'United States', 'country_code' => 'US', 'region' => 'California', 'city' => 'Los Angeles', 'ip' => '1.2.3.4'],
+                'GB' => ['continent' => 'Europe', 'country' => 'United Kingdom', 'country_code' => 'GB', 'region' => 'England', 'city' => 'London', 'ip' => '5.6.7.8'],
+                'DE' => ['continent' => 'Europe', 'country' => 'Germany', 'country_code' => 'DE', 'region' => 'Berlin', 'city' => 'Berlin', 'ip' => '9.10.11.12'],
+                // Add more predefined mocks as needed for testing
+            ];
+
+            if (isset($mocks[$forced_location_key])) {
+                // Return the mock data directly, bypassing API call and filters below
+                return $mocks[$forced_location_key];
+            }
+        }
+    }
+    // --- End E2E Testing Debug Mechanism ---
+
+
     // Allow tests to short-circuit the process and provide mock data
     $pre_result = apply_filters('pre_mgeo_get_geolocation_data', null);
     if ($pre_result !== null) {
