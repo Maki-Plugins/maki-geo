@@ -402,6 +402,7 @@ function mgeo_create_redirection_api($request)
 function mgeo_update_redirection_api($request)
 {
     mgeo_verify_nonce();
+    wp_cache_flush(); // <-- Add cache flush here
     $id = $request->get_param("id");
     $raw_data = $request->get_json_params();
 

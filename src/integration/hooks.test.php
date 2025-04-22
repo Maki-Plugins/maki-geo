@@ -37,7 +37,7 @@ class TestHooksIntegration extends WP_UnitTestCase
         remove_filter('pre_option_mgeo_redirections', [$this, 'mock_get_redirections_non_empty']);
         remove_filter('pre_option_mgeo_redirections', '__return_empty_array');
         remove_filter('pre_mgeo_url_has_potential_redirections', '__return_true');
-        remove_filter('pre_mgeo_url_has_potential_redirections', '__return_false');
+        remove_filter('pre_mgeo_url_has_potential_redirections', '__return_false', 99); // Remove with correct priority
         remove_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
 
@@ -63,7 +63,8 @@ class TestHooksIntegration extends WP_UnitTestCase
         $this->redirect_called = true;
         $this->redirect_location = $location;
         $this->redirect_status = $status;
-        return false; // Prevent actual redirect and exit
+        // Do NOT return false here. Let the redirect proceed (test framework handles exit).
+        // return false;
     }
 
     /**
@@ -318,7 +319,8 @@ class TestHooksIntegration extends WP_UnitTestCase
         update_option('mgeo_client_server_mode', 'client');
         set_current_screen('front');
         add_filter('pre_option_mgeo_redirections', [$this, 'mock_get_redirections_non_empty']);
-        add_filter('pre_mgeo_url_has_potential_redirections', '__return_false'); // Key change: no potential match
+        // Use high priority to ensure filter applies
+        add_filter('pre_mgeo_url_has_potential_redirections', '__return_false', 99); // Key change: no potential match
         add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
         // Trigger the hook

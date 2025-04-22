@@ -631,9 +631,12 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $target_url = 'https://redirect.example.com/target';
         $_SERVER['HTTP_REFERER'] = $referer_url;
 
+        // Ensure mock location data is set for the internal call to mgeo_get_geolocation_data
+        $this->set_mock_location_data($this->get_default_mock_location());
+
         // Mock mgeo_get_redirect_url_for_request to return the target URL
         $filter_callback = function ($original_result, $url_arg) use ($referer_url, $target_url) {
-             $this->assertEquals($referer_url, $url_arg, 'mgeo_get_redirect_url_for_request called with correct URL');
+            $this->assertEquals($referer_url, $url_arg, 'mgeo_get_redirect_url_for_request called with correct URL');
             return $target_url;
         };
         add_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10, 2);
