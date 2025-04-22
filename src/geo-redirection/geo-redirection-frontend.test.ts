@@ -48,6 +48,77 @@ describe('Geo Redirection Frontend Script', () => {
     jest.resetModules();
   });
 
-  // --- Test cases will be added below ---
+  // Helper function to wait for promises to settle
+  const flushPromises = () => new Promise(setImmediate);
 
+  it('should perform redirect when API returns redirect: true', async () => {
+    const redirectUrl = 'http://new.location/path';
+    mockApiFetch.mockResolvedValue({ redirect: true, url: redirectUrl });
+
+    // Require the script to execute it
+    require('../geo-redirection-frontend');
+
+    // Wait for the apiFetch promise to resolve
+    await flushPromises();
+
+    expect(mockApiFetch).toHaveBeenCalledTimes(1);
+    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1);
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
+    expect(locationHrefSpy).toHaveBeenCalledTimes(1);
+    expect(locationHrefSpy).toHaveBeenCalledWith(redirectUrl);
+  });
+
+  it('should not redirect when API returns redirect: false', async () => {
+    mockApiFetch.mockResolvedValue({ redirect: false });
+
+    // Require the script
+    require('../geo-redirection-frontend');
+
+    // Wait for the apiFetch promise to resolve
+    await flushPromises();
+
+    expect(mockApiFetch).toHaveBeenCalledTimes(1);
+    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
+    expect(locationHrefSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call API or redirect if sessionStorage flag is set', () => {
+    // Set the flag *before* the script runs
+    mockSessionStorage.setItem('mgeo_redirected', '1');
+
+    // Require the script
+    require('../geo-redirection-frontend');
+
+    // No need to wait for promises here as apiFetch shouldn't be called
+
+    expect(mockApiFetch).not.toHaveBeenCalled();
+    expect(locationHrefSpy).not.toHaveBeenCalled();
+    // Check that setItem wasn't called *again*
+    expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1); // Only the initial call
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
+  });
+
+  it('should handle API fetch error gracefully', async () => {
+    const error = new Error('Network failed');
+    mockApiFetch.mockRejectedValue(error);
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {}); // Suppress console output during test
+
+    // Require the script
+    require('../geo-redirection-frontend');
+
+    // Wait for the apiFetch promise to reject
+    await flushPromises();
+
+    expect(mockApiFetch).toHaveBeenCalledTimes(1);
+    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Geo redirection error:', error);
+    expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
+    expect(locationHrefSpy).not.toHaveBeenCalled();
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
 });
