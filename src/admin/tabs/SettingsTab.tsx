@@ -73,8 +73,8 @@ export function SettingsTab(): JSX.Element {
         }),
       ]);
       setSaveSuccess(true);
-      // Clear success message after 3 seconds
-      setTimeout(() => setSaveSuccess(false), 3000);
+      // Clear success message after 5 seconds
+      setTimeout(() => setSaveSuccess(false), 5000);
     } catch (error) {
       console.error("Failed to save settings:", error);
       alert("Failed to save settings. Please try again.");
