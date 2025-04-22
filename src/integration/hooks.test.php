@@ -17,10 +17,9 @@ class TestHooksIntegration extends WP_UnitTestCase
         // require_once MGEO_PATH . 'src/geo-redirection/geo-redirection-backend.php'; // Assumed loaded
         // require_once MGEO_PATH . 'src/geo-redirection/geo-redirection-frontend.php'; // Assumed loaded
 
-        // Reset script queue for enqueue tests
-        wp_scripts()->queue = [];
-        wp_scripts()->registered = [];
-        wp_scripts()->done = [];
+        // Reset script queue for enqueue tests more thoroughly
+        global $wp_scripts;
+        $wp_scripts = new WP_Scripts();
     }
 
     public function tearDown(): void
@@ -45,10 +44,9 @@ class TestHooksIntegration extends WP_UnitTestCase
         // Reset admin screen
         set_current_screen(null);
 
-        // Reset script queue again just in case
-        wp_scripts()->queue = [];
-        wp_scripts()->registered = [];
-        wp_scripts()->done = [];
+        // Reset script queue again just in case (though setUp should handle it)
+        global $wp_scripts;
+        $wp_scripts = new WP_Scripts();
 
         parent::tearDown();
     }
@@ -133,13 +131,18 @@ class TestHooksIntegration extends WP_UnitTestCase
         set_current_screen('front'); // Simulate non-admin
         add_filter('wp_doing_ajax', '__return_false');
         add_filter('pre_mgeo_get_redirect_url_for_request', [$this, 'mock_redirect_url']);
-        add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']); // <-- Add this mock
+        add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
         remove_action('template_redirect', 'redirect_canonical');
+
+        // Add the redirect capture filter right before the action
+        add_filter('wp_redirect', [$this, 'capture_redirect'], 10, 2);
 
         // Trigger the hook
         do_action('template_redirect');
 
-        add_action('template_redirect', 'redirect_canonical'); // <-- Optional: Add back if needed later in test
+        // Remove the filter immediately after
+        remove_filter('wp_redirect', [$this, 'capture_redirect'], 10);
+        add_action('template_redirect', 'redirect_canonical'); // Add back canonical redirect
 
         $this->assertTrue($this->redirect_called, 'wp_redirect should have been called.');
         $this->assertEquals('https://server.redirect/path', $this->redirect_location);

@@ -473,6 +473,7 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
             ]
         ];
         update_option('mgeo_redirections', [$initial_redirection]);
+        wp_cache_flush(); // <-- Add cache flush here
 
         // Prepare update data with a different ID in the body
         $mismatched_data = $initial_redirection;
@@ -608,8 +609,9 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
         $nonce = wp_create_nonce('wp_rest');
-        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
+        $_SERVER['HTTP_X_WP_NONCE'] = $nonce; // Set server variable directly
         $response = $this->server->dispatch($request);
+        unset($_SERVER['HTTP_X_WP_NONCE']); // Clean up server variable
         $data = $response->get_data();
 
         $this->assertEquals(200, $response->get_status());
@@ -638,8 +640,9 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
         $nonce = wp_create_nonce('wp_rest');
-        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
+        $_SERVER['HTTP_X_WP_NONCE'] = $nonce; // Set server variable directly
         $response = $this->server->dispatch($request);
+        unset($_SERVER['HTTP_X_WP_NONCE']); // Clean up server variable
         $data = $response->get_data();
 
         $this->assertEquals(200, $response->get_status());
@@ -666,8 +669,9 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
         $nonce = wp_create_nonce('wp_rest');
-        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
+        $_SERVER['HTTP_X_WP_NONCE'] = $nonce; // Set server variable directly
         $response = $this->server->dispatch($request);
+        unset($_SERVER['HTTP_X_WP_NONCE']); // Clean up server variable
         $data = $response->get_data();
 
         $this->assertEquals(200, $response->get_status());
@@ -993,7 +997,8 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $input['locations'][0]['redirectMappings'] = [['fromUrl' => '/path<script>alert("bad")</script>', 'toUrl' => 'https://example.com/target']];
         $sanitized = mgeo_sanitize_single_redirection($input);
         $this->assertIsArray($sanitized);
-        $this->assertEquals('/pathalert("bad")', $sanitized['locations'][0]['redirectMappings'][0]['fromUrl']); // sanitize_text_field strips tags
+        // Update assertion: sanitize_text_field removes script content too
+        $this->assertEquals('/path', $sanitized['locations'][0]['redirectMappings'][0]['fromUrl']);
     }
 
 
