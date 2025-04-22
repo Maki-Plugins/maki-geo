@@ -278,4 +278,224 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $stored_redirections = get_option('mgeo_redirections');
         $this->assertEmpty($stored_redirections, 'Stored option should remain empty after invalid attempts.');
     }
+
+    /**
+     * Test permissions for the PUT /redirections/{id} endpoint.
+     */
+    public function test_update_redirection_api_permissions()
+    {
+        // Test with a non-admin user (subscriber)
+        wp_set_current_user($this->subscriber_user_id);
+        $request = new WP_REST_Request('PUT', '/maki-geo/v1/redirections/some_id');
+        $request->set_url_params(['id' => 'some_id']);
+        $request->set_body_params(['name' => 'Attempt by subscriber']); // Need some body data
+        $response = $this->server->dispatch($request);
+        $this->assertEquals(403, $response->get_status(), 'Subscriber should receive a 403 Forbidden status when trying to update.');
+    }
+
+    /**
+     * Test successful update of a redirection.
+     */
+    public function test_update_redirection_api_success()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Add initial redirection
+        $initial_redirection_id = 'red_test123';
+        $initial_redirection = [
+            'id' => $initial_redirection_id,
+            'isEnabled' => true,
+            'name' => 'Initial Name',
+            'locations' => [
+                [
+                    'id' => 'loc_abc',
+                    'conditions' => [['type' => 'country', 'value' => 'US', 'operator' => 'is']],
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.com/initial',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+        update_option('mgeo_redirections', [$initial_redirection]);
+
+        // Prepare updated data
+        $updated_data = $initial_redirection; // Start with initial data
+        $updated_data['name'] = 'Updated Name';
+        $updated_data['isEnabled'] = false;
+        $updated_data['locations'][0]['redirectUrl'] = 'https://example.com/updated';
+
+        $request = new WP_REST_Request('PUT', '/maki-geo/v1/redirections/' . $initial_redirection_id);
+        $request->set_url_params(['id' => $initial_redirection_id]);
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($updated_data));
+
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(200, $response->get_status(), 'Response status should be 200 OK.');
+        $this->assertTrue($data['success'], 'Response should indicate success.');
+        $this->assertArrayHasKey('redirection', $data, 'Response should contain the updated redirection.');
+        $this->assertEquals($updated_data, $data['redirection'], 'Response redirection data should match the updated data.');
+
+        // Verify option storage
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections);
+        $this->assertCount(1, $stored_redirections);
+        $this->assertEquals($updated_data, $stored_redirections[0], 'Stored redirection should match the updated data.');
+    }
+
+    /**
+     * Test updating a redirection that does not exist.
+     */
+    public function test_update_redirection_api_not_found()
+    {
+        wp_set_current_user($this->admin_user_id);
+        delete_option('mgeo_redirections'); // Ensure it's empty
+
+        $non_existent_id = 'red_nonexistent';
+        $update_data = [
+            'id' => $non_existent_id,
+            'isEnabled' => true,
+            'name' => 'Trying to update non-existent',
+            'locations' => [ /* ... valid location data ... */
+                [
+                    'id' => 'loc_xyz',
+                    'conditions' => [['type' => 'country', 'value' => 'GB', 'operator' => 'is']],
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.co.uk',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+
+        $request = new WP_REST_Request('PUT', '/maki-geo/v1/redirections/' . $non_existent_id);
+        $request->set_url_params(['id' => $non_existent_id]);
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($update_data));
+
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(404, $response->get_status(), 'Response status should be 404 Not Found.');
+        $this->assertFalse($data['success'], 'Response should indicate failure.');
+        $this->assertArrayHasKey('message', $data, 'Response should contain an error message.');
+    }
+
+    /**
+     * Test updating a redirection with invalid data.
+     */
+    public function test_update_redirection_api_invalid_data()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Add initial redirection
+        $initial_redirection_id = 'red_test456';
+        $initial_redirection = [
+            'id' => $initial_redirection_id,
+            'isEnabled' => true,
+            'name' => 'Valid Initial',
+            'locations' => [
+                [
+                    'id' => 'loc_def',
+                    'conditions' => [['type' => 'region', 'value' => 'CA-ON', 'operator' => 'is']],
+                    'operator' => 'AND',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.ca/on',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+        update_option('mgeo_redirections', [$initial_redirection]);
+
+        // Prepare invalid update data (missing 'locations')
+        $invalid_update_data = [
+            'id' => $initial_redirection_id,
+            'isEnabled' => false,
+            'name' => 'Invalid Update Attempt',
+            // 'locations' key is missing
+        ];
+
+        $request = new WP_REST_Request('PUT', '/maki-geo/v1/redirections/' . $initial_redirection_id);
+        $request->set_url_params(['id' => $initial_redirection_id]);
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($invalid_update_data));
+
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(400, $response->get_status(), 'Response status should be 400 Bad Request.');
+        $this->assertFalse($data['success'], 'Response should indicate failure.');
+        $this->assertArrayHasKey('message', $data, 'Response should contain an error message.');
+
+        // Verify option storage is unchanged
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections);
+        $this->assertCount(1, $stored_redirections);
+        $this->assertEquals($initial_redirection, $stored_redirections[0], 'Stored redirection should remain unchanged.');
+    }
+
+     /**
+     * Test updating a redirection where the ID in the route mismatches the ID in the body.
+     */
+    public function test_update_redirection_api_id_mismatch()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Add initial redirection
+        $original_id = 'red_original';
+        $initial_redirection = [
+            'id' => $original_id,
+            'isEnabled' => true,
+            'name' => 'Original ID',
+            'locations' => [
+                [
+                    'id' => 'loc_ghi',
+                    'conditions' => [['type' => 'city', 'value' => 'Paris', 'operator' => 'is']],
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.fr',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+        update_option('mgeo_redirections', [$initial_redirection]);
+
+        // Prepare update data with a different ID in the body
+        $mismatched_data = $initial_redirection;
+        $mismatched_data['id'] = 'red_different'; // ID in body is different
+        $mismatched_data['name'] = 'Mismatched ID Attempt';
+
+        // Request targets the original ID in the route
+        $request = new WP_REST_Request('PUT', '/maki-geo/v1/redirections/' . $original_id);
+        $request->set_url_params(['id' => $original_id]);
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($mismatched_data)); // Body contains 'red_different'
+
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(400, $response->get_status(), 'Response status should be 400 Bad Request due to ID mismatch.');
+        $this->assertFalse($data['success'], 'Response should indicate failure.');
+        $this->assertArrayHasKey('message', $data, 'Response should contain an error message about ID mismatch.');
+
+        // Verify option storage is unchanged
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections);
+        $this->assertCount(1, $stored_redirections);
+        $this->assertEquals($initial_redirection, $stored_redirections[0], 'Stored redirection should remain unchanged after ID mismatch attempt.');
+    }
 }
