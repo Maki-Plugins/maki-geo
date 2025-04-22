@@ -42,3 +42,5 @@ jobs:
         run: npm run env start
       - name: PHP tests
         run: npm run php-test
+      - name: Playwright tests
+        run: npm run playwright-test
