@@ -154,4 +154,128 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $this->assertEquals(200, $response->get_status());
         $this->assertEquals([], $data, 'Response data should be an empty array when no redirections exist.');
     }
+
+    /**
+     * Test permissions for the POST /redirections endpoint.
+     */
+    public function test_create_redirection_api_permissions()
+    {
+        // Test with a non-admin user (subscriber)
+        wp_set_current_user($this->subscriber_user_id);
+        $request = new WP_REST_Request('POST', '/maki-geo/v1/redirections');
+        $request->set_body_params(['name' => 'Attempt by subscriber']); // Need some body data
+        $response = $this->server->dispatch($request);
+        $this->assertEquals(403, $response->get_status(), 'Subscriber should receive a 403 Forbidden status when trying to create.');
+    }
+
+    /**
+     * Test successful creation of a redirection.
+     */
+    public function test_create_redirection_api_success()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        $new_redirection_data = [
+            // No 'id' provided here, should be generated
+            'isEnabled' => true,
+            'name' => 'New Test Redirect',
+            'locations' => [
+                [
+                    // No 'id' provided here, should be generated
+                    'conditions' => [['type' => 'country', 'value' => 'CA', 'operator' => 'is']],
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.ca/welcome',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+
+        $request = new WP_REST_Request('POST', '/maki-geo/v1/redirections');
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($new_redirection_data)); // Use set_body for JSON
+
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(201, $response->get_status(), 'Response status should be 201 Created.');
+        $this->assertTrue($data['success'], 'Response should indicate success.');
+        $this->assertArrayHasKey('redirection', $data, 'Response should contain the created redirection.');
+
+        $created_redirection = $data['redirection'];
+        $this->assertIsString($created_redirection['id'], 'Created redirection should have an ID.');
+        $this->assertStringStartsWith('red_', $created_redirection['id'], 'Redirection ID should start with "red_".');
+        $this->assertEquals($new_redirection_data['name'], $created_redirection['name'], 'Redirection name should match input.');
+        $this->assertEquals($new_redirection_data['isEnabled'], $created_redirection['isEnabled'], 'Redirection isEnabled should match input.');
+        $this->assertCount(1, $created_redirection['locations'], 'Created redirection should have one location.');
+        $this->assertStringStartsWith('loc_', $created_redirection['locations'][0]['id'], 'Location ID should start with "loc_".');
+        $this->assertEquals($new_redirection_data['locations'][0]['conditions'], $created_redirection['locations'][0]['conditions'], 'Location conditions should match input.');
+
+        // Verify option storage
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections, 'Stored option should be an array.');
+        $this->assertCount(1, $stored_redirections, 'Stored option should contain one redirection.');
+        // Compare the stored redirection with the one returned in the response
+        $this->assertEquals($created_redirection, $stored_redirections[0], 'Stored redirection should match the response redirection.');
+    }
+
+    /**
+     * Test creation attempt with invalid data.
+     */
+    public function test_create_redirection_api_invalid_data()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Invalid data: Missing 'locations' array entirely
+        $invalid_data_1 = [
+            'isEnabled' => true,
+            'name' => 'Invalid Redirect - No Locations',
+        ];
+
+        $request1 = new WP_REST_Request('POST', '/maki-geo/v1/redirections');
+        $request1->set_header('Content-Type', 'application/json');
+        $request1->set_body(wp_json_encode($invalid_data_1));
+        $response1 = $this->server->dispatch($request1);
+        $data1 = $response1->get_data();
+
+        $this->assertEquals(400, $response1->get_status(), 'Response status should be 400 Bad Request for missing locations.');
+        $this->assertFalse($data1['success'], 'Response should indicate failure for missing locations.');
+        $this->assertArrayHasKey('message', $data1, 'Response should contain an error message for missing locations.');
+
+        // Invalid data: Location with empty 'conditions' array
+        $invalid_data_2 = [
+            'isEnabled' => true,
+            'name' => 'Invalid Redirect - Empty Conditions',
+            'locations' => [
+                [
+                    'conditions' => [], // Invalid - must have conditions
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.com/fail',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+
+        $request2 = new WP_REST_Request('POST', '/maki-geo/v1/redirections');
+        $request2->set_header('Content-Type', 'application/json');
+        $request2->set_body(wp_json_encode($invalid_data_2));
+        $response2 = $this->server->dispatch($request2);
+        $data2 = $response2->get_data();
+
+        $this->assertEquals(400, $response2->get_status(), 'Response status should be 400 Bad Request for empty conditions.');
+        $this->assertFalse($data2['success'], 'Response should indicate failure for empty conditions.');
+        $this->assertArrayHasKey('message', $data2, 'Response should contain an error message for empty conditions.');
+
+
+        // Verify option storage is still empty
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertEmpty($stored_redirections, 'Stored option should remain empty after invalid attempts.');
+    }
 }
