@@ -78,6 +78,174 @@ test.describe("Frontend Geo Redirection (Client Mode)", () => {
      await deleteAllRedirections(page);
   });
 
-  // --- Test cases will be added below ---
+  // --- Test cases ---
 
+  test("should redirect when API returns redirect: true", async ({ page }) => {
+    const targetUrl = "http://localhost:8888/client-redirect-target/";
+    const apiUrl = "**/maki-geo/v1/redirection";
+
+    // Mock the API response
+    await page.route(apiUrl, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        json: { redirect: true, url: targetUrl },
+      });
+    });
+
+    // Visit a frontend page
+    await page.goto("/sample-page/");
+
+    // Wait for the URL to change
+    await page.waitForURL(targetUrl);
+
+    // Assert the final URL
+    expect(page.url()).toBe(targetUrl);
+
+    // Assert sessionStorage flag
+    const sessionStorageFlag = await page.evaluate(() =>
+      window.sessionStorage.getItem("mgeo_redirected"),
+    );
+    expect(sessionStorageFlag).toBe("1");
+
+    // Clean up route handler
+    await page.unroute(apiUrl);
+  });
+
+  test("should not redirect when API returns redirect: false", async ({ page }) => {
+    const apiUrl = "**/maki-geo/v1/redirection";
+    const originalUrl = "http://localhost:8888/sample-page/";
+
+    // Mock the API response
+    await page.route(apiUrl, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        json: { redirect: false },
+      });
+    });
+
+    // Visit a frontend page
+    await page.goto("/sample-page/");
+
+    // Wait a bit to ensure no redirect happens
+    await page.waitForTimeout(500);
+
+    // Assert the URL hasn't changed
+    expect(page.url()).toBe(originalUrl);
+
+    // Assert sessionStorage flag is not set
+    const sessionStorageFlag = await page.evaluate(() =>
+      window.sessionStorage.getItem("mgeo_redirected"),
+    );
+    expect(sessionStorageFlag).toBeNull();
+
+    // Clean up route handler
+    await page.unroute(apiUrl);
+  });
+
+  test("should not redirect if sessionStorage flag is set", async ({ page }) => {
+    const apiUrl = "**/maki-geo/v1/redirection";
+    const originalUrl = "http://localhost:8888/sample-page/";
+    let apiCalled = false;
+
+    // Set sessionStorage flag before navigation
+    await page.evaluate(() =>
+      window.sessionStorage.setItem("mgeo_redirected", "1"),
+    );
+
+    // Mock the API route to fail the test if called
+    await page.route(apiUrl, async (route) => {
+      apiCalled = true;
+      await route.abort(); // Abort the request
+    });
+
+    // Visit a frontend page
+    await page.goto("/sample-page/");
+
+    // Wait a bit
+    await page.waitForTimeout(500);
+
+    // Assert the URL hasn't changed
+    expect(page.url()).toBe(originalUrl);
+
+    // Assert API was not called
+    expect(apiCalled).toBe(false);
+
+    // Clean up route handler
+    await page.unroute(apiUrl);
+  });
+
+  test("should handle API error gracefully", async ({ page }) => {
+    const apiUrl = "**/maki-geo/v1/redirection";
+    const originalUrl = "http://localhost:8888/sample-page/";
+    let consoleErrors: string[] = [];
+
+    // Listen for console errors
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    // Mock the API route to fail
+    await page.route(apiUrl, async (route) => {
+      await route.abort();
+    });
+
+    // Visit a frontend page
+    await page.goto("/sample-page/");
+
+    // Wait a bit
+    await page.waitForTimeout(500);
+
+    // Assert the URL hasn't changed
+    expect(page.url()).toBe(originalUrl);
+
+    // Assert sessionStorage flag is not set
+    const sessionStorageFlag = await page.evaluate(() =>
+      window.sessionStorage.getItem("mgeo_redirected"),
+    );
+    expect(sessionStorageFlag).toBeNull();
+
+    // Assert console error message
+    expect(consoleErrors.some((msg) => msg.includes("Geo redirection error"))).toBe(true);
+
+    // Clean up route handler and console listener
+    await page.unroute(apiUrl);
+    page.off("console", () => {});
+  });
+
+   test("should not redirect on admin pages", async ({ page }) => {
+    const apiUrl = "**/maki-geo/v1/redirection";
+    const adminUrl = "http://localhost:8888/wp-admin/";
+    let apiCalled = false;
+
+    // Mock the API route to see if it gets called
+    await page.route(apiUrl, async (route) => {
+      apiCalled = true;
+      // Fulfill with a redirect just in case the script *did* run
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        json: { redirect: true, url: "http://localhost:8888/should-not-go-here/" },
+      });
+    });
+
+    // Visit an admin page (ensure logged in if necessary, though script shouldn't enqueue anyway)
+    await logIn({ page }); // Log in first
+    await page.goto(adminUrl);
+
+    // Wait a bit
+    await page.waitForTimeout(500);
+
+    // Assert the URL is still the admin URL (or contains it)
+    expect(page.url()).toContain(adminUrl);
+
+    // Assert API was not called (because script shouldn't be enqueued/run)
+    expect(apiCalled).toBe(false);
+
+    // Clean up route handler
+    await page.unroute(apiUrl);
+  });
 });
