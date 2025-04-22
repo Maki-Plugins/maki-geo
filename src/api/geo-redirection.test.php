@@ -689,4 +689,356 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         unset($_SERVER['HTTP_REFERER']);
         // No need to add the filter back here, tearDown handles it.
     }
+
+    // --- Tests for Sanitization Functions ---
+
+    /**
+     * Helper to get a basic valid redirection structure.
+     */
+    private function get_valid_redirection_data_base() {
+        return [
+            'isEnabled' => true,
+            'name' => 'Valid Redirect',
+            'locations' => [
+                [
+                    'conditions' => [['type' => 'country', 'value' => 'US', 'operator' => 'is']],
+                    'operator' => 'OR',
+                    'pageTargetingType' => 'all',
+                    'redirectUrl' => 'https://example.com/us',
+                    'redirectMappings' => [],
+                    'exclusions' => [],
+                    'passPath' => true,
+                    'passQuery' => true,
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Test mgeo_sanitize_single_redirection with valid data.
+     */
+    public function test_sanitize_single_redirection_valid()
+    {
+        $valid_input = $this->get_valid_redirection_data_base();
+        $sanitized = mgeo_sanitize_single_redirection($valid_input);
+
+        $this->assertIsArray($sanitized);
+        $this->assertStringStartsWith('red_', $sanitized['id']);
+        $this->assertEquals('Valid Redirect', $sanitized['name']);
+        $this->assertTrue($sanitized['isEnabled']);
+        $this->assertCount(1, $sanitized['locations']);
+
+        $location = $sanitized['locations'][0];
+        $this->assertStringStartsWith('loc_', $location['id']);
+        $this->assertEquals('OR', $location['operator']);
+        $this->assertEquals('all', $location['pageTargetingType']);
+        $this->assertEquals('https://example.com/us', $location['redirectUrl']);
+        $this->assertCount(1, $location['conditions']);
+        $this->assertEquals('country', $location['conditions'][0]['type']);
+        $this->assertEquals('US', $location['conditions'][0]['value']);
+        $this->assertEquals('is', $location['conditions'][0]['operator']);
+        $this->assertEmpty($location['redirectMappings']);
+        $this->assertEmpty($location['exclusions']);
+        $this->assertTrue($location['passPath']);
+        $this->assertTrue($location['passQuery']);
+
+        // Test with specific IDs provided
+        $valid_input_with_ids = [
+            'id' => 'red_myid',
+            'isEnabled' => false,
+            'name' => 'Specific ID Redirect',
+            'locations' => [
+                [
+                    'id' => 'loc_myloc',
+                    'conditions' => [['type' => 'city', 'value' => 'Tokyo', 'operator' => 'is not']],
+                    'operator' => 'AND',
+                    'pageTargetingType' => 'specific',
+                    'redirectUrl' => '', // Ignored for specific
+                    'redirectMappings' => [['id' => 'map_mymap', 'fromUrl' => '/jp', 'toUrl' => 'https://example.jp/tokyo']],
+                    'exclusions' => [['id' => 'excl_myexcl', 'type' => 'url_contains', 'value' => 'admin']],
+                    'passPath' => false,
+                    'passQuery' => false,
+                ]
+            ]
+        ];
+        $sanitized_with_ids = mgeo_sanitize_single_redirection($valid_input_with_ids);
+        $this->assertEquals('red_myid', $sanitized_with_ids['id']);
+        $this->assertEquals('loc_myloc', $sanitized_with_ids['locations'][0]['id']);
+        $this->assertEquals('map_mymap', $sanitized_with_ids['locations'][0]['redirectMappings'][0]['id']);
+        $this->assertEquals('excl_myexcl', $sanitized_with_ids['locations'][0]['exclusions'][0]['id']);
+        $this->assertFalse($sanitized_with_ids['isEnabled']);
+        $this->assertEquals('AND', $sanitized_with_ids['locations'][0]['operator']);
+        $this->assertEquals('specific', $sanitized_with_ids['locations'][0]['pageTargetingType']);
+        $this->assertFalse($sanitized_with_ids['locations'][0]['passPath']);
+        $this->assertFalse($sanitized_with_ids['locations'][0]['passQuery']);
+    }
+
+    /**
+     * Test mgeo_sanitize_single_redirection with invalid data types.
+     */
+    public function test_sanitize_single_redirection_invalid_types()
+    {
+        // Top level not an array
+        $this->assertNull(mgeo_sanitize_single_redirection("not an array"));
+
+        // isEnabled as string
+        $input = $this->get_valid_redirection_data_base();
+        $input['isEnabled'] = 'true_string';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertTrue($sanitized['isEnabled']); // Should cast to true
+
+        $input['isEnabled'] = 'false_string';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertTrue($sanitized['isEnabled']); // Non-empty string casts to true
+
+        $input['isEnabled'] = '';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertFalse($sanitized['isEnabled']); // Empty string casts to false
+
+        // locations not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'] = "not an array";
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if locations is not an array");
+
+        // location item not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'] = ["not an array"];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if a location item is not an array");
+
+        // conditions not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'] = "not an array";
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if conditions is not an array");
+
+        // condition item not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'] = ["not an array"];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if a condition item is not an array");
+
+        // redirectMappings not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific'; // Need specific for mappings
+        $input['locations'][0]['redirectMappings'] = "not an array";
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        // This case makes the location invalid due to cross-field rule (specific but no valid mappings)
+        $this->assertNull($sanitized, "Redirection should be invalid if redirectMappings is not an array");
+
+        // exclusions not an array
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['exclusions'] = "not an array";
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized); // Exclusions being invalid doesn't invalidate the whole rule
+        $this->assertEmpty($sanitized['locations'][0]['exclusions']);
+    }
+
+    /**
+     * Test mgeo_sanitize_single_redirection with invalid enum values.
+     */
+    public function test_sanitize_single_redirection_invalid_enums()
+    {
+        // Invalid condition type
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'][0]['type'] = 'zipcode';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals('country', $sanitized['locations'][0]['conditions'][0]['type']); // Defaults to country
+
+        // Invalid condition operator
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'][0]['operator'] = 'contains';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals('is', $sanitized['locations'][0]['conditions'][0]['operator']); // Defaults to is
+
+        // Invalid location operator
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['operator'] = 'XOR';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals('OR', $sanitized['locations'][0]['operator']); // Defaults to OR
+
+        // Invalid pageTargetingType
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'homepage';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals('all', $sanitized['locations'][0]['pageTargetingType']); // Defaults to all
+
+        // Invalid exclusion type
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['exclusions'] = [['type' => 'cookie_present', 'value' => 'test']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals('url_equals', $sanitized['locations'][0]['exclusions'][0]['type']); // Defaults to url_equals
+    }
+
+    /**
+     * Test mgeo_sanitize_single_redirection with empty values for conditions, mappings, exclusions.
+     */
+    public function test_sanitize_single_redirection_empty_values()
+    {
+        // Empty condition value
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'][0]['value'] = '';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if the only condition has an empty value");
+
+        // Add a valid condition alongside an empty one
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['conditions'][] = ['type' => 'region', 'value' => '', 'operator' => 'is'];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized);
+        $this->assertCount(1, $sanitized['locations'][0]['conditions'], "Condition with empty value should be removed");
+        $this->assertEquals('US', $sanitized['locations'][0]['conditions'][0]['value']);
+
+        // Empty mapping fromUrl
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '', 'toUrl' => 'https://example.com/a']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if the only mapping has empty fromUrl");
+
+        // Empty mapping toUrl
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '/a', 'toUrl' => '']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if the only mapping has empty toUrl");
+
+        // Empty exclusion value
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['exclusions'] = [['type' => 'url_contains', 'value' => '']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized);
+        $this->assertEmpty($sanitized['locations'][0]['exclusions'], "Exclusion with empty value should be removed");
+    }
+
+    /**
+     * Test mgeo_sanitize_single_redirection cross-field validation rules.
+     */
+    public function test_sanitize_single_redirection_cross_field_rules()
+    {
+        // pageTargetingType 'all' requires redirectUrl
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'all';
+        $input['locations'][0]['redirectUrl'] = ''; // Invalid state
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if type is 'all' but redirectUrl is empty");
+
+        // pageTargetingType 'specific' requires redirectMappings
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectUrl'] = 'https://should.be.ignored';
+        $input['locations'][0]['redirectMappings'] = []; // Invalid state
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertNull($sanitized, "Redirection should be invalid if type is 'specific' but redirectMappings is empty");
+
+        // Valid 'specific' case
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectUrl'] = '';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '/from', 'toUrl' => 'https://to.example.com']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized);
+        $this->assertEquals('specific', $sanitized['locations'][0]['pageTargetingType']);
+        $this->assertCount(1, $sanitized['locations'][0]['redirectMappings']);
+    }
+
+    /**
+     * Test URL sanitization within mgeo_sanitize_single_redirection.
+     */
+    public function test_sanitize_single_redirection_url_sanitization()
+    {
+        // redirectUrl with script
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['redirectUrl'] = 'javascript:alert("XSS")';
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEmpty($sanitized['locations'][0]['redirectUrl'], "Javascript URL should be removed by esc_url_raw");
+        // This makes the rule invalid because pageTargetingType 'all' needs a URL
+        $this->assertNull($sanitized, "Redirection should be invalid if redirectUrl is sanitized away for 'all' type");
+
+
+        // redirectUrl with valid but complex URL
+        $input = $this->get_valid_redirection_data_base();
+        $complex_url = 'https://user:pass@example.com:8080/path/to/page?query=val&q2=v2#fragment';
+        $input['locations'][0]['redirectUrl'] = $complex_url;
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertEquals($complex_url, $sanitized['locations'][0]['redirectUrl'], "Valid complex URL should pass esc_url_raw");
+
+        // mapping toUrl with script
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectUrl'] = '';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '/safe', 'toUrl' => 'javascript:alert("XSS")']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        // The mapping itself becomes invalid because toUrl is empty after sanitization
+        $this->assertNull($sanitized, "Redirection should be invalid if mapping toUrl is sanitized away");
+
+        // mapping fromUrl (relative path, should be kept by sanitize_text_field)
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectUrl'] = '';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '../relative/path', 'toUrl' => 'https://example.com/target']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized);
+        $this->assertEquals('../relative/path', $sanitized['locations'][0]['redirectMappings'][0]['fromUrl']);
+
+        // mapping fromUrl with html (should be stripped by sanitize_text_field)
+        $input = $this->get_valid_redirection_data_base();
+        $input['locations'][0]['pageTargetingType'] = 'specific';
+        $input['locations'][0]['redirectUrl'] = '';
+        $input['locations'][0]['redirectMappings'] = [['fromUrl' => '/path<script>alert("bad")</script>', 'toUrl' => 'https://example.com/target']];
+        $sanitized = mgeo_sanitize_single_redirection($input);
+        $this->assertIsArray($sanitized);
+        $this->assertEquals('/pathalert("bad")', $sanitized['locations'][0]['redirectMappings'][0]['fromUrl']); // sanitize_text_field strips tags
+    }
+
+
+    /**
+     * Test mgeo_sanitize_redirections with a mix of valid and invalid inputs.
+     */
+    public function test_sanitize_redirections_valid_and_invalid()
+    {
+        $valid_redir = $this->get_valid_redirection_data_base();
+        $valid_redir['id'] = 'red_valid'; // Give it an ID for identification
+
+        $invalid_redir_1 = $this->get_valid_redirection_data_base();
+        $invalid_redir_1['locations'][0]['conditions'][0]['value'] = ''; // Invalid condition
+
+        $invalid_redir_2 = $this->get_valid_redirection_data_base();
+        $invalid_redir_2['locations'] = "not an array"; // Invalid structure
+
+        $input_array = [
+            $invalid_redir_1,
+            $valid_redir,
+            $invalid_redir_2,
+        ];
+
+        $sanitized_array = mgeo_sanitize_redirections($input_array);
+
+        $this->assertIsArray($sanitized_array);
+        $this->assertCount(1, $sanitized_array, "Only the valid redirection should remain");
+        $this->assertEquals('red_valid', $sanitized_array[0]['id'], "The remaining redirection should be the valid one");
+        // Deep check one field to be sure it's the sanitized version
+        $this->assertEquals('https://example.com/us', $sanitized_array[0]['locations'][0]['redirectUrl']);
+    }
+
+    /**
+     * Test mgeo_sanitize_redirections with empty array input.
+     */
+    public function test_sanitize_redirections_empty_input()
+    {
+        $sanitized_array = mgeo_sanitize_redirections([]);
+        $this->assertIsArray($sanitized_array);
+        $this->assertEmpty($sanitized_array);
+    }
+
+    /**
+     * Test mgeo_sanitize_redirections with non-array input.
+     */
+    public function test_sanitize_redirections_non_array_input()
+    {
+        $this->assertEquals([], mgeo_sanitize_redirections(null));
+        $this->assertEquals([], mgeo_sanitize_redirections("a string"));
+        $this->assertEquals([], mgeo_sanitize_redirections(123));
+    }
 }
