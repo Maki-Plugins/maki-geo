@@ -498,4 +498,94 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $this->assertCount(1, $stored_redirections);
         $this->assertEquals($initial_redirection, $stored_redirections[0], 'Stored redirection should remain unchanged after ID mismatch attempt.');
     }
+
+    /**
+     * Test permissions for the DELETE /redirections/{id} endpoint.
+     */
+    public function test_delete_redirection_api_permissions()
+    {
+        // Test with a non-admin user (subscriber)
+        wp_set_current_user($this->subscriber_user_id);
+        $request = new WP_REST_Request('DELETE', '/maki-geo/v1/redirections/some_id');
+        $request->set_url_params(['id' => 'some_id']);
+        $response = $this->server->dispatch($request);
+        $this->assertEquals(403, $response->get_status(), 'Subscriber should receive a 403 Forbidden status when trying to delete.');
+    }
+
+    /**
+     * Test successful deletion of a redirection.
+     */
+    public function test_delete_redirection_api_success()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Add initial redirections
+        $id_to_delete = 'red_todelete';
+        $id_to_keep = 'red_tokeep';
+        $redirection_to_delete = [
+            'id' => $id_to_delete,
+            'name' => 'Delete Me',
+            'isEnabled' => true,
+            'locations' => [/* minimal valid location */ ['id' => 'loc_del', 'conditions' => [['type' => 'ip', 'value' => '1.1.1.1', 'operator' => 'is']], 'operator' => 'OR', 'pageTargetingType' => 'all', 'redirectUrl' => '/deleted']]
+        ];
+        $redirection_to_keep = [
+            'id' => $id_to_keep,
+            'name' => 'Keep Me',
+            'isEnabled' => true,
+            'locations' => [/* minimal valid location */ ['id' => 'loc_keep', 'conditions' => [['type' => 'country', 'value' => 'FR', 'operator' => 'is']], 'operator' => 'OR', 'pageTargetingType' => 'all', 'redirectUrl' => '/kept']]
+        ];
+        update_option('mgeo_redirections', [$redirection_to_delete, $redirection_to_keep]);
+
+        // Dispatch DELETE request
+        $request = new WP_REST_Request('DELETE', '/maki-geo/v1/redirections/' . $id_to_delete);
+        $request->set_url_params(['id' => $id_to_delete]);
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(200, $response->get_status(), 'Response status should be 200 OK for successful deletion.');
+        $this->assertTrue($data['success'], 'Response should indicate success.');
+
+        // Verify option storage
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections, 'Stored option should still be an array.');
+        $this->assertCount(1, $stored_redirections, 'Stored option should contain only one redirection after deletion.');
+        $this->assertEquals($id_to_keep, $stored_redirections[0]['id'], 'The remaining redirection should be the one intended to be kept.');
+        $this->assertEquals($redirection_to_keep, $stored_redirections[0], 'The remaining redirection data should match the one intended to be kept.');
+    }
+
+    /**
+     * Test deleting a redirection that does not exist.
+     */
+    public function test_delete_redirection_api_not_found()
+    {
+        wp_set_current_user($this->admin_user_id);
+
+        // Add an existing redirection
+        $existing_id = 'red_exists';
+        $existing_redirection = [
+            'id' => $existing_id,
+            'name' => 'I Exist',
+            'isEnabled' => true,
+            'locations' => [/* minimal valid location */ ['id' => 'loc_exist', 'conditions' => [['type' => 'country', 'value' => 'DE', 'operator' => 'is']], 'operator' => 'OR', 'pageTargetingType' => 'all', 'redirectUrl' => '/exists']]
+        ];
+        update_option('mgeo_redirections', [$existing_redirection]);
+
+        $non_existent_id = 'red_nonexistent';
+
+        // Dispatch DELETE request for non-existent ID
+        $request = new WP_REST_Request('DELETE', '/maki-geo/v1/redirections/' . $non_existent_id);
+        $request->set_url_params(['id' => $non_existent_id]);
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(404, $response->get_status(), 'Response status should be 404 Not Found when deleting non-existent ID.');
+        $this->assertFalse($data['success'], 'Response should indicate failure.');
+        $this->assertArrayHasKey('message', $data, 'Response should contain an error message.');
+
+        // Verify option storage is unchanged
+        $stored_redirections = get_option('mgeo_redirections');
+        $this->assertIsArray($stored_redirections);
+        $this->assertCount(1, $stored_redirections);
+        $this->assertEquals($existing_redirection, $stored_redirections[0], 'Stored redirection should remain unchanged.');
+    }
 }
