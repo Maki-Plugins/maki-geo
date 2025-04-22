@@ -307,7 +307,11 @@ function mgeo_sanitize_redirections($redirections_input)
  */
 function mgeo_handle_redirection_api($request)
 {
-    mgeo_verify_nonce();
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
+
     $current_url = isset($_SERVER["HTTP_REFERER"])
         ? $_SERVER["HTTP_REFERER"]
         : "";
@@ -404,7 +408,7 @@ function mgeo_update_redirection_api($request)
     if (
         $updated_data === null ||
         !isset($updated_data["id"]) || // ID should exist after sanitization
-        $updated_data["id"] !== sanitize_key($id) // Compare sanitized IDs
+        $updated_data["id"] !== $id // Compare route ID directly with sanitized body ID
     ) {
         return new WP_REST_Response(
             [

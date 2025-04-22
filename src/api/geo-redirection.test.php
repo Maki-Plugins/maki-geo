@@ -952,8 +952,7 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $input = $this->get_valid_redirection_data_base();
         $input['locations'][0]['redirectUrl'] = 'javascript:alert("XSS")';
         $sanitized = mgeo_sanitize_single_redirection($input);
-        $this->assertEmpty($sanitized['locations'][0]['redirectUrl'], "Javascript URL should be removed by esc_url_raw");
-        // This makes the rule invalid because pageTargetingType 'all' needs a URL
+        // This makes the rule invalid because pageTargetingType 'all' needs a URL, and the URL was sanitized away.
         $this->assertNull($sanitized, "Redirection should be invalid if redirectUrl is sanitized away for 'all' type");
 
 

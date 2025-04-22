@@ -133,9 +133,12 @@ class TestHooksIntegration extends WP_UnitTestCase
         set_current_screen('front'); // Simulate non-admin
         add_filter('wp_doing_ajax', '__return_false');
         add_filter('pre_mgeo_get_redirect_url_for_request', [$this, 'mock_redirect_url']);
+        remove_action('template_redirect', 'redirect_canonical'); // <-- Add this
 
         // Trigger the hook
         do_action('template_redirect');
+
+        add_action('template_redirect', 'redirect_canonical'); // <-- Optional: Add back if needed later in test
 
         $this->assertTrue($this->redirect_called, 'wp_redirect should have been called.');
         $this->assertEquals('https://server.redirect/path', $this->redirect_location);
@@ -151,9 +154,12 @@ class TestHooksIntegration extends WP_UnitTestCase
         set_current_screen('front'); // Simulate non-admin
         add_filter('wp_doing_ajax', '__return_false');
         add_filter('pre_mgeo_get_redirect_url_for_request', '__return_null'); // No redirect URL
+        remove_action('template_redirect', 'redirect_canonical'); // <-- Add this
 
         // Trigger the hook
         do_action('template_redirect');
+
+        add_action('template_redirect', 'redirect_canonical'); // <-- Optional: Add back
 
         $this->assertFalse($this->redirect_called, 'wp_redirect should not have been called.');
     }
@@ -168,9 +174,12 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter('wp_doing_ajax', '__return_false');
         // Add filter that *would* cause redirect, to ensure mode check works
         add_filter('pre_mgeo_get_redirect_url_for_request', [$this, 'mock_redirect_url']);
+        remove_action('template_redirect', 'redirect_canonical'); // <-- Add this
 
         // Trigger the hook
         do_action('template_redirect');
+
+        add_action('template_redirect', 'redirect_canonical'); // <-- Optional: Add back
 
         $this->assertFalse($this->redirect_called, 'wp_redirect should not have been called in client mode.');
     }
@@ -200,9 +209,12 @@ class TestHooksIntegration extends WP_UnitTestCase
         set_current_screen('front');
         add_filter('wp_doing_ajax', '__return_true'); // Key change: simulate AJAX
         add_filter('pre_mgeo_get_redirect_url_for_request', [$this, 'mock_redirect_url']);
+        remove_action('template_redirect', 'redirect_canonical'); // <-- Add this
 
         // Trigger the hook
         do_action('template_redirect');
+
+        add_action('template_redirect', 'redirect_canonical'); // <-- Optional: Add back
 
         $this->assertFalse($this->redirect_called, 'wp_redirect should not have been called during AJAX.');
     }
@@ -257,6 +269,11 @@ class TestHooksIntegration extends WP_UnitTestCase
      */
     public function test_client_script_not_enqueued_in_admin()
     {
+        // Define WP_ADMIN constant to properly simulate admin context
+        if (!defined('WP_ADMIN')) {
+            define('WP_ADMIN', true);
+        }
+
         update_option('mgeo_client_server_mode', 'client');
         set_current_screen('dashboard'); // Key change: admin area
         add_filter('pre_option_mgeo_redirections', [$this, 'mock_get_redirections_non_empty']);
