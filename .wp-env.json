@@ -1,4 +1,7 @@
 {
   "core": null,
-  "plugins": ["."]
+  "plugins": ["."],
+  "config": {
+    "MGEO_E2E_TESTING": true
+  }
 }
