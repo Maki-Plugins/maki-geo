@@ -588,4 +588,105 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         $this->assertCount(1, $stored_redirections);
         $this->assertEquals($existing_redirection, $stored_redirections[0], 'Stored redirection should remain unchanged.');
     }
+
+    // --- Tests for GET /maki-geo/v1/redirection ---
+
+    /**
+     * Test the redirection API when no redirect URL is found.
+     */
+    public function test_handle_redirection_api_no_redirect()
+    {
+        $referer_url = 'https://current.example.com/page';
+        $_SERVER['HTTP_REFERER'] = $referer_url;
+
+        // Mock mgeo_get_redirect_url_for_request to return null
+        $filter_callback = function ($original_result, $url_arg) use ($referer_url) {
+            $this->assertEquals($referer_url, $url_arg, 'mgeo_get_redirect_url_for_request called with correct URL');
+            return null;
+        };
+        add_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10, 2);
+
+        $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        // Note: No nonce needed here as we rely on the global bypass in setUp, unless testing nonce failure
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(200, $response->get_status());
+        $this->assertEquals(['redirect' => false], $data, 'Response should indicate no redirect.');
+
+        // Clean up
+        remove_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10);
+        unset($_SERVER['HTTP_REFERER']);
+    }
+
+    /**
+     * Test the redirection API when a redirect URL is found.
+     */
+    public function test_handle_redirection_api_redirect_found()
+    {
+        $referer_url = 'https://current.example.com/another/page?query=1';
+        $target_url = 'https://redirect.example.com/target';
+        $_SERVER['HTTP_REFERER'] = $referer_url;
+
+        // Mock mgeo_get_redirect_url_for_request to return the target URL
+        $filter_callback = function ($original_result, $url_arg) use ($referer_url, $target_url) {
+             $this->assertEquals($referer_url, $url_arg, 'mgeo_get_redirect_url_for_request called with correct URL');
+            return $target_url;
+        };
+        add_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10, 2);
+
+        $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(200, $response->get_status());
+        $this->assertEquals(
+            ['redirect' => true, 'url' => $target_url],
+            $data,
+            'Response should indicate redirect and include the target URL.'
+        );
+
+        // Clean up
+        remove_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10);
+        unset($_SERVER['HTTP_REFERER']);
+    }
+
+    /**
+     * Test the redirection API when the HTTP_REFERER is missing.
+     */
+    public function test_handle_redirection_api_no_referer()
+    {
+        // Ensure referer is not set
+        unset($_SERVER['HTTP_REFERER']);
+
+        // We don't even need to mock mgeo_get_redirect_url_for_request as it shouldn't be called
+
+        $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        $response = $this->server->dispatch($request);
+        $data = $response->get_data();
+
+        $this->assertEquals(200, $response->get_status());
+        $this->assertEquals(['redirect' => false], $data, 'Response should indicate no redirect when referer is missing.');
+    }
+
+    /**
+     * Test the redirection API when nonce verification fails.
+     */
+    public function test_handle_redirection_api_nonce_failure()
+    {
+        // Remove the global bypass for this test
+        remove_filter('mgeo_verify_nonce', '__return_true');
+
+        $_SERVER['HTTP_REFERER'] = 'https://current.example.com/page'; // Referer is needed to get past the first check
+
+        $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        // Intentionally do not add a nonce header
+        $response = $this->server->dispatch($request);
+
+        $this->assertEquals(403, $response->get_status(), 'Response status should be 403 Forbidden due to nonce failure.');
+
+        // Clean up (tearDown will add the filter back, but good practice if tearDown changed)
+        unset($_SERVER['HTTP_REFERER']);
+        // No need to add the filter back here, tearDown handles it.
+    }
 }
