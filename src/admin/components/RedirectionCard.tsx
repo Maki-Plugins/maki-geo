@@ -177,7 +177,7 @@ export function RedirectionCard({
         // Determine success message based on context (create/update)
         const successText = isNew
           ? "Redirection created successfully!"
-          : `Redirection "${response?.redirection?.name || data.name}" updated successfully!`;
+          : "Redirection saved successfully!";
         setCardSaveMessage({ text: successText, type: "success" });
         // Optionally reset form if needed, e.g., for 'new' card, but parent handles closing it.
         // if (isNew) methods.reset(); // Reset form after successful creation if desired
@@ -367,18 +367,6 @@ export function RedirectionCard({
             methods.formState.isSubmitted && (
               <p className="text-error text-sm">{formErrorMessage}</p>
             )}
-          {/* Display local card save message */}
-          {cardSaveMessage && (
-            <p
-              className={`text-sm mt-1 ${
-                cardSaveMessage.type === "success"
-                  ? "text-green-600"
-                  : "text-error"
-              }`}
-            >
-              {cardSaveMessage.text}
-            </p>
-          )}
           <button
             type="submit"
             className="btn btn-primary" // Remove loading class from button itself
@@ -394,6 +382,18 @@ export function RedirectionCard({
               "Update Redirection"
             )}
           </button>
+          {/* Display local card save message */}
+          {cardSaveMessage && (
+            <p
+              className={`text-sm mt-1 ${
+                cardSaveMessage.type === "success"
+                  ? "text-green-600"
+                  : "text-error"
+              }`}
+            >
+              {cardSaveMessage.text}
+            </p>
+          )}
         </div>
       </form>
     </FormProvider>
