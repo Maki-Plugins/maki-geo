@@ -607,7 +607,8 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         add_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10, 2);
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
-        // Note: No nonce needed here as we rely on the global bypass in setUp, unless testing nonce failure
+        $nonce = wp_create_nonce('wp_rest');
+        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
         $response = $this->server->dispatch($request);
         $data = $response->get_data();
 
@@ -636,6 +637,8 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         add_filter('mgeo_get_redirect_url_for_request', $filter_callback, 10, 2);
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        $nonce = wp_create_nonce('wp_rest');
+        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
         $response = $this->server->dispatch($request);
         $data = $response->get_data();
 
@@ -662,6 +665,8 @@ class TestGeoRedirectionApi extends WP_UnitTestCase
         // We don't even need to mock mgeo_get_redirect_url_for_request as it shouldn't be called
 
         $request = new WP_REST_Request('GET', '/maki-geo/v1/redirection');
+        $nonce = wp_create_nonce('wp_rest');
+        $request->set_header('X-WP-Nonce', $nonce); // Add nonce header
         $response = $this->server->dispatch($request);
         $data = $response->get_data();
 

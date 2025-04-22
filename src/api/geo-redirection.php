@@ -203,7 +203,11 @@ function mgeo_sanitize_single_redirection($redirection)
                         $mapping["fromUrl"]
                     );
                     $sanitized_map["toUrl"] = esc_url_raw($mapping["toUrl"]);
-                    $sanitized_loc["redirectMappings"][] = $sanitized_map;
+
+                    // Only add the mapping if both fromUrl and toUrl are non-empty AFTER sanitization
+                    if (!empty($sanitized_map["fromUrl"]) && !empty($sanitized_map["toUrl"])) {
+                        $sanitized_loc["redirectMappings"][] = $sanitized_map;
+                    }
                 }
             }
 
@@ -401,15 +405,24 @@ function mgeo_update_redirection_api($request)
     $id = $request->get_param("id");
     $raw_data = $request->get_json_params();
 
+    // Explicitly check for ID mismatch *before* full sanitization
+    // Use sanitize_key on the raw ID for a fair comparison with the route ID.
+    if (isset($raw_data['id']) && sanitize_key($raw_data['id']) !== $id) {
+        return new WP_REST_Response(
+            [
+                "success" => false,
+                "message" => "Redirection ID in request body does not match route ID.",
+            ],
+            400
+        );
+    }
+
     // Sanitize the incoming data
     $updated_data = mgeo_sanitize_single_redirection($raw_data);
 
-    // Check if sanitization failed or ID mismatch after sanitization
-    if (
-        $updated_data === null ||
-        !isset($updated_data["id"]) || // ID should exist after sanitization
-        $updated_data["id"] !== $id // Compare route ID directly with sanitized body ID
-    ) {
+    // Check if sanitization failed (e.g., returned null, or ID missing after sanitization)
+    // No need to check mismatch again, as we did it above.
+    if ($updated_data === null || !isset($updated_data["id"])) {
         return new WP_REST_Response(
             [
                 "success" => false,

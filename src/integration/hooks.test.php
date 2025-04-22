@@ -133,7 +133,8 @@ class TestHooksIntegration extends WP_UnitTestCase
         set_current_screen('front'); // Simulate non-admin
         add_filter('wp_doing_ajax', '__return_false');
         add_filter('pre_mgeo_get_redirect_url_for_request', [$this, 'mock_redirect_url']);
-        remove_action('template_redirect', 'redirect_canonical'); // <-- Add this
+        add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']); // <-- Add this mock
+        remove_action('template_redirect', 'redirect_canonical');
 
         // Trigger the hook
         do_action('template_redirect');
@@ -259,6 +260,7 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
         // Trigger the hook
+        wp_cache_flush(); // Flush cache before action
         do_action('wp_enqueue_scripts');
 
         $this->assertFalse(wp_script_is('mgeo-client-redirection', 'enqueued'), 'Client script should NOT be enqueued in server mode.');
@@ -281,6 +283,7 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
         // Trigger the hook
+        wp_cache_flush(); // Flush cache before action
         do_action('wp_enqueue_scripts');
 
         $this->assertFalse(wp_script_is('mgeo-client-redirection', 'enqueued'), 'Client script should NOT be enqueued in admin.');
@@ -298,6 +301,7 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
         // Trigger the hook
+        wp_cache_flush(); // Flush cache before action
         do_action('wp_enqueue_scripts');
 
         $this->assertFalse(wp_script_is('mgeo-client-redirection', 'enqueued'), 'Client script should NOT be enqueued if no redirections exist.');
@@ -315,6 +319,7 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter('pre_mgeo_get_current_url', [$this, 'mock_get_current_url']);
 
         // Trigger the hook
+        wp_cache_flush(); // Flush cache before action
         do_action('wp_enqueue_scripts');
 
         $this->assertFalse(wp_script_is('mgeo-client-redirection', 'enqueued'), 'Client script should NOT be enqueued if URL has no potential redirections.');
