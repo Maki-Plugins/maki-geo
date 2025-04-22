@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-    branches: ["main", "feat/geo-redirect"]
+    branches: ["main", "feat/geo-redirect"] # Temp added feat/geo-redirect to test playwright tests on Github
   pull_request:
     branches: ["main"]
 
@@ -42,5 +42,13 @@ jobs:
         run: npm run env start
       - name: PHP tests
         run: npm run php-test
-      - name: Playwright tests
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Playwright e2e tests
         run: npm run playwright-test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
