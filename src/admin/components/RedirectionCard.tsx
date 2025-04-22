@@ -1,4 +1,4 @@
-import { useState } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
 import {
   useForm,
   useFieldArray,
@@ -108,6 +108,24 @@ export function RedirectionCard({
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  // --- Effects ---
+  // Effect to clear the save message after a delay
+  useEffect(() => {
+    let timerId: number | undefined;
+    if (cardSaveMessage) {
+      timerId = window.setTimeout(() => {
+        setCardSaveMessage(null);
+      }, 5000); // 5 seconds
+    }
+    // Cleanup function to clear the timeout if the component unmounts
+    // or if cardSaveMessage changes again before the timeout finishes
+    return () => {
+      if (timerId) {
+        window.clearTimeout(timerId);
+      }
+    };
+  }, [cardSaveMessage]); // Re-run effect when cardSaveMessage changes
 
   // --- Functions ---
   // Default location structure for appending new locations
