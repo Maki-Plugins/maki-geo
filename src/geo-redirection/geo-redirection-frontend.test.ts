@@ -3,8 +3,8 @@
  */
 
 // Mock wp.apiFetch before importing the script
-const mockApiFetch = jest.fn();
-global.wp = {
+const mockApiFetch = jest.fn() as jest.Mock; // Cast to jest.Mock for type safety
+window.wp = {
   apiFetch: mockApiFetch,
 };
 
