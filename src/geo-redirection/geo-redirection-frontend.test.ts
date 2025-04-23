@@ -26,10 +26,24 @@ const mockSessionStorage = (() => {
 })();
 Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
 
-// Mock window.location.href
-const originalLocation = window.location;
-delete (window as any).location;
-window.location = { ...originalLocation, href: '' };
+// Mock window.location.href with a setter
+let currentHref = '';
+const locationMock = {
+  // Keep other properties if needed, or mock them as well
+  ...window.location,
+  // Define href with getter and setter
+  get href() {
+    return currentHref;
+  },
+  set href(url: string) {
+    currentHref = url;
+  },
+};
+Object.defineProperty(window, 'location', {
+  value: locationMock,
+  writable: true, // Allow reassignment if necessary, though usually not needed for mocks
+});
+// Now spy on the setter we defined
 const locationHrefSpy = jest.spyOn(window.location, 'href', 'set');
 
 
@@ -41,8 +55,8 @@ describe('Geo Redirection Frontend Script', () => {
     mockSessionStorage.getItem.mockClear();
     mockSessionStorage.setItem.mockClear();
     locationHrefSpy.mockClear();
-    // Reset window.location.href if needed, though spy handles assignment checks
-    window.location.href = 'http://initial.test/';
+    // Reset the internal state of our mock href
+    currentHref = 'http://initial.test/';
 
     // Reset modules to ensure script runs fresh for each test
     jest.resetModules();
