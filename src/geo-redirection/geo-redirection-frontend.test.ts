@@ -62,10 +62,10 @@ describe("Geo Redirection Frontend Script", () => {
     // Reset modules to ensure script runs fresh for each test
     jest.resetModules();
   });
-
+ 
   // Helper function to wait for promises to settle
-  const flushPromises = () => new Promise(setImmediate);
-
+  const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+ 
   it("should perform redirect when API returns redirect: true", async () => {
     const redirectUrl = "http://new.location/path";
     mockApiFetch.mockResolvedValue({ redirect: true, url: redirectUrl });
