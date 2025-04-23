@@ -205,7 +205,10 @@ function mgeo_sanitize_single_redirection($redirection)
                     $sanitized_map["toUrl"] = esc_url_raw($mapping["toUrl"]);
 
                     // Only add the mapping if both fromUrl and toUrl are non-empty AFTER sanitization
-                    if (!empty($sanitized_map["fromUrl"]) && !empty($sanitized_map["toUrl"])) {
+                    if (
+                        !empty($sanitized_map["fromUrl"]) &&
+                        !empty($sanitized_map["toUrl"])
+                    ) {
                         $sanitized_loc["redirectMappings"][] = $sanitized_map;
                     }
                 }
@@ -343,7 +346,10 @@ function mgeo_handle_redirection_api($request)
  */
 function mgeo_get_redirections_api()
 {
-    mgeo_verify_nonce();
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
     $redirections = mgeo_get_redirections();
     return new WP_REST_Response($redirections);
 }
@@ -356,7 +362,10 @@ function mgeo_get_redirections_api()
  */
 function mgeo_create_redirection_api($request)
 {
-    mgeo_verify_nonce();
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
     $raw_data = $request->get_json_params();
 
     // Sanitize the incoming data first
@@ -401,18 +410,31 @@ function mgeo_create_redirection_api($request)
  */
 function mgeo_update_redirection_api($request)
 {
-    mgeo_verify_nonce();
-    wp_cache_flush(); // <-- Add cache flush here
-    $id = $request->get_param("id");
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
+    $url_params = $request->get_url_params();
+    if (!isset($url_params["id"])) {
+        return new WP_REST_Response(
+            [
+                "success" => false,
+                "message" => "Missing route ID in request.",
+            ],
+            400
+        );
+    }
+    $id = $url_params["id"];
     $raw_data = $request->get_json_params();
 
     // Explicitly check for ID mismatch *before* full sanitization
     // Use sanitize_key on the raw ID for a fair comparison with the route ID.
-    if (isset($raw_data['id']) && sanitize_key($raw_data['id']) !== $id) {
+    if (isset($raw_data["id"]) && sanitize_key($raw_data["id"]) !== $id) {
         return new WP_REST_Response(
             [
                 "success" => false,
-                "message" => "Redirection ID in request body does not match route ID.",
+                "message" =>
+                    "Redirection ID in request body does not match route ID.",
             ],
             400
         );
@@ -485,7 +507,10 @@ function mgeo_update_redirection_api($request)
  */
 function mgeo_delete_redirection_api($request)
 {
-    mgeo_verify_nonce();
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
     $id = $request->get_param("id");
 
     if (empty($id)) {

@@ -30,7 +30,12 @@ trait MockLocationHelper
     public function start_mocking_location()
     {
         // Use a high priority to ensure it runs before other potential filters
-        add_filter('pre_mgeo_get_geolocation_data', [$this, 'filter_pre_mgeo_get_geolocation_data'], 1, 1);
+        add_filter(
+            "pre_mgeo_get_geolocation_data",
+            [$this, "filter_pre_mgeo_get_geolocation_data"],
+            1,
+            1
+        );
         // Set initial mock data for the test run
         $this->current_mock_location_data = $this->default_mock_location_data;
     }
@@ -40,7 +45,11 @@ trait MockLocationHelper
      */
     public function stop_mocking_location()
     {
-        remove_filter('pre_mgeo_get_geolocation_data', [$this, 'filter_pre_mgeo_get_geolocation_data'], 1);
+        remove_filter(
+            "pre_mgeo_get_geolocation_data",
+            [$this, "filter_pre_mgeo_get_geolocation_data"],
+            1
+        );
         $this->current_mock_location_data = null; // Clear data
     }
 
@@ -68,7 +77,6 @@ trait MockLocationHelper
         mgeo_get_location_data(true);
     }
 
-
     /**
      * The filter callback function. Returns the currently set mock data.
      *
@@ -79,5 +87,14 @@ trait MockLocationHelper
     {
         // Return the mock data currently set for this test instance
         return $this->current_mock_location_data;
+    }
+
+    /**
+     * Helper to get default mock location data.
+     * Can be overridden in specific tests using set_mock_location_data.
+     */
+    public function get_default_mock_location()
+    {
+        return $this->default_mock_location_data;
     }
 }

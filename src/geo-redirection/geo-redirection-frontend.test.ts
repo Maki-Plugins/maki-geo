@@ -136,7 +136,7 @@ describe("Geo Redirection Frontend Script", () => {
     expect(mockApiFetch).toHaveBeenCalledWith({
       path: "maki-geo/v1/redirection",
     });
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2); // Twice because we call the script (1) and it's auto-run (2)
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Maki Geo redirection error:",
       error,

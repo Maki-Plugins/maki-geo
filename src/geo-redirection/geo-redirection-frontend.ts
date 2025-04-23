@@ -29,3 +29,6 @@ export function runGeoRedirect() {
       console.error("Maki Geo redirection error:", error);
     });
 }
+
+// Run the redirection check automatically when the script loads
+runGeoRedirect();

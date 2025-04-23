@@ -36,8 +36,26 @@ function mgeo_init_geo_redirection()
     // Perform redirection if a URL was returned
     if (!empty($redirect_url)) {
         wp_redirect($redirect_url, 302);
-        exit();
+        mgeo_exit();
     }
+}
+
+/**
+ * Run exit() but don't for tests (breaks phpunit)
+ */
+function mgeo_exit()
+{
+    /**
+     * Allow test to short-circuit the exit() call so we don't kill phpunit
+     */
+    $filtered_result = apply_filters("pre_mgeo_exit", null);
+    // If the filter returned a value (non-null), use it
+    if (!is_null($filtered_result)) {
+        return;
+    }
+
+    // Normal logic
+    exit();
 }
 
 /**
@@ -86,6 +104,23 @@ function mgeo_get_current_url()
  */
 function mgeo_url_has_potential_redirections($redirections, $current_url)
 {
+    /**
+     * Allow filtering the result of the potential redirection logic.
+     * Enables mocking in unit tests or custom override in production.
+     *
+     * @param string $redirect_url Default result before core logic runs.
+     */
+    $filtered_result = apply_filters(
+        "pre_mgeo_url_has_potential_redirections",
+        null,
+        $redirections,
+        $current_url
+    );
+    // If the filter returned a value (non-null), use it
+    if (!is_null($filtered_result)) {
+        return $filtered_result;
+    }
+
     // Parse the current URL
     $url_parts = parse_url($current_url);
     $scheme = isset($url_parts["scheme"]) ? $url_parts["scheme"] : "https";
@@ -359,6 +394,24 @@ function mgeo_build_redirect_url($base_url, $path, $query, $hash, $location)
  */
 function mgeo_get_redirect_url_for_request($current_url)
 {
+    /**
+     * Allow filtering the result of the redirection URL logic.
+     * Enables mocking in unit tests or custom override in production.
+     *
+     * @param null|string $redirect_url Default result before core logic runs.
+     * @param string $current_url The URL being checked for redirection.
+     */
+    $filtered_result = apply_filters(
+        "pre_mgeo_get_redirect_url_for_request",
+        null,
+        $current_url
+    );
+
+    // If the filter returned a value (non-null), use it
+    if (!is_null($filtered_result)) {
+        return $filtered_result;
+    }
+
     // Get all redirections
     $redirections = mgeo_get_redirections();
     if (empty($redirections)) {

@@ -17,6 +17,7 @@
     "start:css": "tailwindcss -i src/styles/main.css -o src/styles/tailwind.css --minify --watch",
     "start:hot": "wp-scripts start --hot --config webpack.config.js",
     "env": "wp-env",
+    "env-start": "wp-env start --xdebug",
     "test": "npm run php-test && npm run js-test",
     "js-test": "jest",
     "js-test:watch": "jest --watch",
