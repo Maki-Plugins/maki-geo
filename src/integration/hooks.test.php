@@ -78,8 +78,6 @@ class TestHooksIntegration extends WP_UnitTestCase
         $this->redirect_called = true;
         $this->redirect_location = $location;
         $this->redirect_status = $status;
-        // Do NOT return false here. Let the redirect proceed (test framework handles exit).
-        // return false;
     }
 
     /**
@@ -334,7 +332,6 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter("pre_mgeo_get_current_url", [$this, "mock_get_current_url"]);
 
         // Trigger the hook
-        wp_cache_flush(); // Flush cache before action
         do_action("wp_enqueue_scripts");
 
         $this->assertFalse(
@@ -363,7 +360,6 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter("pre_mgeo_get_current_url", [$this, "mock_get_current_url"]);
 
         // Trigger the hook
-        wp_cache_flush(); // Flush cache before action
         do_action("wp_enqueue_scripts");
 
         $this->assertFalse(
@@ -384,7 +380,6 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter("pre_mgeo_get_current_url", [$this, "mock_get_current_url"]);
 
         // Trigger the hook
-        wp_cache_flush(); // Flush cache before action
         do_action("wp_enqueue_scripts");
 
         $this->assertFalse(
@@ -408,7 +403,6 @@ class TestHooksIntegration extends WP_UnitTestCase
         add_filter("pre_mgeo_get_current_url", [$this, "mock_get_current_url"]);
 
         // Trigger the hook
-        wp_cache_flush(); // Flush cache before action
         do_action("wp_enqueue_scripts");
 
         $this->assertFalse(
