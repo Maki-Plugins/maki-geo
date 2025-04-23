@@ -68,9 +68,8 @@ describe("Geo Redirection Frontend Script", () => {
   it("should perform redirect when API returns redirect: true", async () => {
     const redirectUrl = "http://new.location/path";
     mockApiFetch.mockResolvedValue({ redirect: true, url: redirectUrl });
-
     // Require the script to execute it
-    require("../geo-redirection-frontend");
+    require("./geo-redirection-frontend");
 
     // Wait for the apiFetch promise to resolve
     await flushPromises();
@@ -90,9 +89,8 @@ describe("Geo Redirection Frontend Script", () => {
 
   it("should not redirect when API returns redirect: false", async () => {
     mockApiFetch.mockResolvedValue({ redirect: false });
-
     // Require the script
-    require("../geo-redirection-frontend");
+    require("./geo-redirection-frontend");
 
     // Wait for the apiFetch promise to resolve
     await flushPromises();
@@ -109,9 +107,8 @@ describe("Geo Redirection Frontend Script", () => {
   it("should not call API or redirect if sessionStorage flag is set", () => {
     // Set the flag *before* the script runs
     mockSessionStorage.setItem("mgeo_redirected", "1");
-
     // Require the script
-    require("../geo-redirection-frontend");
+    require("./geo-redirection-frontend");
 
     // No need to wait for promises here as apiFetch shouldn't be called
 
@@ -132,9 +129,8 @@ describe("Geo Redirection Frontend Script", () => {
     const consoleErrorSpy = jest
       .spyOn(console, "error")
       .mockImplementation(() => {}); // Suppress console output during test
-
     // Require the script
-    require("../geo-redirection-frontend");
+    require("./geo-redirection-frontend");
 
     // Wait for the apiFetch promise to reject
     await flushPromises();
