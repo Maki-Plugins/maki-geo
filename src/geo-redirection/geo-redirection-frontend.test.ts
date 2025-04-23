@@ -43,8 +43,8 @@ Object.defineProperty(window, 'location', {
   value: locationMock,
   writable: true, // Allow reassignment if necessary, though usually not needed for mocks
 });
-// Now spy on the setter we defined
-const locationHrefSpy = jest.spyOn(window.location, 'href', 'set');
+// We won't spy on the setter directly anymore.
+// We will check the value of window.location.href after the script runs.
 
 
 describe('Geo Redirection Frontend Script', () => {
@@ -54,9 +54,10 @@ describe('Geo Redirection Frontend Script', () => {
     mockSessionStorage.clear();
     mockSessionStorage.getItem.mockClear();
     mockSessionStorage.setItem.mockClear();
-    locationHrefSpy.mockClear();
     // Reset the internal state of our mock href
     currentHref = 'http://initial.test/';
+    // Ensure the window.location.href reflects the reset state
+    window.location.href = currentHref;
 
     // Reset modules to ensure script runs fresh for each test
     jest.resetModules();
@@ -79,8 +80,8 @@ describe('Geo Redirection Frontend Script', () => {
     expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
     expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1);
     expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
-    expect(locationHrefSpy).toHaveBeenCalledTimes(1);
-    expect(locationHrefSpy).toHaveBeenCalledWith(redirectUrl);
+    // Check the final URL directly
+    expect(window.location.href).toBe(redirectUrl);
   });
 
   it('should not redirect when API returns redirect: false', async () => {
@@ -95,7 +96,8 @@ describe('Geo Redirection Frontend Script', () => {
     expect(mockApiFetch).toHaveBeenCalledTimes(1);
     expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
     expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
-    expect(locationHrefSpy).not.toHaveBeenCalled();
+    // Check that the URL hasn't changed
+    expect(window.location.href).toBe('http://initial.test/');
   });
 
   it('should not call API or redirect if sessionStorage flag is set', () => {
@@ -108,7 +110,8 @@ describe('Geo Redirection Frontend Script', () => {
     // No need to wait for promises here as apiFetch shouldn't be called
 
     expect(mockApiFetch).not.toHaveBeenCalled();
-    expect(locationHrefSpy).not.toHaveBeenCalled();
+    // Check that the URL hasn't changed
+    expect(window.location.href).toBe('http://initial.test/');
     // Check that setItem wasn't called *again*
     expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1); // Only the initial call
     expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
@@ -130,7 +133,8 @@ describe('Geo Redirection Frontend Script', () => {
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith('Geo redirection error:', error);
     expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
-    expect(locationHrefSpy).not.toHaveBeenCalled();
+    // Check that the URL hasn't changed
+    expect(window.location.href).toBe('http://initial.test/');
 
     // Restore console.error
     consoleErrorSpy.mockRestore();
