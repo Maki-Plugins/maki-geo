@@ -2,6 +2,7 @@ node_modules
 build
 .aider*
 .env
+.vscode
 vendor
 .phpunit*
 maki-geo.zip
