@@ -24,10 +24,10 @@ const mockSessionStorage = (() => {
     }),
   };
 })();
-Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
+Object.defineProperty(window, "sessionStorage", { value: mockSessionStorage });
 
 // Mock window.location.href with a setter
-let currentHref = '';
+let currentHref = "";
 const locationMock = {
   // Keep other properties if needed, or mock them as well
   ...window.location,
@@ -39,15 +39,14 @@ const locationMock = {
     currentHref = url;
   },
 };
-Object.defineProperty(window, 'location', {
+Object.defineProperty(window, "location", {
   value: locationMock,
   writable: true, // Allow reassignment if necessary, though usually not needed for mocks
 });
 // We won't spy on the setter directly anymore.
 // We will check the value of window.location.href after the script runs.
 
-
-describe('Geo Redirection Frontend Script', () => {
+describe("Geo Redirection Frontend Script", () => {
   beforeEach(() => {
     // Reset mocks before each test
     mockApiFetch.mockClear();
@@ -55,7 +54,7 @@ describe('Geo Redirection Frontend Script', () => {
     mockSessionStorage.getItem.mockClear();
     mockSessionStorage.setItem.mockClear();
     // Reset the internal state of our mock href
-    currentHref = 'http://initial.test/';
+    currentHref = "http://initial.test/";
     // Ensure the window.location.href reflects the reset state
     window.location.href = currentHref;
 
@@ -66,75 +65,92 @@ describe('Geo Redirection Frontend Script', () => {
   // Helper function to wait for promises to settle
   const flushPromises = () => new Promise(setImmediate);
 
-  it('should perform redirect when API returns redirect: true', async () => {
-    const redirectUrl = 'http://new.location/path';
+  it("should perform redirect when API returns redirect: true", async () => {
+    const redirectUrl = "http://new.location/path";
     mockApiFetch.mockResolvedValue({ redirect: true, url: redirectUrl });
 
     // Require the script to execute it
-    require('../geo-redirection-frontend');
+    require("../geo-redirection-frontend");
 
     // Wait for the apiFetch promise to resolve
     await flushPromises();
 
     expect(mockApiFetch).toHaveBeenCalledTimes(1);
-    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(mockApiFetch).toHaveBeenCalledWith({
+      path: "maki-geo/v1/redirection",
+    });
     expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1);
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+      "mgeo_redirected",
+      "1",
+    );
     // Check the final URL directly
     expect(window.location.href).toBe(redirectUrl);
   });
 
-  it('should not redirect when API returns redirect: false', async () => {
+  it("should not redirect when API returns redirect: false", async () => {
     mockApiFetch.mockResolvedValue({ redirect: false });
 
     // Require the script
-    require('../geo-redirection-frontend');
+    require("../geo-redirection-frontend");
 
     // Wait for the apiFetch promise to resolve
     await flushPromises();
 
     expect(mockApiFetch).toHaveBeenCalledTimes(1);
-    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(mockApiFetch).toHaveBeenCalledWith({
+      path: "maki-geo/v1/redirection",
+    });
     expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
     // Check that the URL hasn't changed
-    expect(window.location.href).toBe('http://initial.test/');
+    expect(window.location.href).toBe("http://initial.test/");
   });
 
-  it('should not call API or redirect if sessionStorage flag is set', () => {
+  it("should not call API or redirect if sessionStorage flag is set", () => {
     // Set the flag *before* the script runs
-    mockSessionStorage.setItem('mgeo_redirected', '1');
+    mockSessionStorage.setItem("mgeo_redirected", "1");
 
     // Require the script
-    require('../geo-redirection-frontend');
+    require("../geo-redirection-frontend");
 
     // No need to wait for promises here as apiFetch shouldn't be called
 
     expect(mockApiFetch).not.toHaveBeenCalled();
     // Check that the URL hasn't changed
-    expect(window.location.href).toBe('http://initial.test/');
+    expect(window.location.href).toBe("http://initial.test/");
     // Check that setItem wasn't called *again*
     expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(1); // Only the initial call
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('mgeo_redirected', '1');
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+      "mgeo_redirected",
+      "1",
+    );
   });
 
-  it('should handle API fetch error gracefully', async () => {
-    const error = new Error('Network failed');
+  it("should handle API fetch error gracefully", async () => {
+    const error = new Error("Network failed");
     mockApiFetch.mockRejectedValue(error);
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {}); // Suppress console output during test
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {}); // Suppress console output during test
 
     // Require the script
-    require('../geo-redirection-frontend');
+    require("../geo-redirection-frontend");
 
     // Wait for the apiFetch promise to reject
     await flushPromises();
 
     expect(mockApiFetch).toHaveBeenCalledTimes(1);
-    expect(mockApiFetch).toHaveBeenCalledWith({ path: 'maki-geo/v1/redirection' });
+    expect(mockApiFetch).toHaveBeenCalledWith({
+      path: "maki-geo/v1/redirection",
+    });
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Geo redirection error:', error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Geo redirection error:",
+      error,
+    );
     expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
     // Check that the URL hasn't changed
-    expect(window.location.href).toBe('http://initial.test/');
+    expect(window.location.href).toBe("http://initial.test/");
 
     // Restore console.error
     consoleErrorSpy.mockRestore();
