@@ -183,7 +183,7 @@ export const GeoConditionEditor: React.FC<GeoConditionEditorProps> = ({
                           >
                             ⋮⋮
                           </div>
-                          <span>When </span>
+                          <div style={{flexShrink: 0}}>When</div>{" "}
                           <SelectControl
                             className="mgeo-geo-rule-select"
                             __nextHasNoMarginBottom={true}
