@@ -12,27 +12,39 @@ class TestLocation extends WP_UnitTestCase
         );
 
         // Mock the nonce verification
-        add_filter('mgeo_verify_nonce', '__return_true');
+        add_filter("mgeo_verify_nonce", "__return_true");
+    }
+
+    /**
+     * Set a nonce and do an api request. Helper so we don't have to keep setting the nonce every time.
+     */
+    private function do_get_geolocation_data()
+    {
+        $nonce = wp_create_nonce("wp_rest");
+        $_SERVER["HTTP_X_WP_NONCE"] = $nonce; // Set server variable directly
+        $response = mgeo_get_geolocation_data();
+        unset($_SERVER["HTTP_X_WP_NONCE"]); // Clean up server variable
+        return $response;
     }
 
     public function test_geolocation_data_from_api()
     {
         // Mock the API response
         $mock_data = [
-        "continent" => "Europe",
-        "country" => "France",
-        "region" => "Île-de-France",
-        "city" => "Paris",
+            "continent" => "Europe",
+            "country" => "France",
+            "region" => "Île-de-France",
+            "city" => "Paris",
         ];
 
         // Add filter to mock wp_remote_get response
         add_filter(
             "pre_http_request",
             function ($preempt, $args, $url) use ($mock_data) {
-                if (strpos($url, 'makiplugins.com') !== false) {
+                if (strpos($url, "makiplugins.com") !== false) {
                     return [
                         "response" => ["code" => 200],
-                        "body" => wp_json_encode(["data" => $mock_data])
+                        "body" => wp_json_encode(["data" => $mock_data]),
                     ];
                 }
                 return $preempt;
@@ -40,10 +52,13 @@ class TestLocation extends WP_UnitTestCase
             10,
             3
         );
-        
-        $result = mgeo_get_geolocation_data();
 
-        $this->assertIsArray($result, 'Expected geolocation data to be an array');
+        $result = $this->do_get_geolocation_data();
+
+        $this->assertIsArray(
+            $result,
+            "Expected geolocation data to be an array"
+        );
         $this->assertEquals($mock_data, $result);
 
         // Verify the data was cached using the expected IP from the test environment
@@ -75,7 +90,7 @@ class TestLocation extends WP_UnitTestCase
         add_filter(
             "pre_http_request",
             function ($preempt, $args, $url) {
-                if (strpos($url, 'makiplugins.com') !== false) {
+                if (strpos($url, "makiplugins.com") !== false) {
                     $this->fail(
                         "wp_remote_get should not be called when data is cached"
                     );
@@ -86,7 +101,7 @@ class TestLocation extends WP_UnitTestCase
             3
         );
 
-        $result = mgeo_get_geolocation_data();
+        $result = $this->do_get_geolocation_data();
 
         $this->assertEquals($cached_data, $result);
     }
@@ -97,8 +112,7 @@ class TestLocation extends WP_UnitTestCase
         add_filter(
             "pre_http_request",
             function ($preempt, $args, $url) {
-                
-                if (strpos($url, 'makiplugins.com') !== false) {
+                if (strpos($url, "makiplugins.com") !== false) {
                     return new WP_Error(
                         "http_request_failed",
                         "API request failed"
@@ -109,7 +123,7 @@ class TestLocation extends WP_UnitTestCase
             3
         );
 
-        $result = mgeo_get_geolocation_data();
+        $result = $this->do_get_geolocation_data();
 
         $this->assertFalse($result);
 

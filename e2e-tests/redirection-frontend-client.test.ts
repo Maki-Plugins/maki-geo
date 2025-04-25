@@ -37,7 +37,6 @@ async function createRedirectionRule(page: Page, name: string, country: string, 
     await page.getByRole('button', { name: 'Add new redirection' }).click();
     await page.getByLabel('Geo Redirect Name').fill(name);
     await page.locator('.mgeo-geo-rule-select input[placeholder*="Country"]').fill(country);
-    await page.getByText(country, { exact: true }).click();
     await page.getByLabel('Redirect URL').fill(redirectUrl);
     const passPathToggle = page.locator('input[type="checkbox"]').near(page.getByText('Pass page path'));
     if (await passPathToggle.isChecked() !== passPath) { await passPathToggle.click(); }

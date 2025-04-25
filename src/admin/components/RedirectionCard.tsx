@@ -6,19 +6,12 @@ import {
   Controller,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  PageExclusion,
-  Redirection,
-  RedirectionLocation,
-  RedirectMapping,
-} from "../../types/types";
+import { Redirection, RedirectionLocation } from "../../types/types";
 import { redirectionSchema, RedirectionFormData } from "./redirection-schema";
 import { Dashicon } from "@wordpress/components";
 import Toggle from "./Toggle";
 import HelpHover from "./HelpHover";
 import { LocationCard } from "./LocationCard"; // Import the new component
-
-// Types (WizardStep removed)
 
 interface RedirectionCardProps {
   // Updated prop type to expect a Promise
@@ -31,21 +24,6 @@ interface RedirectionCardProps {
 // Helper function to generate unique IDs
 function generateUniqueId(prefix = "loc_"): string {
   return `${prefix}${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-}
-
-// Helper to create default location structure matching the schema
-function createDefaultLocation(): RedirectionLocation {
-  return {
-    id: generateUniqueId(), // Use the helper function
-    conditions: [{ type: "country", value: "", operator: "is" }],
-    operator: "OR",
-    pageTargetingType: "all",
-    redirectUrl: "",
-    redirectMappings: [],
-    exclusions: [],
-    passPath: true,
-    passQuery: true,
-  };
 }
 
 export function RedirectionCard({
@@ -86,7 +64,6 @@ export function RedirectionCard({
     handleSubmit,
     formState: { errors },
     control, // Needed for useFieldArray and Controller
-    watch, // Needed for conditional rendering later
     getValues, // Useful for debugging or complex logic if needed
   } = methods;
 
@@ -151,11 +128,6 @@ export function RedirectionCard({
     // Optionally expand the newly added location - use the generated ID
     // This is slightly more complex, might need useEffect or watch
     // For now, let's not auto-expand. User can click.
-    // const newIndex = fields.length; // Index before append
-    // setTimeout(() => { // Allow RHF to update fields
-    //   const newFieldId = fields[newIndex]?.id;
-    //   if (newFieldId) setExpandedLocationId(newFieldId);
-    // }, 0);
   }
 
   function deleteLocation(index: number) {
@@ -173,15 +145,6 @@ export function RedirectionCard({
 
   // --- Nested Field Array Functions (will be called inside renderLocationCard) ---
 
-  // Default structures for appending new nested items
-  function createDefaultMapping(): Omit<RedirectMapping, "id"> {
-    return { fromUrl: "", toUrl: "" };
-  }
-
-  function createDefaultExclusion(): Omit<PageExclusion, "id"> {
-    return { value: "", type: "url_equals" };
-  }
-
   // --- Form Submission ---
   // Modified onSubmit to handle the promise from onComplete
   const onSubmit = (data: RedirectionFormData) => {
@@ -191,7 +154,7 @@ export function RedirectionCard({
 
     // Call onComplete and handle the returned promise
     onComplete(data)
-      .then((response) => {
+      .then((_response) => {
         // Determine success message based on context (create/update)
         const successText = isNew
           ? "Redirection created successfully!"
