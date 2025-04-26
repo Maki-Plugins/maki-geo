@@ -320,7 +320,7 @@ function mgeo_handle_redirection_api($request)
     }
 
     $current_url = isset($_SERVER["HTTP_REFERER"])
-        ? $_SERVER["HTTP_REFERER"]
+        ? sanitize_url(wp_unslash($_SERVER["HTTP_REFERER"]))
         : "";
     if (empty($current_url)) {
         return new WP_REST_Response(["redirect" => false]);

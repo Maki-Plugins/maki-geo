@@ -89,8 +89,8 @@ function mgeo_get_current_url()
         isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on"
             ? "https"
             : "http";
-    $host = $_SERVER["HTTP_HOST"];
-    $uri = $_SERVER["REQUEST_URI"];
+    $host = isset($_SERVER["HTTP_HOST"]) ? sanitize_text_field(wp_unslash($_SERVER["HTTP_HOST"])) : "";
+    $uri = isset($_SERVER["REQUEST_URI"]) ? sanitize_text_field(wp_unslash($_SERVER["REQUEST_URI"])) : "";
 
     return $protocol . "://" . $host . $uri;
 }
@@ -122,7 +122,7 @@ function mgeo_url_has_potential_redirections($redirections, $current_url)
     }
 
     // Parse the current URL
-    $url_parts = parse_url($current_url);
+    $url_parts = wp_parse_url($current_url);
     $scheme = isset($url_parts["scheme"]) ? $url_parts["scheme"] : "https";
     $host = isset($url_parts["host"]) ? $url_parts["host"] : "";
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
@@ -181,7 +181,7 @@ function mgeo_find_matching_redirection(
     $current_url
 ) {
     // Parse the current URL
-    $url_parts = parse_url($current_url);
+    $url_parts = wp_parse_url($current_url);
     $scheme = isset($url_parts["scheme"]) ? $url_parts["scheme"] : "https";
     $host = isset($url_parts["host"]) ? $url_parts["host"] : "";
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
@@ -325,7 +325,7 @@ function mgeo_url_matches_mapping($url, $pattern)
     }
 
     // Otherwise, treat pattern as a path and compare with the path of the URL
-    $url_parts = parse_url($url);
+    $url_parts = wp_parse_url($url);
     $path = isset($url_parts["path"]) ? $url_parts["path"] : "/";
 
     return $path === $pattern;

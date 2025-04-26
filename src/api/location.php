@@ -28,6 +28,18 @@ add_action("rest_api_init", function () {
  */
 function mgeo_get_geolocation_data()
 {
+    // Allow tests to short-circuit the process and provide mock data
+    $pre_result = apply_filters("pre_mgeo_get_geolocation_data", null);
+    if ($pre_result !== null) {
+        // Allow tests and other code to filter the final result even when pre-filtered
+        return apply_filters("mgeo_location_data_result", $pre_result);
+    }
+
+    $nonce_check = mgeo_verify_nonce();
+    if (is_wp_error($nonce_check)) {
+        return $nonce_check; // Return the WP_Error directly
+    }
+
     // --- E2E Testing Debug Mechanism ---
     // Allow forcing a location via query parameter ONLY if MGEO_E2E_TESTING is defined and true
     if (defined("MGEO_E2E_TESTING") && MGEO_E2E_TESTING) {
@@ -75,18 +87,6 @@ function mgeo_get_geolocation_data()
         }
     }
     // --- End E2E Testing Debug Mechanism ---
-
-    // Allow tests to short-circuit the process and provide mock data
-    $pre_result = apply_filters("pre_mgeo_get_geolocation_data", null);
-    if ($pre_result !== null) {
-        // Allow tests and other code to filter the final result even when pre-filtered
-        return apply_filters("mgeo_location_data_result", $pre_result);
-    }
-
-    $nonce_check = mgeo_verify_nonce();
-    if (is_wp_error($nonce_check)) {
-        return $nonce_check; // Return the WP_Error directly
-    }
 
     $request_limiter = new mgeo_RequestLimiter();
     if (!$request_limiter->can_make_request()) {
