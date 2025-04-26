@@ -59,6 +59,10 @@ An API request is used when a new IP address is used to visit your geo targeted 
 
 == Changelog ==
 
+= 1.1.0 =
+* New feature: Geo Redirection
+* Admin UI upgrade
+
 = 1.0.0 =
 * Initial version of Maki Geo.
 
