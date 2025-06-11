@@ -37,7 +37,7 @@
     "@types/wordpress__blocks": "^12.5.0",
     "@types/wordpress__components": "^23.0.11",
     "@wordpress/env": "^10.14.0",
-    "@wordpress/scripts": "^30.16.0",
+    "@wordpress/scripts": "^30.18.0",
     "autoprefixer": "^10.4.20",
     "css-loader": "^6.8.1",
     "daisyui": "^4.12.23",
